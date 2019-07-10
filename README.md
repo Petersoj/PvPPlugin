@@ -1,10 +1,10 @@
 # A PVP Plugin for Spo Jell
 
-The final Jar is located in the build/libs/ folder.
+*The final Jar is located in the build/libs/ folder.*
 
 Informational Screenshots: https://imgur.com/a/DJ6aXN4
 
-#GENERAL COMMANDS
+# GENERAL COMMANDS
 
 <displayname> = GroupManager prefix
 Features:
@@ -58,7 +58,7 @@ game.scoreboard -> Allowed to see top 10 players
 
 
 
-#UNRANKED FFA
+# UNRANKED FFA
 
 <displayname> = GroupManager prefix
 Features:
@@ -99,7 +99,7 @@ ffa.setleave -> Can set leave point
 
 
 
-#RANKED 1V1
+# RANKED 1V1
 
 <displayname> = GroupManager prefix
 Features:
@@ -173,7 +173,7 @@ Permissions:
 
 
 
-#TEAM PVP
+# TEAM PVP
 
 <displayname> = GroupManager prefix
 Features:
