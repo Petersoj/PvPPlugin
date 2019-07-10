@@ -1,0 +1,7 @@
+name: PVPPlugin
+version: 1.0
+main: net.jacobpeterson.spigot.PVPPlugin
+website: https://gitlab.com/Petersoj/pvpplugin
+description: PVP Plugin for Spo Jell
+authors:
+  - Petersoj
