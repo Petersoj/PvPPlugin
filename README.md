@@ -1,8 +1,18 @@
-# A PVP Plugin for Spo Jell
+# A PVP Plugin for Siege Network
 
 **The final Jar is located in the build/libs/ folder.**
 
 Informational Screenshots: https://imgur.com/a/DJ6aXN4
+
+Hiring/General Info: https://www.spigotmc.org/threads/searching-for-a-developer.382281/
+
+## General Description
+Okay! So there is 3 gamemodes, Ranked 1v1, FFA and a Team PvP gamemode.
+The Ranked 1v1 gamemode is where 2 players meets eachother in a duel. When joining the queue for Ranked 1v1 you will be matched up against someone in your ELO or someone close to your ELO and ELO is like points and a skill level. So when I join the Ranked 1v1 and I have 1050 ELO then I will play against someone who has around 1050 elo it can be both less ELO and more ELO. When I win a game I will get more ELO so if I had 1050 ELO I would have 1065 ELO if I would win a match, but if I would lose the game I would lose 10 ELO so that means that I would have 1040 ELO after the game that I lost. All players starts at 1000 ELO when they first join the server or until they have played a match. The ELO in the plugin is very important because everything is balanced by the ELO. When doing /scoreboard it shows the top 10 players of my server. So if I would have 1065 ELO and you would have 1085 ELO that means that you would be in position 1 and me in position 2.
+
+The FFA gamemode is a simple one, when opening the Play Now menu you will see a bow and when clicking on the bow you will be teleported to the spawn for the FFA arena. When you join the FFA you will be given full iron armor, 1 iron sword, 1 fishing rod, 1 bow and 16 arrows. When killing a player you wont be given or lose any ELO because FFA is just for practice. When you die in FFA you will be teleported back to the FFA spawn and if you want to leave the FFA arena you will simply just type /leave and you will be teleported back to the server lobby.
+
+The Team PvP plugin is a 2v2 plugin where two different teams meet eachother, a player needs to go to the Play Now menu and then click on the skull and that will open the 2v2 menu. When clicking on the craftingtable in the 2v2 menu that means that a pre-team has created and the player that clicked on the crafting table is the team leader. When you have clicked on the crafting table you need to choose a map to play on, when you have selected a map to play on the team has successfully been created and players can now see the team in the first menu of the 2v2 gamemode and I explained about the wools in the imgur page! So when a team has been created and a player has joined the team and you have accepted the request you will join the queue automatically, when finding a team of two to play against it only searches for a random team and the elo doesn't matter in the 2v2 queue. When two teams has joined the queue the teleport countdown will start from 3 and down to 0 and when the countdown is done a 5 seconds countdown will start and when that's done the match has successfully started. And the first team to 3 wins the game and that's the same in the Ranked 1v1. When you win a Team PvP match you get 15 ELO and if you losse 10 ELO will be drawn from your account
 
 ## GENERAL COMMANDS
 
