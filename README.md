@@ -7,7 +7,8 @@ Informational Screenshots: https://imgur.com/a/DJ6aXN4
 Hiring/General Info: https://www.spigotmc.org/threads/searching-for-a-developer.382281/
 
 ## General Description
-Okay! So there is 3 gamemodes, Ranked 1v1, FFA and a Team PvP gamemode.
+So there is 3 gamemodes, Ranked 1v1, FFA and a Team PvP gamemode.
+
 The Ranked 1v1 gamemode is where 2 players meets eachother in a duel. When joining the queue for Ranked 1v1 you will be matched up against someone in your ELO or someone close to your ELO and ELO is like points and a skill level. So when I join the Ranked 1v1 and I have 1050 ELO then I will play against someone who has around 1050 elo it can be both less ELO and more ELO. When I win a game I will get more ELO so if I had 1050 ELO I would have 1065 ELO if I would win a match, but if I would lose the game I would lose 10 ELO so that means that I would have 1040 ELO after the game that I lost. All players starts at 1000 ELO when they first join the server or until they have played a match. The ELO in the plugin is very important because everything is balanced by the ELO. When doing /scoreboard it shows the top 10 players of my server. So if I would have 1065 ELO and you would have 1085 ELO that means that you would be in position 1 and me in position 2.
 
 The FFA gamemode is a simple one, when opening the Play Now menu you will see a bow and when clicking on the bow you will be teleported to the spawn for the FFA arena. When you join the FFA you will be given full iron armor, 1 iron sword, 1 fishing rod, 1 bow and 16 arrows. When killing a player you wont be given or lose any ELO because FFA is just for practice. When you die in FFA you will be teleported back to the FFA spawn and if you want to leave the FFA arena you will simply just type /leave and you will be teleported back to the server lobby.
@@ -172,7 +173,7 @@ Permissions:
 1v1.rjoin -> Allowed to join a random map
 1v1.join.* -> Allowed to choose what map to join
 1v1.first -> Jumps before default rank in the queue
-1v1.arena* -> Allowed to use all "arena create" commands (create,delete, setspawn, finish, inventory,enable/disable)
+1v1.arena.* -> Allowed to use all "arena create" commands (create,delete, setspawn, finish, inventory,enable/disable)
 
 
 
@@ -203,7 +204,7 @@ Commands:
 /2v2 arena setTeamBlue1 <arena> -> Player 1/2 in team blue will be teleported to this spawn when the game has started
 /2v2 arena setFinish <arena> -> Both teams will be teleported to this position when the match has ended
 /2v2 setInv <team> <arena> -> Sets the inventory + armor for the team and arena.
-/2v2 enable/disable <arena> -> Enabled or disabled a arena. Enabled = Can play Disabled = Cannot play
+/2v2 enable/disable <arena> -> Enabled or disabled a arena. Enabled = Can play. Disabled = Cannot play
 
 Messages:
 Invited to team:

@@ -1,7 +1,96 @@
 name: PVPPlugin
 version: 1.0
 main: net.jacobpeterson.spigot.PVPPlugin
+depend: [GroupManager]
 website: https://gitlab.com/Petersoj/pvpplugin
 description: PVP Plugin for Spo Jell
-authors:
-  - Petersoj
+authors: [Petersoj]
+commands:
+  setlobby:
+    description: Sets the lobby (when joining the lobby)
+  lobby:
+    description: Teleports to lobby, 0 seconds cooldown
+  record:
+    aliases: [records]
+    description: See personal stats, <player> - See a players stats
+  save:
+    description: Saves the in-game hotbar while playing 1v1/2v2
+  scoreboard:
+    description: Top 10 players (most elo)
+  accept:
+    description: Accepts a duel challenge/team invite
+
+  ffa:
+    description: Joins the ffa arena
+  leave:
+    description: Leaves the ffa arena
+
+  1v1:
+    description: Opens the 1v1 menu
+  challenge:
+    aliases: [duel]
+    description: Sends a 1v1 duel to a player
+
+  2v2:
+    description: Opens the 2v2 menu
+
+permissions:
+  game.*:
+    description: All the game permissions
+  game.setlobby:
+    description: Allowed to set the server lobby
+  game.lobby:
+    description: Allowed to use /lobby command
+  game.record:
+    description: Can see personal stats
+  game.record.player:
+    description: Allowed to see other players stats
+  game.save:
+    description: Can save inventory while playing 1v1/2v2 until you logout
+  game.save.premium:
+    description: When having this permission your inventory will be saved the whole time
+  game.scoreboard:
+    description: Allowed to see top 10 players
+
+  ffa.join:
+    description: Can join the ffa arena
+  ffa.leave:
+    description: Can leave the ffa arena
+  ffa.setinv:
+    description: Can set ffa inventory
+  ffa.setspawn:
+    description: Can set join point
+  ffa.setleave:
+    description: Can set leave point
+
+  1v1.menu:
+    description: This allows the group to open the 1v1 menus
+  1v1.challenge:
+    description: Can challenge a player
+  1v1.accept:
+    description: Can accept a challenge from a player
+  1v1.rjoin:
+    description: Allowed to join a random map
+  1v1.join.*:
+    description: Allowed to choose what map to join
+  1v1.first:
+    description: Jumps before default rank in the queue
+  1v1.arena.*:
+    description: Allowed to use all "arena create" commands (create,delete, setspawn, finish, inventory,enable/disable)
+
+  2v2.menu:
+    description: Allowed to open all 2v2 menus
+  2v2.teamcreate:
+    description: Allowed to create 2v2 team
+  2v2.challenge.team:
+    description: Allowed to challenge a team
+  2v2.jointeam:
+    description: Can join a crafted team
+  2v2.accept.team:
+    description: Can accept a team challenge
+  2v2.rjoin:
+    description: Can join a random map when creating a 2v2 team
+  2v2.join.*:
+    description: Can join ALL maps in 2v2
+  2v2.arena.*:
+    description: Allowed to use all "arena create" commands (create,delete, setspawn, finish, inventory,enable/disable)
