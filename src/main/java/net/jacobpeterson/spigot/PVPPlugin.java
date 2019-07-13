@@ -1,13 +1,20 @@
 package net.jacobpeterson.spigot;
 
+import net.jacobpeterson.spigot.gui.GUIManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class PVPPlugin extends JavaPlugin {
+public class PvPPlugin extends JavaPlugin {
+
+    private GUIManager guiManager;
+
+//        GroupManager groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+//        groupManager.getWorldsHolder().getWorldData(player).getPermissionsHandler().getUserPrefix("username");
 
     @Override
     public void onEnable() {
-//        GroupManager groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
-//        groupManager.getWorldsHolder().getWorldData(player).getPermissionsHandler().getUserPrefix("username");
+        this.guiManager = new GUIManager(this);
+
+        guiManager.init();
     }
 
     @Override

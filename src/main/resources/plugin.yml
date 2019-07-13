@@ -1,6 +1,6 @@
-name: PVPPlugin
+name: PvPPlugin
 version: 1.0
-main: net.jacobpeterson.spigot.PVPPlugin
+main: net.jacobpeterson.spigot.PvPPlugin
 depend: [GroupManager]
 website: https://gitlab.com/Petersoj/pvpplugin
 description: PVP Plugin for Spo Jell

@@ -1,17 +1,17 @@
 package net.jacobpeterson.spigot.command;
 
-import net.jacobpeterson.spigot.PVPPlugin;
+import net.jacobpeterson.spigot.PvPPlugin;
 
 public class CommandHandler {
 
-    private PVPPlugin pvpPlugin;
+    private PvPPlugin pvpPlugin;
 
     /**
      * Instantiates a new Command handler.
      *
      * @param pvpPlugin the pvp plugin
      */
-    public CommandHandler(PVPPlugin pvpPlugin) {
+    public CommandHandler(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
     }
 
@@ -20,7 +20,7 @@ public class CommandHandler {
      *
      * @return the pvp plugin
      */
-    public PVPPlugin getPvpPlugin() {
+    public PvPPlugin getPVPPlugin() {
         return pvpPlugin;
     }
 }
