@@ -27,6 +27,7 @@ public class CommandListener implements CommandExecutor {
         } else {
             return false;
         }
+        return false;
     }
 
     /**

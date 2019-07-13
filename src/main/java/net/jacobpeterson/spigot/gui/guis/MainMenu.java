@@ -18,6 +18,11 @@ public class MainMenu extends AbstractInventoryGUI implements Initializers {
     private ItemStack teamPvPItem;
     private String currentlyPlayingLine;
 
+    /**
+     * Instantiates a new Main menu.
+     *
+     * @param guiManager the gui manager
+     */
     public MainMenu(GUIManager guiManager) {
         super(9, ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Main Menu");
         this.guiManager = guiManager;
@@ -31,7 +36,7 @@ public class MainMenu extends AbstractInventoryGUI implements Initializers {
                 CharUtil.boldColor(ChatColor.YELLOW) + "Play Ranked 1v1",
                 ChatColor.GOLD + "We will match up you up against the",
                 ChatColor.GOLD + "most suitable opponent possible!");
-        this.getInventory().setItem(0, ranked1v1Item);
+        inventory.setItem(0, ranked1v1Item);
 
         unrankedFFAItem = new ItemStack(Material.BOW);
         ItemStackUtil.formatLore(unrankedFFAItem, true,
@@ -49,18 +54,25 @@ public class MainMenu extends AbstractInventoryGUI implements Initializers {
                 ChatColor.GOLD + "Join a team or craft your own!",
                 ChatColor.GOLD + "For more information, please visit",
                 ChatColor.AQUA + "mcsiege.namelesshosting.com/teampvp");
-        this.getInventory().setItem(2, teamPvPItem);
+        inventory.setItem(2, teamPvPItem);
     }
 
     @Override
     public void deinit() {
+
     }
 
     @Override
     public void onInventoryInteractEvent(InventoryInteractEvent event) {
         event.setCancelled(true);
+        // TODO
     }
 
+    /**
+     * Update FFA currently playing on Itemstack.
+     *
+     * @param ffaCurrentlyPlaying the number of FFA players currently playing
+     */
     public void updateFFACurrentlyPlaying(int ffaCurrentlyPlaying) {
         ItemStackUtil.setLoreLine(unrankedFFAItem, 3, currentlyPlayingLine + ChatColor.AQUA + ffaCurrentlyPlaying);
         inventory.setItem(1, unrankedFFAItem); // Updates any client's open GUI

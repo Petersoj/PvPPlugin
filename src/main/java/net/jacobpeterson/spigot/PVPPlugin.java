@@ -1,9 +1,10 @@
 package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.gui.GUIManager;
+import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class PvPPlugin extends JavaPlugin {
+public class PvPPlugin extends JavaPlugin implements Initializers {
 
     private GUIManager guiManager;
 
@@ -14,11 +15,21 @@ public class PvPPlugin extends JavaPlugin {
     public void onEnable() {
         this.guiManager = new GUIManager(this);
 
-        guiManager.init();
+        this.init();
     }
 
     @Override
     public void onDisable() {
+
+    }
+
+    @Override
+    public void init() {
+        guiManager.init();
+    }
+
+    @Override
+    public void deinit() {
 
     }
 }
