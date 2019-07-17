@@ -15,7 +15,6 @@ public abstract class AbstractInventoryGUI {
      * Instantiates a new Abstract inventory gui with no initial inventory created.
      */
     public AbstractInventoryGUI() {
-
     }
 
     /**

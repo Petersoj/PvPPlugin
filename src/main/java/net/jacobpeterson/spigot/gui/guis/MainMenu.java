@@ -65,7 +65,7 @@ public class MainMenu extends AbstractInventoryGUI implements Initializers {
     @Override
     public void onInventoryInteractEvent(InventoryInteractEvent event) {
         event.setCancelled(true);
-        // TODO
+        // TODO MainMenu Inventory Interact
     }
 
     /**
