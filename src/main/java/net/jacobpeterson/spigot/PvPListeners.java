@@ -6,11 +6,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 
-public class PluginListeners implements Listener, Initializers {
+public class PvPListeners implements Listener, Initializers {
 
     private PvPPlugin pvpPlugin;
 
-    public PluginListeners(PvPPlugin pvpPlugin) {
+    public PvPListeners(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
     }
 

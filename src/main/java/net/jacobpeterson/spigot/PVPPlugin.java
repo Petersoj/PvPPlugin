@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.command.CommandListener;
+import net.jacobpeterson.spigot.data.DatabaseManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.util.Initializers;
@@ -12,43 +13,72 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
+
 public class PvPPlugin extends JavaPlugin implements Initializers {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private GroupManager groupManager;
-    private PluginListeners pluginListeners;
+    private PvPConfig pvpConfig;
+    private PvPListeners pvpListeners;
     private CommandListener commandListener;
-    private GUIManager guiManager;
+    private DatabaseManager databaseManager;
     private PlayerManager playerManager;
+    private GUIManager guiManager;
 
-    @Override
-    public void onEnable() {
+
+    public PvPPlugin() {
         LOGGER.info("Building PvPPlugin");
 
         this.groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
-        this.pluginListeners = new PluginListeners(this);
+        this.pvpConfig = new PvPConfig(this);
+        this.pvpListeners = new PvPListeners(this);
         this.commandListener = new CommandListener(this);
-        this.guiManager = new GUIManager(this);
+        this.databaseManager = new DatabaseManager(this);
         this.playerManager = new PlayerManager(this);
+        this.guiManager = new GUIManager(this);
+    }
 
+    @Override
+    public void onEnable() {
         LOGGER.info("Initializing PvPPlugin");
-        this.init(); // this onEnable() is kinda acting as a constructor when using Spigot
+
+        try {
+            this.init();
+        } catch (SQLException exception) {
+            LOGGER.fatal(exception);
+
+            Bukkit.getPluginManager().disablePlugin(this); // Disable plugin
+        }
     }
 
     @Override
     public void onDisable() {
+        LOGGER.info("Deinitializing PvPPlugin");
+
+        try {
+            this.deinit();
+        } catch (SQLException sqlException) {
+            LOGGER.fatal(sqlException);
+        }
     }
 
     @Override
-    public void init() {
-        pluginListeners.init();
+    public void init() throws SQLException {
+        pvpConfig.init();
+        pvpListeners.init();
+        databaseManager.init();
+        playerManager.init();
         guiManager.init();
     }
 
     @Override
-    public void deinit() {
-        pluginListeners.deinit();
+    public void deinit() throws SQLException {
+        pvpConfig.deinit();
+        pvpListeners.deinit();
+        databaseManager.deinit();
+        playerManager.deinit();
         guiManager.deinit();
     }
 
@@ -67,12 +97,21 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
     }
 
     /**
-     * Gets plugin listeners.
+     * Gets pvp config.
      *
-     * @return the plugin listeners
+     * @return the pvp config
      */
-    public PluginListeners getPluginListeners() {
-        return pluginListeners;
+    public PvPConfig getPvPConfig() {
+        return pvpConfig;
+    }
+
+    /**
+     * Gets pvp listeners.
+     *
+     * @return the pvp listeners
+     */
+    public PvPListeners getPvPListeners() {
+        return pvpListeners;
     }
 
     /**
