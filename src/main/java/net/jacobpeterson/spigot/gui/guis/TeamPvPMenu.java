@@ -18,7 +18,7 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
     private GUIManager guiManager;
     private ItemStack craftTeamItem;
     private ItemStack backItem;
-    private HashMap<Team2v2, ItemStack> teamItems;
+    private HashMap<ItemStack, Team2v2> teamItems;
 
     public TeamPvPMenu(GUIManager guiManager) {
         this.guiManager = guiManager;

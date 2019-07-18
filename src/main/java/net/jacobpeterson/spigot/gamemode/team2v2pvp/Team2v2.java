@@ -1,16 +1,21 @@
 package net.jacobpeterson.spigot.gamemode.team2v2pvp;
 
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
 
 public class Team2v2 {
 
     private Player teamLeader;
     private Player teamMember;
+    private ArrayList<PvPPlayer> prospectivePlayers;
 
     /**
      * Instantiates a new Team 2v2.
      */
     public Team2v2() {
+        this.prospectivePlayers = new ArrayList<>();
     }
 
     /**
@@ -19,6 +24,7 @@ public class Team2v2 {
      * @param teamLeader the team leader
      */
     public Team2v2(Player teamLeader) {
+        this();
         this.teamLeader = teamLeader;
     }
 
@@ -56,5 +62,23 @@ public class Team2v2 {
      */
     public void setTeamMember(Player teamMember) {
         this.teamMember = teamMember;
+    }
+
+    /**
+     * Gets prospective players.
+     *
+     * @return the prospective players
+     */
+    public ArrayList<PvPPlayer> getProspectivePlayers() {
+        return prospectivePlayers;
+    }
+
+    /**
+     * Sets prospective players.
+     *
+     * @param prospectivePlayers the prospective players
+     */
+    public void setProspectivePlayers(ArrayList<PvPPlayer> prospectivePlayers) {
+        this.prospectivePlayers = prospectivePlayers;
     }
 }

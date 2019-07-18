@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class PlayerData {
 
-    private final PvPPlayer pvpPlayer;
+    private transient final PvPPlayer pvpPlayer; // transient = don't serialize
     private int ELO;
     private HashMap<Arena, Integer> arenaTimesPlayed;
     private int unrankedFFAKills;
