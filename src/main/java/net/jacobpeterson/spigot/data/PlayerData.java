@@ -35,7 +35,7 @@ public class PlayerData {
      *
      * @return the pvp player
      */
-    public PvPPlayer getPvpPlayer() {
+    public PvPPlayer getPvPPlayer() {
         return pvpPlayer;
     }
 

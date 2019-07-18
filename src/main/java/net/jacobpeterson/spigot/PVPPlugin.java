@@ -27,7 +27,6 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
     private PlayerManager playerManager;
     private GUIManager guiManager;
 
-
     public PvPPlugin() {
         LOGGER.info("Building PvPPlugin");
 
