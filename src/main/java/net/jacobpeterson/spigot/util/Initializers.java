@@ -7,14 +7,14 @@ package net.jacobpeterson.spigot.util;
 public interface Initializers {
 
     /**
-     * Init method for an object.
+     * Init method.
      *
      * @throws Exception an optional exception to throw
      */
     void init() throws Exception;
 
     /**
-     * Deinit method for an object.
+     * Deinit method.
      *
      * @throws Exception an optional exception to throw
      */

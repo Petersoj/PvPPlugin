@@ -1,13 +1,16 @@
 package net.jacobpeterson.spigot.gui;
 
+import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 
 /**
  * The type Abstract Inventory GUI.
  */
-public abstract class AbstractInventoryGUI {
+public abstract class AbstractInventoryGUI implements Initializers {
 
     protected Inventory inventory;
 
@@ -25,6 +28,19 @@ public abstract class AbstractInventoryGUI {
      */
     public AbstractInventoryGUI(int size, String title) {
         this.inventory = Bukkit.createInventory(null, size, title);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Will close the inventory for all current viewers.
+     */
+    @Override
+    public void deinit() {
+        if (inventory != null) {
+            inventory.getViewers().stream()
+                    .filter(humanEntity -> humanEntity instanceof Player)
+                    .forEach(HumanEntity::closeInventory);
+        }
     }
 
     /**

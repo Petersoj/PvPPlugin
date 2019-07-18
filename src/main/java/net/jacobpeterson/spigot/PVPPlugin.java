@@ -2,8 +2,11 @@ package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.command.CommandListener;
 import net.jacobpeterson.spigot.gui.GUIManager;
+import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.anjocaido.groupmanager.GroupManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,19 +14,26 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PvPPlugin extends JavaPlugin implements Initializers {
 
+    public static final Logger LOGGER = LogManager.getLogger();
+
     private GroupManager groupManager;
     private PluginListeners pluginListeners;
     private CommandListener commandListener;
     private GUIManager guiManager;
+    private PlayerManager playerManager;
 
     @Override
     public void onEnable() {
+        LOGGER.info("Building PvPPlugin");
+
         this.groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
         this.pluginListeners = new PluginListeners(this);
         this.commandListener = new CommandListener(this);
         this.guiManager = new GUIManager(this);
+        this.playerManager = new PlayerManager(this);
 
-        this.init();
+        LOGGER.info("Initializing PvPPlugin");
+        this.init(); // this onEnable() is kinda acting as a constructor when using Spigot
     }
 
     @Override
@@ -32,16 +42,14 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
 
     @Override
     public void init() {
-        Bukkit.getPluginManager().registerEvents(pluginListeners, this);
-
+        pluginListeners.init();
         guiManager.init();
-
-        // TODO use this later
-        // groupManager.getWorldsHolder().getWorldData(player).getPermissionsHandler().getUserPrefix("username");
     }
 
     @Override
     public void deinit() {
+        pluginListeners.deinit();
+        guiManager.deinit();
     }
 
     @Override
@@ -81,8 +89,17 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
      *
      * @return the gui manager
      */
-    public GUIManager getGuiManager() {
+    public GUIManager getGUIManager() {
         return guiManager;
+    }
+
+    /**
+     * Gets player manager.
+     *
+     * @return the player manager
+     */
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 }
 

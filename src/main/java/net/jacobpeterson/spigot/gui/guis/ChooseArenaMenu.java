@@ -4,7 +4,6 @@ import net.jacobpeterson.spigot.gamemode.Arena;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
-import net.jacobpeterson.spigot.util.Initializers;
 import net.jacobpeterson.spigot.util.ItemStackUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,11 +14,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
-public abstract class ChooseArenaMenu extends AbstractInventoryGUI implements Initializers {
+public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
     protected GUIManager guiManager;
+    protected String title;
     protected ItemStack anyItem;
     protected ItemStack backItem;
     protected ArrayList<Arena> arenas;
@@ -28,10 +28,11 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI implements In
      * Instantiates a new 'Choose Arena' menu. This is meant to be extended by other GUI/menus as this is a general viewer.
      *
      * @param guiManager the gui manager
+     * @param title      the title
      */
-    public ChooseArenaMenu(GUIManager guiManager) {
+    public ChooseArenaMenu(GUIManager guiManager, String title) {
         this.guiManager = guiManager;
-        this.arenas = new ArrayList<>();
+        this.title = title;
     }
 
     @Override
@@ -40,25 +41,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI implements In
         if (chestLines > 6) {
             throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
         }
-        inventory = Bukkit.createInventory(null, chestLines * 9,
-                ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Ranked 1v1");
-
-        int currentIndex = 1;
-        int currentLine = 0;
-        for (Arena arena : arenas) {
-            if (currentIndex > 5) {
-                currentIndex = 0;
-                currentLine++;
-            }
-
-            if (arena.getItemStack() == null) {
-                LOGGER.warn("No Arena ItemStack representation for arena: " + arena.getName());
-            } else {
-                inventory.setItem((currentLine * 9) + currentIndex, arena.getItemStack());
-            }
-
-            currentIndex++;
-        }
+        inventory = Bukkit.createInventory(null, chestLines * 9, title);
 
         anyItem = new ItemStack(Material.EMERALD);
         ItemStackUtil.formatLore(anyItem, true,
@@ -71,11 +54,34 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI implements In
                 CharUtil.boldColor(ChatColor.YELLOW) + "Back",
                 "");
         inventory.setItem(8, backItem);
+
+        if (arenas != null) {
+            int currentIndex = 1;
+            int currentLine = 0;
+            for (Arena arena : arenas) {
+                if (currentIndex > 5) {
+                    currentIndex = 0;
+                    currentLine++;
+                }
+
+                if (arena.getItemStack() == null) {
+                    LOGGER.warn("No Arena ItemStack representation for arena: " + arena.getName());
+                } else {
+                    inventory.setItem((currentLine * 9) + currentIndex, arena.getItemStack());
+                }
+
+                currentIndex++;
+            }
+        }
     }
 
-    @Override
-    public void deinit() {
-
+    /**
+     * Update arenas shown in the GUI.
+     * Note that this simply execute {@link AbstractInventoryGUI#deinit()} and then {@link AbstractInventoryGUI#init()}.
+     */
+    public void updateArenas() {
+        this.deinit();
+        this.init();
     }
 
     /**

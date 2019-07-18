@@ -3,14 +3,13 @@ package net.jacobpeterson.spigot.gui.guis;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
-import net.jacobpeterson.spigot.util.Initializers;
 import net.jacobpeterson.spigot.util.ItemStackUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class MainMenu extends AbstractInventoryGUI implements Initializers {
+public class MainMenu extends AbstractInventoryGUI {
 
     private GUIManager guiManager;
     private ItemStack ranked1v1Item;
@@ -55,11 +54,6 @@ public class MainMenu extends AbstractInventoryGUI implements Initializers {
                 ChatColor.GOLD + "For more information, please visit",
                 ChatColor.AQUA + "mcsiege.namelesshosting.com/teampvp");
         inventory.setItem(2, teamPvPItem);
-    }
-
-    @Override
-    public void deinit() {
-
     }
 
     @Override
