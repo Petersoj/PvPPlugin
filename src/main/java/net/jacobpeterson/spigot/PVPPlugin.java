@@ -2,6 +2,7 @@ package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.command.CommandListener;
 import net.jacobpeterson.spigot.data.DatabaseManager;
+import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.util.Initializers;
@@ -20,6 +21,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private GroupManager groupManager;
+    private GsonManager gsonManager;
     private PvPConfig pvpConfig;
     private PvPListeners pvpListeners;
     private CommandListener commandListener;
@@ -31,6 +33,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         LOGGER.info("Building PvPPlugin");
 
         this.groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+        this.gsonManager = new GsonManager(this);
         this.pvpConfig = new PvPConfig(this);
         this.pvpListeners = new PvPListeners(this);
         this.commandListener = new CommandListener(this);
@@ -65,6 +68,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
 
     @Override
     public void init() throws SQLException {
+        gsonManager.init();
         pvpConfig.init();
         pvpListeners.init();
         databaseManager.init();
@@ -74,6 +78,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
 
     @Override
     public void deinit() throws SQLException {
+        gsonManager.deinit();
         pvpConfig.deinit();
         pvpListeners.deinit();
         databaseManager.deinit();
@@ -93,6 +98,15 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
      */
     public GroupManager getGroupManager() {
         return groupManager;
+    }
+
+    /**
+     * Gets gson manager.
+     *
+     * @return the gson manager
+     */
+    public GsonManager getGsonManager() {
+        return gsonManager;
     }
 
     /**

@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.data.serializers;
+package net.jacobpeterson.spigot.data.itemstack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -31,7 +31,7 @@ public class ItemStackArraySerializer implements JsonSerializer<ItemStack[]>, Js
 
                 JsonObject inventorySlotObject = new JsonObject();
                 inventorySlotObject.addProperty("slot", index);
-                // ItemStack will be serialized with the net.jacobpeterson.spigot.data.serializers.ItemStackSerializer
+                // ItemStack will be serialized with the net.jacobpeterson.spigot.data.itemstack.ItemStackSerializer
                 inventorySlotObject.add("item", jsonSerializationContext.serialize(itemStack, ItemStack.class));
 
                 jsonArray.add(inventorySlotObject);

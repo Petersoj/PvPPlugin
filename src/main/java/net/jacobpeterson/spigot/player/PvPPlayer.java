@@ -1,6 +1,6 @@
 package net.jacobpeterson.spigot.player;
 
-import net.jacobpeterson.spigot.data.PlayerData;
+import net.jacobpeterson.spigot.data.player.PlayerData;
 import org.bukkit.entity.Player;
 
 public class PvPPlayer {
@@ -15,18 +15,6 @@ public class PvPPlayer {
      */
     public PvPPlayer(Player player) {
         this.player = player;
-        this.playerData = new PlayerData(this);
-    }
-
-    /**
-     * Instantiates a new PvP Player with PlayerData which is like a pseudo super-class to {@link Player}.
-     *
-     * @param player     the player
-     * @param playerData the player data
-     */
-    public PvPPlayer(Player player, PlayerData playerData) {
-        this.player = player;
-        this.playerData = playerData;
     }
 
     /**

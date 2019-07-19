@@ -1,7 +1,6 @@
-package net.jacobpeterson.spigot.data;
+package net.jacobpeterson.spigot.data.player;
 
 import net.jacobpeterson.spigot.gamemode.Arena;
-import net.jacobpeterson.spigot.player.PvPPlayer;
 
 import java.util.HashMap;
 
@@ -10,7 +9,6 @@ import java.util.HashMap;
  */
 public class PlayerData {
 
-    private transient final PvPPlayer pvpPlayer; // transient = don't serialize
     private int ELO;
     private HashMap<Arena, Integer> arenaTimesPlayed;
     private int unrankedFFAKills;
@@ -22,21 +20,9 @@ public class PlayerData {
 
     /**
      * Instantiates a new Player data.
-     *
-     * @param pvpPlayer the pvp player
      */
-    public PlayerData(PvPPlayer pvpPlayer) {
-        this.pvpPlayer = pvpPlayer;
+    public PlayerData() {
         this.arenaTimesPlayed = new HashMap<>();
-    }
-
-    /**
-     * Gets pvp player.
-     *
-     * @return the pvp player
-     */
-    public PvPPlayer getPvPPlayer() {
-        return pvpPlayer;
     }
 
     /**
