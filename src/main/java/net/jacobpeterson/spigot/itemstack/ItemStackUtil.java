@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.util;
+package net.jacobpeterson.spigot.itemstack;
 
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;

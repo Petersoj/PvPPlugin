@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.gamemode;
+package net.jacobpeterson.spigot.arena;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;

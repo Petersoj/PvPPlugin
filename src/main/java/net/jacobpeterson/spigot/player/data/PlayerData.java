@@ -1,6 +1,6 @@
-package net.jacobpeterson.spigot.data.player;
+package net.jacobpeterson.spigot.player.data;
 
-import net.jacobpeterson.spigot.gamemode.Arena;
+import net.jacobpeterson.spigot.arena.Arena;
 
 import java.util.HashMap;
 

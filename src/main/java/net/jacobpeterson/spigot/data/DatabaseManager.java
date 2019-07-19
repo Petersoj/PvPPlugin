@@ -44,6 +44,8 @@ public class DatabaseManager implements Initializers {
         mysqlConnection = DriverManager.getConnection(mysqlURL, pvpConfig.getMysqlUsername(),
                 pvpConfig.getMysqlPassword());
         LOGGER.info("Database connection successful!");
+
+        // TODO check if PvPPlugin table exists, if not, create it or fatal exception.
     }
 
     @Override

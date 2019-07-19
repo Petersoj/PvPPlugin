@@ -1,11 +1,11 @@
 package net.jacobpeterson.spigot;
 
+import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.command.CommandListener;
 import net.jacobpeterson.spigot.data.DatabaseManager;
 import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
-import net.jacobpeterson.spigot.util.Initializers;
 import org.anjocaido.groupmanager.GroupManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 
-public class PvPPlugin extends JavaPlugin implements Initializers {
+public class PvPPlugin extends JavaPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -26,6 +26,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
     private PvPListeners pvpListeners;
     private CommandListener commandListener;
     private DatabaseManager databaseManager;
+    private ArenaManager arenaManager;
     private PlayerManager playerManager;
     private GUIManager guiManager;
 
@@ -38,6 +39,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         this.pvpListeners = new PvPListeners(this);
         this.commandListener = new CommandListener(this);
         this.databaseManager = new DatabaseManager(this);
+        this.arenaManager = new ArenaManager(this);
         this.playerManager = new PlayerManager(this);
         this.guiManager = new GUIManager(this);
     }
@@ -47,11 +49,17 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         LOGGER.info("Initializing PvPPlugin");
 
         try {
-            this.init();
+            gsonManager.init();
+            pvpConfig.init();
+            pvpListeners.init();
+            databaseManager.init();
+            arenaManager.init();
+            playerManager.init();
+//            guiManager.init();
         } catch (SQLException exception) {
             LOGGER.fatal(exception);
 
-            Bukkit.getPluginManager().disablePlugin(this); // Disable plugin
+            Bukkit.getPluginManager().disablePlugin(this); // Disable plugin because of error in initializing plugin
         }
     }
 
@@ -60,30 +68,16 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         LOGGER.info("Deinitializing PvPPlugin");
 
         try {
-            this.deinit();
-        } catch (SQLException sqlException) {
-            LOGGER.fatal(sqlException);
+            gsonManager.deinit();
+            pvpConfig.deinit();
+            pvpListeners.deinit();
+            databaseManager.deinit();
+            arenaManager.deinit();
+            playerManager.deinit();
+//            guiManager.deinit();
+        } catch (SQLException exception) {
+            LOGGER.fatal(exception);
         }
-    }
-
-    @Override
-    public void init() throws SQLException {
-        gsonManager.init();
-        pvpConfig.init();
-        pvpListeners.init();
-        databaseManager.init();
-        playerManager.init();
-//        guiManager.init();
-    }
-
-    @Override
-    public void deinit() throws SQLException {
-        gsonManager.deinit();
-        pvpConfig.deinit();
-        pvpListeners.deinit();
-        databaseManager.deinit();
-        playerManager.deinit();
-//        guiManager.deinit();
     }
 
     @Override
@@ -134,6 +128,24 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
      */
     public CommandListener getCommandListener() {
         return commandListener;
+    }
+
+    /**
+     * Gets database manager.
+     *
+     * @return the database manager
+     */
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
+    /**
+     * Gets arena manager.
+     *
+     * @return the arena manager
+     */
+    public ArenaManager getArenaManager() {
+        return arenaManager;
     }
 
     /**

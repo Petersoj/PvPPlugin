@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.data.player;
+package net.jacobpeterson.spigot.player.data;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -13,12 +13,14 @@ public class PlayerDataSerializer implements JsonSerializer<PlayerData>, JsonDes
 
     @Override
     public JsonElement serialize(PlayerData playerData, Type type, JsonSerializationContext jsonSerializationContext) {
+        // Use names of Arenas to get arena time played and references are found in ArenaManager
         return null;
     }
 
     @Override
     public PlayerData deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
+        // Use names of Arenas to get arena time played
         return null;
     }
 }

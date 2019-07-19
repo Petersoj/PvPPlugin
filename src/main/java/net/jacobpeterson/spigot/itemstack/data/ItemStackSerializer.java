@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.data.itemstack;
+package net.jacobpeterson.spigot.itemstack.data;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

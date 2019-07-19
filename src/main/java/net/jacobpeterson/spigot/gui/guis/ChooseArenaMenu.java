@@ -1,10 +1,10 @@
 package net.jacobpeterson.spigot.gui.guis;
 
-import net.jacobpeterson.spigot.gamemode.Arena;
+import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
-import net.jacobpeterson.spigot.util.ItemStackUtil;
+import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;

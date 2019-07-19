@@ -4,7 +4,7 @@ import net.jacobpeterson.spigot.gamemode.team2v2pvp.Team2v2;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
-import net.jacobpeterson.spigot.util.ItemStackUtil;
+import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryInteractEvent;

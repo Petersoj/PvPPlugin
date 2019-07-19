@@ -1,6 +1,6 @@
 package net.jacobpeterson.spigot.player;
 
-import net.jacobpeterson.spigot.data.player.PlayerData;
+import net.jacobpeterson.spigot.player.data.PlayerData;
 import org.bukkit.entity.Player;
 
 public class PvPPlayer {

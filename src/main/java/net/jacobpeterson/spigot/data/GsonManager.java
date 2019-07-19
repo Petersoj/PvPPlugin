@@ -5,8 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import net.jacobpeterson.spigot.PvPPlugin;
-import net.jacobpeterson.spigot.data.itemstack.ItemStackArraySerializer;
-import net.jacobpeterson.spigot.data.itemstack.ItemStackSerializer;
+import net.jacobpeterson.spigot.itemstack.data.ItemStackArraySerializer;
+import net.jacobpeterson.spigot.itemstack.data.ItemStackSerializer;
+import net.jacobpeterson.spigot.player.data.PlayerData;
+import net.jacobpeterson.spigot.player.data.PlayerDataSerializer;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.ItemStack;
 
@@ -33,6 +35,7 @@ public class GsonManager implements Initializers {
         gsonBuilder.registerTypeAdapter(ItemStack.class, new ItemStackSerializer());
         gsonBuilder.registerTypeAdapter(new TypeToken<ItemStack[]>() {
         }.getType(), new ItemStackArraySerializer());
+        gsonBuilder.registerTypeAdapter(PlayerData.class, new PlayerDataSerializer());
 
         this.gson = gsonBuilder.create();
     }
