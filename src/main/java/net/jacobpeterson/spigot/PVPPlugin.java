@@ -69,7 +69,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         pvpListeners.init();
         databaseManager.init();
         playerManager.init();
-        guiManager.init();
+//        guiManager.init();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class PvPPlugin extends JavaPlugin implements Initializers {
         pvpListeners.deinit();
         databaseManager.deinit();
         playerManager.deinit();
-        guiManager.deinit();
+//        guiManager.deinit();
     }
 
     @Override

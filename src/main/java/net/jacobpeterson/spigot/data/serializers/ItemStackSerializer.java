@@ -17,7 +17,8 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
     @Override
     public JsonElement serialize(ItemStack itemStack, Type type, JsonSerializationContext jsonSerializationContext) {
         // Call the ItemStack serialization method provided by Bukkit which is meant for YAML, but we want JSON.
-        return jsonSerializationContext.serialize(itemStack.serialize());
+        return jsonSerializationContext.serialize(itemStack.serialize(), new TypeToken<Map<String, Object>>() {
+        }.getType());
     }
 
     @Override

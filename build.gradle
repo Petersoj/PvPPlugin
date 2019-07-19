@@ -28,7 +28,7 @@ dependencies {
 
 shadowJar {
     dependencies {
-        exclude(dependency('org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'))
-        exclude(dependency(':EssentialsGroupManager:'))
+        include(dependency('net.jacobpeterson.spigot:PvPPlugin:1.0-SNAPSHOT'))
+        include(dependency('mysql:mysql-connector-java:5.1.6'))
     }
 }

@@ -32,7 +32,7 @@ public class ItemStackArraySerializer implements JsonSerializer<ItemStack[]>, Js
                 JsonObject inventorySlotObject = new JsonObject();
                 inventorySlotObject.addProperty("slot", index);
                 // ItemStack will be serialized with the net.jacobpeterson.spigot.data.serializers.ItemStackSerializer
-                inventorySlotObject.add("item", jsonSerializationContext.serialize(itemStack));
+                inventorySlotObject.add("item", jsonSerializationContext.serialize(itemStack, ItemStack.class));
 
                 jsonArray.add(inventorySlotObject);
             }
