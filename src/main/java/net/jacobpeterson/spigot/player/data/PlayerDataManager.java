@@ -53,6 +53,7 @@ public class PlayerDataManager implements Initializers {
     }
 
     public synchronized PlayerData fetchDatabasePlayerData(PvPPlayer pvpPlayer) {
+
         // Use Gson for PlayerData#arenaTimesPlayed()
         return null;
     }

@@ -3,8 +3,9 @@ package net.jacobpeterson.spigot.data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.data.ArenaReferenceSerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackArraySerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackSerializer;
 import net.jacobpeterson.spigot.util.Initializers;
@@ -14,6 +15,9 @@ public class GsonManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
     private JsonParser jsonParser;
+    private ItemStackSerializer itemStackSerializer;
+    private ItemStackArraySerializer itemStackArraySerializer;
+    private ArenaReferenceSerializer arenaReferenceSerializer;
     private Gson gson;
 
     /**
@@ -23,6 +27,9 @@ public class GsonManager implements Initializers {
      */
     public GsonManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
+        this.itemStackSerializer = new ItemStackSerializer();
+        this.itemStackArraySerializer = new ItemStackArraySerializer();
+        this.arenaReferenceSerializer = new ArenaReferenceSerializer();
     }
 
     @Override
@@ -30,9 +37,9 @@ public class GsonManager implements Initializers {
         this.jsonParser = new JsonParser();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ItemStack.class, new ItemStackSerializer());
-        gsonBuilder.registerTypeAdapter(new TypeToken<ItemStack[]>() {
-        }.getType(), new ItemStackArraySerializer());
+        gsonBuilder.registerTypeAdapter(ItemStack.class, itemStackSerializer);
+        gsonBuilder.registerTypeAdapter(ItemStack[].class, itemStackArraySerializer);
+        gsonBuilder.registerTypeAdapter(Arena.class, arenaReferenceSerializer);
 
         this.gson = gsonBuilder.create();
     }
