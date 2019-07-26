@@ -46,17 +46,25 @@ public class ArenaManager implements Initializers {
      * @return whether or not the arena exists boolean
      */
     public boolean doesArenaExist(String name) {
-        // TODO check if name == arena.getName();
-        for (FFAArena ffaArena : ffaArenas) {
-
-        }
-        for (Ranked1v1Arena ranked1v1Arena : ranked1v1Arenas) {
-
-        }
-        for (Team2v2Arena team2v2Arena : team2v2Arenas) {
-
+        for (Arena arena : getAllArenas()) {
+            if (arena.getName().equals(name)) {
+                return true;
+            }
         }
         return false;
+    }
+
+    /**
+     * Gets all arenas in a referencing list.
+     *
+     * @return all arena references
+     */
+    public ArrayList<Arena> getAllArenas() {
+        ArrayList<Arena> arenas = new ArrayList<>();
+        arenas.addAll(ffaArenas);
+        arenas.addAll(ranked1v1Arenas);
+        arenas.addAll(team2v2Arenas);
+        return arenas;
     }
 
     /**

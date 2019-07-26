@@ -95,7 +95,7 @@ public class ArenaDataManager implements Initializers {
      * @throws ClassCastException    the class cast exception
      * @throws FileNotFoundException the file not found exception
      */
-    @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if there is
+    @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
     public void loadArenas(GsonManager gsonManager) throws IOException, ClassCastException, FileNotFoundException {
         Gson gson = gsonManager.getGson();
 

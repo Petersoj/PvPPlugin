@@ -22,7 +22,7 @@ public class PlayerData {
      * Instantiates a new Player data.
      */
     public PlayerData() {
-        this.arenaTimesPlayed = new HashMap<>();
+        this.arenaTimesPlayed = new HashMap<>(); // Instantiate so that getClass() of this variable for Gson is not null
     }
 
     /**
