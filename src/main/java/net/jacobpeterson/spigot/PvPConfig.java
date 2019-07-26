@@ -3,6 +3,8 @@ package net.jacobpeterson.spigot;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.logging.Logger;
+
 public class PvPConfig implements Initializers {
 
     private static final String MYSQL_HOST_KEY = "mysql_host";
@@ -10,6 +12,8 @@ public class PvPConfig implements Initializers {
     private static final String MYSQL_DATABASE_KEY = "mysql_database";
     private static final String MYSQL_USERNAME_KEY = "mysql_username";
     private static final String MYSQL_PASSWORD_KEY = "mysql_password";
+
+    private final Logger LOGGER;
     private PvPPlugin pvpPlugin;
     private String mysqlHost;
     private int mysqlPort;
@@ -23,6 +27,7 @@ public class PvPConfig implements Initializers {
      * @param pvpPlugin the pvp plugin
      */
     public PvPConfig(PvPPlugin pvpPlugin) {
+        this.LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlugin = pvpPlugin;
     }
 
@@ -34,6 +39,8 @@ public class PvPConfig implements Initializers {
         mysqlDatabase = fileConfiguration.getString(MYSQL_DATABASE_KEY);
         mysqlUsername = fileConfiguration.getString(MYSQL_USERNAME_KEY);
         mysqlPassword = fileConfiguration.getString(MYSQL_PASSWORD_KEY);
+
+        LOGGER.info("Loaded Configuration");
     }
 
     @Override

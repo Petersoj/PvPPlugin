@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 
 public class PvPPlugin extends JavaPlugin {
 
-    // This Logger will later be set in the constructor of this class when the plugin is enabled via Spigot
-    public static Logger LOGGER = Logger.getLogger("PvPPlugin");
+    private static Logger PLUGIN_LOGGER_INSTANCE = null; // This only for the getPluginLogger() static method
 
+    private final Logger LOGGER;
     private GroupManager groupManager;
     private GsonManager gsonManager;
     private PvPConfig pvpConfig;
@@ -31,7 +31,8 @@ public class PvPPlugin extends JavaPlugin {
     private GUIManager guiManager;
 
     public PvPPlugin() {
-        LOGGER = super.getLogger(); // Gets the Spigot Plugin Logger which nicely formats log messages
+        PLUGIN_LOGGER_INSTANCE = super.getLogger(); // The Bukkit logger is nicely formatted so use it globally
+        LOGGER = PvPPlugin.getPluginLogger();
 
         LOGGER.info("Building PvPPlugin");
 
@@ -46,6 +47,17 @@ public class PvPPlugin extends JavaPlugin {
         this.guiManager = new GUIManager(this);
     }
 
+    /**
+     * Gets plugin logger for PvPPlugin.
+     * NOTE: This WILL be null if used in a static context in another class! The plugin class needs to be instantiated
+     * by Spigot first before using this method (so you should only set logger instances in an init() or constructor).
+     *
+     * @return the plugin logger
+     */
+    public static Logger getPluginLogger() {
+        return PLUGIN_LOGGER_INSTANCE;
+    }
+
     @Override
     public void onEnable() {
         LOGGER.info("Initializing PvPPlugin");
@@ -57,7 +69,7 @@ public class PvPPlugin extends JavaPlugin {
             databaseManager.init();
             arenaManager.init();
             playerManager.init();
-            guiManager.init();
+//            guiManager.init();
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot enable PvPPlugin", exception);
 
@@ -76,7 +88,7 @@ public class PvPPlugin extends JavaPlugin {
             databaseManager.deinit();
             arenaManager.deinit();
             playerManager.deinit();
-            guiManager.deinit();
+//            guiManager.deinit();
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot disable PvPPlugin", exception);
         }
@@ -86,10 +98,6 @@ public class PvPPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender commandSender, Command command, String alias, String[] args) {
         return commandListener.onCommand(commandSender, command, alias, args);
     }
-
-//    public static final Logger getLogger() {
-//
-//    }
 
     /**
      * Gets group manager.

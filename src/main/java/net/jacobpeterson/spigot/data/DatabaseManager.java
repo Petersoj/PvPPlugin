@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public class DatabaseManager implements Initializers {
 
-    private static final Logger LOGGER = PvPPlugin.LOGGER;
+    private final Logger LOGGER;
 
     private PvPPlugin pvpPlugin;
     private Connection mysqlConnection;
@@ -22,6 +22,7 @@ public class DatabaseManager implements Initializers {
      * @param pvpPlugin the pvp plugin
      */
     public DatabaseManager(PvPPlugin pvpPlugin) {
+        this.LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlugin = pvpPlugin;
     }
 

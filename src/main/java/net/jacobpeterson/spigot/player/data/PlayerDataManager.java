@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class PlayerDataManager implements Initializers {
 
-    private static final Logger LOGGER = PvPPlugin.LOGGER;
+    private final Logger LOGGER;
 
     private final PlayerManager playerManager;
     private final GsonManager gsonManager;
@@ -30,6 +30,7 @@ public class PlayerDataManager implements Initializers {
      * @param databaseManager the database manager
      */
     public PlayerDataManager(PlayerManager playerManager, GsonManager gsonManager, DatabaseManager databaseManager) {
+        this.LOGGER = PvPPlugin.getPluginLogger();
         this.playerManager = playerManager;
         this.gsonManager = gsonManager;
         this.databaseManager = databaseManager;
@@ -69,7 +70,7 @@ public class PlayerDataManager implements Initializers {
      */
     public synchronized void createPlayerDataTable() throws SQLException {
         // Table modeled after PlayerData object
-        String createTableSQL = "CREATE TABLE " + databaseTableName + " (\n" + // create table where ? = databaseTableName
+        String createTableSQL = "CREATE TABLE " + databaseTableName + " (\n" +
                 "    uuid CHAR(36) NOT NULL,\n" +
                 "    elo INT NOT NULL,\n" +
                 "    arena_times_played TEXT NOT NULL,\n" +

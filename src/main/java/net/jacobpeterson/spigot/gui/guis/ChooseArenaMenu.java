@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
-    protected static final Logger LOGGER = PvPPlugin.LOGGER;
+    protected final Logger LOGGER;
 
     protected GUIManager guiManager;
     protected String title;
@@ -31,6 +31,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      * @param title      the title
      */
     public ChooseArenaMenu(GUIManager guiManager, String title) {
+        this.LOGGER = PvPPlugin.getPluginLogger();
         this.guiManager = guiManager;
         this.title = title;
     }
