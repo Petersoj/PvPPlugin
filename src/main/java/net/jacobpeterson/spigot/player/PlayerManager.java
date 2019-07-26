@@ -5,6 +5,7 @@ import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -28,11 +29,13 @@ public class PlayerManager implements Initializers {
     }
 
     @Override
-    public void init() {
+    public void init() throws SQLException {
+        playerDataManager.init();
     }
 
     @Override
     public void deinit() {
+        playerDataManager.deinit();
     }
 
     /**

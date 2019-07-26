@@ -3,8 +3,8 @@ package net.jacobpeterson.spigot.gui.guis;
 import net.jacobpeterson.spigot.gamemode.team2v2pvp.Team2v2;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -30,7 +30,7 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
         // TODO create Inventory based on # of teams
 
         craftTeamItem = new ItemStack(Material.WORKBENCH, 2);
-        ItemStackUtil.formatLore(backItem, true,
+        ItemStackUtil.formatLore(craftTeamItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
                 ChatColor.GOLD + "Be the leader of a team and invite others.");
         inventory.setItem(0, craftTeamItem);

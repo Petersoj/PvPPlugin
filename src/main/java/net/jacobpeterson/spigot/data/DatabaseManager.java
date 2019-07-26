@@ -3,16 +3,15 @@ package net.jacobpeterson.spigot.data;
 import net.jacobpeterson.spigot.PvPConfig;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.util.Initializers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 public class DatabaseManager implements Initializers {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = PvPPlugin.LOGGER;
 
     private PvPPlugin pvpPlugin;
     private Connection mysqlConnection;
@@ -40,12 +39,10 @@ public class DatabaseManager implements Initializers {
 
         String mysqlURL = urlBuilder.toString();
 
-        LOGGER.info("Attempting to connect to MySQL Database with URL {}", mysqlURL);
+        LOGGER.info("Attempting to connect to MySQL Database with URL: " + mysqlURL);
         mysqlConnection = DriverManager.getConnection(mysqlURL, pvpConfig.getMysqlUsername(),
                 pvpConfig.getMysqlPassword());
         LOGGER.info("Database connection successful!");
-
-        // TODO check if PvPPlugin table exists, if not, create it or fatal exception.
     }
 
     @Override
@@ -53,5 +50,14 @@ public class DatabaseManager implements Initializers {
         if (mysqlConnection != null && !mysqlConnection.isClosed()) {
             mysqlConnection.close();
         }
+    }
+
+    /**
+     * Gets mysql connection.
+     *
+     * @return the mysql connection
+     */
+    public Connection getMysqlConnection() {
+        return mysqlConnection;
     }
 }

@@ -1,22 +1,22 @@
 package net.jacobpeterson.spigot.gui.guis;
 
+import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    protected static final Logger LOGGER = PvPPlugin.LOGGER;
 
     protected GUIManager guiManager;
     protected String title;
@@ -37,6 +37,11 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     @Override
     public void init() {
+        if (arenas == null) {
+            LOGGER.warning("Arenas not set in ChooseArenaMenu!");
+            return;
+        }
+
         int chestLines = (int) Math.ceil((arenas.size() == 0 ? 5 : arenas.size()) / 5); // 5 Arena ItemStacks per chest row
         if (chestLines > 6) {
             throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
@@ -65,7 +70,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                 }
 
                 if (arena.getItemStack() == null) {
-                    LOGGER.warn("No Arena ItemStack representation for arena: " + arena.getName());
+                    LOGGER.warning("No Arena ItemStack representation for arena: " + arena.getName());
                 } else {
                     inventory.setItem((currentLine * 9) + currentIndex, arena.getItemStack());
                 }
