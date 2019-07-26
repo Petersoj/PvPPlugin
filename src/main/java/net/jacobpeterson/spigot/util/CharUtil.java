@@ -3,10 +3,11 @@ package net.jacobpeterson.spigot.util;
 import org.bukkit.ChatColor;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public final class CharUtil {
 
-    private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
+    private static final Charset UTF_8_CHARSET = StandardCharsets.UTF_8;
 
     public static final String DOUBLE_RIGHT_ARROW = fromUTFCode("\u2192");
 

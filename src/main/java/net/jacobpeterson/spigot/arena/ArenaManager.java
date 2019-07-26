@@ -7,6 +7,7 @@ import net.jacobpeterson.spigot.arena.arenas.Team2v2Arena;
 import net.jacobpeterson.spigot.arena.data.ArenaDataManager;
 import net.jacobpeterson.spigot.util.Initializers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -23,16 +24,39 @@ public class ArenaManager implements Initializers {
     public ArenaManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
         this.arenaDataManager = new ArenaDataManager(this);
+        // Instantiate these to empty Arraylists because we need the types via getClass() for Gson
+        this.ffaArenas = new ArrayList<>();
+        this.ranked1v1Arenas = new ArrayList<>();
+        this.team2v2Arenas = new ArrayList<>();
     }
 
     @Override
-    public void init() {
-
+    public void init() throws IOException {
+        arenaDataManager.init();
     }
 
     @Override
     public void deinit() {
+        arenaDataManager.deinit();
+    }
 
+    /**
+     * Checks if arena name already exists.
+     *
+     * @return whether or not the arena exists boolean
+     */
+    public boolean doesArenaExist(String name) {
+        // TODO check if name == arena.getName();
+        for (FFAArena ffaArena : ffaArenas) {
+
+        }
+        for (Ranked1v1Arena ranked1v1Arena : ranked1v1Arenas) {
+
+        }
+        for (Team2v2Arena team2v2Arena : team2v2Arenas) {
+
+        }
+        return false;
     }
 
     /**
@@ -42,6 +66,15 @@ public class ArenaManager implements Initializers {
      */
     public PvPPlugin getPvPPlugin() {
         return pvpPlugin;
+    }
+
+    /**
+     * Gets arena data manager.
+     *
+     * @return the arena data manager
+     */
+    public ArenaDataManager getArenaDataManager() {
+        return arenaDataManager;
     }
 
     /**

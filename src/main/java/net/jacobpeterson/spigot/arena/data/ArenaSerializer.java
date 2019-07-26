@@ -8,22 +8,24 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
 
 import java.lang.reflect.Type;
 
-public class ArenaReferenceSerializer implements JsonSerializer<Arena>, JsonDeserializer<Arena> {
+public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<Arena> {
 
-    private PvPPlugin pvpPlugin; // Used to get the ArenaManager b/c this is instantiated b4 ArenaManager in PvPPlugin init
+    private PvPPlugin pvpPlugin;
     private boolean referenceSerialization;
     private boolean referenceDeserialization;
 
     /**
-     * Instantiates a new Arena reference serializer, used to JSON (de)serialize Arena objects by referencing them already
+     * Instantiates a new Arena serializer, used to JSON (de)serialize Arena objects by referencing them already
      * (de)serialized in ArenaDataManager.
      *
-     * @param pvpPlugin the pvp plugin
+     * @param pvpPlugin the pvp plugin is used to get the ArenaManager because this class is instantiated
+     *                  before ArenaManager in PvPPlugin init
      */
-    public ArenaReferenceSerializer(PvPPlugin pvpPlugin) {
+    public ArenaSerializer(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
     }
 
@@ -32,6 +34,7 @@ public class ArenaReferenceSerializer implements JsonSerializer<Arena>, JsonDese
         if (!referenceSerialization) {
             return jsonSerializationContext.serialize(arena, type);
         }
+        ArenaManager arenaManager = pvpPlugin.getArenaManager();
         // TODO serialize by reference
         return null;
     }
@@ -42,6 +45,7 @@ public class ArenaReferenceSerializer implements JsonSerializer<Arena>, JsonDese
         if (!referenceDeserialization) {
             return jsonDeserializationContext.deserialize(jsonElement, type);
         }
+        ArenaManager arenaManager = pvpPlugin.getArenaManager();
         // TODO deserialize by reference
         return null;
     }
