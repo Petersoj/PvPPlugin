@@ -60,7 +60,7 @@ public class PlayerDataManager implements Initializers {
                 throw new SQLException("Cannot create " + databaseTableName + " table!");
             }
         }
-        LOGGER.info("Found " + databaseTableName + " table in database!");
+        LOGGER.info("Found " + databaseTableName + " table in database");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class PlayerDataManager implements Initializers {
      * Fetch PlayerData from SQL database.
      *
      * @param pvpPlayer the pvp player
-     * @return the player data
+     * @return the player data (null if no data exists)
      * @throws SQLException the sql exception
      */
     @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so

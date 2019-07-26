@@ -2,6 +2,7 @@ package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.command.CommandListener;
+import net.jacobpeterson.spigot.data.DatabaseConfig;
 import net.jacobpeterson.spigot.data.DatabaseManager;
 import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
@@ -22,8 +23,8 @@ public class PvPPlugin extends JavaPlugin {
     private final Logger LOGGER;
     private GroupManager groupManager;
     private GsonManager gsonManager;
-    private PvPConfig pvpConfig;
-    private PvPListeners pvpListeners;
+    private DatabaseConfig databaseConfig;
+    private PluginListeners pluginListeners;
     private CommandListener commandListener;
     private DatabaseManager databaseManager;
     private ArenaManager arenaManager;
@@ -34,12 +35,12 @@ public class PvPPlugin extends JavaPlugin {
         PLUGIN_LOGGER_INSTANCE = super.getLogger(); // The Bukkit logger is nicely formatted so use it globally
         LOGGER = PvPPlugin.getPluginLogger();
 
-        LOGGER.info("Building PvPPlugin");
+        LOGGER.info("Building " + this.getName());
 
         this.groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
         this.gsonManager = new GsonManager(this);
-        this.pvpConfig = new PvPConfig(this);
-        this.pvpListeners = new PvPListeners(this);
+        this.databaseConfig = new DatabaseConfig(this);
+        this.pluginListeners = new PluginListeners(this);
         this.commandListener = new CommandListener(this);
         this.databaseManager = new DatabaseManager(this);
         this.arenaManager = new ArenaManager(this);
@@ -48,7 +49,7 @@ public class PvPPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets plugin logger for PvPPlugin.
+     * Gets plugin logger for this Plugin.
      * NOTE: This WILL be null if used in a static context in another class! The plugin class needs to be instantiated
      * by Spigot first before using this method (so you should only set logger instances in an init() or constructor).
      *
@@ -60,37 +61,39 @@ public class PvPPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        LOGGER.info("Initializing PvPPlugin");
+        LOGGER.info("Initializing " + this.getName());
 
         try {
             gsonManager.init();
-            pvpConfig.init();
-            pvpListeners.init();
+            databaseConfig.init();
+            pluginListeners.init();
             databaseManager.init();
             arenaManager.init();
             playerManager.init();
-//            guiManager.init();
+            guiManager.init();
         } catch (Exception exception) {
-            LOGGER.log(Level.SEVERE, "Cannot enable PvPPlugin", exception);
+            LOGGER.log(Level.SEVERE, "Cannot enable " + this.getName(), exception);
 
             Bukkit.getPluginManager().disablePlugin(this); // Disable plugin because of error in initializing plugin
         }
+
+        LOGGER.info("Finished Initializing " + this.getName());
     }
 
     @Override
     public void onDisable() {
-        LOGGER.info("Deinitializing PvPPlugin");
+        LOGGER.info("Deinitializing " + this.getName());
 
         try {
             gsonManager.deinit();
-            pvpConfig.deinit();
-            pvpListeners.deinit();
+            databaseConfig.deinit();
+            pluginListeners.deinit();
             databaseManager.deinit();
             arenaManager.deinit();
             playerManager.deinit();
-//            guiManager.deinit();
+            guiManager.deinit();
         } catch (Exception exception) {
-            LOGGER.log(Level.SEVERE, "Cannot disable PvPPlugin", exception);
+            LOGGER.log(Level.SEVERE, "Cannot disable " + this.getName(), exception);
         }
     }
 
@@ -118,21 +121,21 @@ public class PvPPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets pvp config.
+     * Gets database config.
      *
-     * @return the pvp config
+     * @return the database config
      */
-    public PvPConfig getPvPConfig() {
-        return pvpConfig;
+    public DatabaseConfig getDatabaseConfig() {
+        return databaseConfig;
     }
 
     /**
-     * Gets pvp listeners.
+     * Gets plugin listeners.
      *
-     * @return the pvp listeners
+     * @return the plugin listeners
      */
-    public PvPListeners getPvPListeners() {
-        return pvpListeners;
+    public PluginListeners getPluginListeners() {
+        return pluginListeners;
     }
 
     /**

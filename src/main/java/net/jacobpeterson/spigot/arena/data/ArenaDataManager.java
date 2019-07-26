@@ -50,7 +50,7 @@ public class ArenaDataManager implements Initializers {
 
             LOGGER.info("Loaded Arenas");
         } catch (FileNotFoundException exception) {
-            LOGGER.warning(arenaDataFile.getName() + " file not found - No Arenas loaded");
+            LOGGER.warning(arenaDataFile.getName() + " file not found - No Arenas loaded!");
         }
     }
 

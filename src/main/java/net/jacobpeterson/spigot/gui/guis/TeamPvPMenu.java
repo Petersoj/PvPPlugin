@@ -27,19 +27,22 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
 
     @Override
     public void init() {
-        // TODO create Inventory based on # of teams
-
         craftTeamItem = new ItemStack(Material.WORKBENCH, 2);
         ItemStackUtil.formatLore(craftTeamItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
                 ChatColor.GOLD + "Be the leader of a team and invite others.");
-        inventory.setItem(0, craftTeamItem);
 
         backItem = new ItemStack(Material.BOOK);
         ItemStackUtil.formatLore(backItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Back",
                 "");
-        inventory.setItem(8, backItem);
+    }
+
+    @Override
+    public void createInventory() {
+        // TODO create Inventory based on # of teams
+//        inventory.setItem(0, craftTeamItem);
+//        inventory.setItem(8, backItem);
     }
 
     @Override

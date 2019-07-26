@@ -34,39 +34,46 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
         this.LOGGER = PvPPlugin.getPluginLogger();
         this.guiManager = guiManager;
         this.title = title;
+        this.arenas = guiManager.getPvPPlugin().getArenaManager().getAllArenas();
     }
 
     @Override
     public void init() {
-        if (arenas == null) {
-            LOGGER.warning("Arenas not set in ChooseArenaMenu!");
-            return;
-        }
-
-        int chestLines = (int) Math.ceil((arenas.size() == 0 ? 5 : arenas.size()) / 5); // 5 Arena ItemStacks per chest row
-        if (chestLines > 6) {
-            throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
-        }
-        inventory = Bukkit.createInventory(null, chestLines * 9, title);
-
         anyItem = new ItemStack(Material.EMERALD);
         ItemStackUtil.formatLore(anyItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Any",
                 ChatColor.GOLD + "Play on any arena (fastest)");
-        inventory.setItem(0, anyItem);
 
         backItem = new ItemStack(Material.BOOK);
         ItemStackUtil.formatLore(backItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Back",
                 "");
+
+        this.createInventory();
+    }
+
+    @Override
+    public void createInventory() {
+        if (arenas == null) {
+            LOGGER.warning("Null Arenas ArrayList in ChooseArenaMenu!");
+            return;
+        }
+
+        int chestLines = (int) Math.ceil((arenas.size() == 0 ? 2 : arenas.size()) / 5); // 5 Arena ItemStacks per chest row
+        if (chestLines > 6) {
+            throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
+        }
+        inventory = Bukkit.createInventory(null, chestLines * 9, title);
+
+        inventory.setItem(0, anyItem);
         inventory.setItem(8, backItem);
 
         if (arenas != null) {
-            int currentIndex = 1;
+            int currentIndex = 2;
             int currentLine = 0;
             for (Arena arena : arenas) {
-                if (currentIndex > 5) {
-                    currentIndex = 0;
+                if (currentIndex > 7) {
+                    currentIndex = 2;
                     currentLine++;
                 }
 
@@ -83,11 +90,12 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     /**
      * Update arenas shown in the GUI.
-     * Note that this simply execute {@link AbstractInventoryGUI#deinit()} and then {@link AbstractInventoryGUI#init()}.
+     * Note that this simply execute {@link AbstractInventoryGUI#closeViewers()}
+     * and then {@link AbstractInventoryGUI#createInventory()} respectively.
      */
     public void updateArenas() {
-        this.deinit();
-        this.init();
+        this.closeViewers();
+        this.createInventory();
     }
 
     /**

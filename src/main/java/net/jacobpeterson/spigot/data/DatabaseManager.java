@@ -1,6 +1,5 @@
 package net.jacobpeterson.spigot.data;
 
-import net.jacobpeterson.spigot.PvPConfig;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.util.Initializers;
 
@@ -28,22 +27,19 @@ public class DatabaseManager implements Initializers {
 
     @Override
     public void init() throws SQLException {
-        PvPConfig pvpConfig = pvpPlugin.getPvPConfig();
+        DatabaseConfig databaseConfig = pvpPlugin.getDatabaseConfig();
 
-        StringBuilder urlBuilder = new StringBuilder("jdbc:mysql://");
-        urlBuilder.append(pvpConfig.getMysqlHost());
-        urlBuilder.append(":");
-        urlBuilder.append(pvpConfig.getMysqlPort());
-        urlBuilder.append("/");
-        urlBuilder.append(pvpConfig.getMysqlDatabase());
-        urlBuilder.append("?useSSL=true");
-
-        String mysqlURL = urlBuilder.toString();
+        String mysqlURL = "jdbc:mysql://" + databaseConfig.getMysqlHost() +
+                ":" +
+                databaseConfig.getMysqlPort() +
+                "/" +
+                databaseConfig.getMysqlDatabase() +
+                "?useSSL=true";
 
         LOGGER.info("Attempting to connect to MySQL Database with URL: " + mysqlURL);
-        mysqlConnection = DriverManager.getConnection(mysqlURL, pvpConfig.getMysqlUsername(),
-                pvpConfig.getMysqlPassword());
-        LOGGER.info("Database connection successful!");
+        mysqlConnection = DriverManager.getConnection(mysqlURL, databaseConfig.getMysqlUsername(),
+                databaseConfig.getMysqlPassword());
+        LOGGER.info("Database connection successful");
     }
 
     @Override

@@ -1,11 +1,12 @@
-package net.jacobpeterson.spigot;
+package net.jacobpeterson.spigot.data;
 
+import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.logging.Logger;
 
-public class PvPConfig implements Initializers {
+public class DatabaseConfig implements Initializers {
 
     private static final String MYSQL_HOST_KEY = "mysql_host";
     private static final String MYSQL_PORT_KEY = "mysql_port";
@@ -22,11 +23,11 @@ public class PvPConfig implements Initializers {
     private String mysqlPassword;
 
     /**
-     * Instantiates a new PvP config. Used to get Java objects from config.yml.
+     * Instantiates a new Database config. Used to get Java objects from config.yml.
      *
      * @param pvpPlugin the pvp plugin
      */
-    public PvPConfig(PvPPlugin pvpPlugin) {
+    public DatabaseConfig(PvPPlugin pvpPlugin) {
         this.LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlugin = pvpPlugin;
     }

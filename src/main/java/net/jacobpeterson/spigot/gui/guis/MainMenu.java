@@ -2,8 +2,9 @@ package net.jacobpeterson.spigot.gui.guis;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.util.CharUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -23,7 +24,6 @@ public class MainMenu extends AbstractInventoryGUI {
      * @param guiManager the gui manager
      */
     public MainMenu(GUIManager guiManager) {
-        super(9, ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Main Menu");
         this.guiManager = guiManager;
         this.currentlyPlayingLine = ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": ";
     }
@@ -35,7 +35,6 @@ public class MainMenu extends AbstractInventoryGUI {
                 CharUtil.boldColor(ChatColor.YELLOW) + "Play Ranked 1v1",
                 ChatColor.GOLD + "We will match up you up against the",
                 ChatColor.GOLD + "most suitable opponent possible!");
-        inventory.setItem(0, ranked1v1Item);
 
         unrankedFFAItem = new ItemStack(Material.BOW);
         ItemStackUtil.formatLore(unrankedFFAItem, true,
@@ -44,7 +43,6 @@ public class MainMenu extends AbstractInventoryGUI {
                 ChatColor.GOLD + "Perfect activity during queues.",
                 ChatColor.RESET + "",
                 currentlyPlayingLine);
-        this.updateFFACurrentlyPlaying(0); // Also adds ItemStack to Inventory at index 1
 
         teamPvPItem = new ItemStack(Material.SKULL_ITEM, 1, (short) 3); // damage of 3 = player skull
         ItemStackUtil.formatLore(teamPvPItem, true,
@@ -53,6 +51,17 @@ public class MainMenu extends AbstractInventoryGUI {
                 ChatColor.GOLD + "Join a team or craft your own!",
                 ChatColor.GOLD + "For more information, please visit",
                 ChatColor.AQUA + "mcsiege.namelesshosting.com/teampvp");
+
+        this.createInventory();
+    }
+
+    @Override
+    public void createInventory() {
+        String title = ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Main Menu";
+        this.inventory = Bukkit.createInventory(null, 9, title);
+
+        inventory.setItem(0, ranked1v1Item);
+        this.updateFFACurrentlyPlaying(0); // Also set ItemStack in Inventory at index 1
         inventory.setItem(2, teamPvPItem);
     }
 
@@ -69,6 +78,6 @@ public class MainMenu extends AbstractInventoryGUI {
      */
     public void updateFFACurrentlyPlaying(int ffaCurrentlyPlaying) {
         ItemStackUtil.setLoreLine(unrankedFFAItem, 3, currentlyPlayingLine + ChatColor.AQUA + ffaCurrentlyPlaying);
-        inventory.setItem(1, unrankedFFAItem); // Updates any client's open GUI
+        inventory.setItem(1, unrankedFFAItem); // Will update any clients' open GUI
     }
 }
