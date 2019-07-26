@@ -65,4 +65,31 @@ public class GsonManager implements Initializers {
     public Gson getGson() {
         return gson;
     }
+
+    /**
+     * Gets item stack serializer.
+     *
+     * @return the item stack serializer
+     */
+    public ItemStackSerializer getItemStackSerializer() {
+        return itemStackSerializer;
+    }
+
+    /**
+     * Gets item stack array serializer.
+     *
+     * @return the item stack array serializer
+     */
+    public ItemStackArraySerializer getItemStackArraySerializer() {
+        return itemStackArraySerializer;
+    }
+
+    /**
+     * Gets arena serializer.
+     *
+     * @return the arena serializer
+     */
+    public ArenaSerializer getArenaSerializer() {
+        return arenaSerializer;
+    }
 }

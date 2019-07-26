@@ -56,6 +56,9 @@ public class ArenaDataManager implements Initializers {
     public void saveArenas(GsonManager gsonManager) throws IOException {
         Gson gson = gsonManager.getGson();
 
+        ArenaSerializer arenaSerializer = gsonManager.getArenaSerializer();
+        arenaSerializer.setReferenceSerialization(false); // This will serialize the entire object via Gson
+
         JsonObject arenasObject = new JsonObject();
         JsonElement ffaArenasArray = gson.toJsonTree(arenaManager.getFFAArenas(),
                 arenaManager.getFFAArenas().getClass());
@@ -81,6 +84,9 @@ public class ArenaDataManager implements Initializers {
     @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if there is
     public void loadArenas(GsonManager gsonManager) throws IOException, ClassCastException {
         Gson gson = gsonManager.getGson();
+
+        ArenaSerializer arenaSerializer = gsonManager.getArenaSerializer();
+        arenaSerializer.setReferenceDeserialization(false); // This will deserialize the entire object via Gson
 
         JsonReader jsonReader = new JsonReader(new FileReader(arenaDataFile));
 
