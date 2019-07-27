@@ -1,6 +1,7 @@
-package net.jacobpeterson.spigot.gui.guis;
+package net.jacobpeterson.spigot.gui.guis.teampvp;
 
 import net.jacobpeterson.spigot.gui.GUIManager;
+import net.jacobpeterson.spigot.gui.guis.ChooseArenaMenu;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.event.inventory.InventoryInteractEvent;

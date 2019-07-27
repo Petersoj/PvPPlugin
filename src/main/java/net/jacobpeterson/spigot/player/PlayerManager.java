@@ -2,7 +2,7 @@ package net.jacobpeterson.spigot.player;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
-import net.jacobpeterson.spigot.player.listener.PlayerListeners;
+import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class PlayerManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
-    private PlayerListeners playerListeners;
+    private PlayerEventHandlers playerEventHandlers;
     private PlayerDataManager playerDataManager;
     private ArrayList<PvPPlayer> pvpPlayers;
 
@@ -26,7 +26,7 @@ public class PlayerManager implements Initializers {
      */
     public PlayerManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
-        this.playerListeners = new PlayerListeners(this);
+        this.playerEventHandlers = new PlayerEventHandlers(this);
         this.pvpPlayers = new ArrayList<>();
         this.playerDataManager = new PlayerDataManager(this, pvpPlugin.getGsonManager(), pvpPlugin.getDatabaseManager());
     }
@@ -88,12 +88,12 @@ public class PlayerManager implements Initializers {
     }
 
     /**
-     * Gets player listeners.
+     * Gets player event handlers.
      *
-     * @return the player listeners
+     * @return the player event handlers
      */
-    public PlayerListeners getPlayerListeners() {
-        return playerListeners;
+    public PlayerEventHandlers getPlayerEventHandlers() {
+        return playerEventHandlers;
     }
 
     /**

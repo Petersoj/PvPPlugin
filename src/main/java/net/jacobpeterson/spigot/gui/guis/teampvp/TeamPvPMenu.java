@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.gui.guis;
+package net.jacobpeterson.spigot.gui.guis.teampvp;
 
 import net.jacobpeterson.spigot.gamemode.team2v2pvp.Team2v2;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;

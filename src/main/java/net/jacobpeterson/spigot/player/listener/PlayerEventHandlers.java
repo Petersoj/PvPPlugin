@@ -7,17 +7,23 @@ import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PlayerListeners {
+public class PlayerEventHandlers {
 
     private final Logger LOGGER;
     private PlayerManager playerManager;
 
-    public PlayerListeners(PlayerManager playerManager) {
+    /**
+     * Instantiates a new PlayerEventHandlers for handling Bukkit events.
+     *
+     * @param playerManager the player manager
+     */
+    public PlayerEventHandlers(PlayerManager playerManager) {
         LOGGER = PvPPlugin.getPluginLogger();
         this.playerManager = playerManager;
     }
@@ -44,5 +50,14 @@ public class PlayerListeners {
             playerData = new PlayerData(); // Create a fresh PlayerData for the player
         }
         pvpPlayer.setPlayerData(playerData);
+    }
+
+    /**
+     * Handle on player quit event (save player data, clean up, etc.).
+     *
+     * @param event the event
+     */
+    public void handleOnPlayerQuitEvent(PlayerQuitEvent event) {
+
     }
 }
