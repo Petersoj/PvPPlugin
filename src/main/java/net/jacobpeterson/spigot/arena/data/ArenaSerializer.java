@@ -3,6 +3,7 @@ package net.jacobpeterson.spigot.arena.data;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
@@ -34,9 +35,9 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
         if (!referenceSerialization) {
             return jsonSerializationContext.serialize(arena, type);
         }
-        ArenaManager arenaManager = pvpPlugin.getArenaManager();
-        // TODO serialize by reference
-        return null;
+        JsonObject arenaNameObject = new JsonObject();
+        arenaNameObject.addProperty("name", arena.getName());
+        return arenaNameObject;
     }
 
     @Override
@@ -45,8 +46,16 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
         if (!referenceDeserialization) {
             return jsonDeserializationContext.deserialize(jsonElement, type);
         }
+        if (!(jsonElement instanceof JsonObject)) {
+            throw new JsonParseException("Must be JsonObject!");
+        }
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
-        // TODO deserialize by reference
+        String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
+        for (Arena arena : arenaManager.getAllArenas()) {
+            if (arena.getName().equals(arenaName)) {
+                return arena;
+            }
+        }
         return null;
     }
 

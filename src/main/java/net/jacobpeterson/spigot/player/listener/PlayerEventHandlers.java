@@ -50,6 +50,7 @@ public class PlayerEventHandlers {
             playerData = new PlayerData(); // Create a fresh PlayerData for the player
         }
         pvpPlayer.setPlayerData(playerData);
+        // TODO Insert empty playerData into database via DatabaseManager
     }
 
     /**
@@ -58,6 +59,6 @@ public class PlayerEventHandlers {
      * @param event the event
      */
     public void handleOnPlayerQuitEvent(PlayerQuitEvent event) {
-
+        // TODO async pushing player data
     }
 }

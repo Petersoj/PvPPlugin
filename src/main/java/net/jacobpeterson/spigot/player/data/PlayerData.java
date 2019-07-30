@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public class PlayerData {
 
-    private int ELO;
+    private int elo;
     private HashMap<Arena, Integer> arenaTimesPlayed;
     private int unrankedFFAKills;
     private int unrankedFFADeaths;
@@ -22,25 +22,26 @@ public class PlayerData {
      * Instantiates a new Player data.
      */
     public PlayerData() {
+        this.elo = 1000; // For first-timers
         this.arenaTimesPlayed = new HashMap<>(); // Instantiate so that getClass() of this variable for Gson is not null
     }
 
     /**
-     * Gets elo.
+     * Gets ELO.
      *
-     * @return the elo
+     * @return the ELO
      */
     public int getELO() {
-        return ELO;
+        return elo;
     }
 
     /**
-     * Sets elo.
+     * Sets ELO.
      *
-     * @param ELO the elo
+     * @param elo the ELO
      */
-    public void setELO(int ELO) {
-        this.ELO = ELO;
+    public void setELO(int elo) {
+        this.elo = elo;
     }
 
     /**
