@@ -8,13 +8,16 @@ import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.data.ArenaSerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackArraySerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackSerializer;
+import net.jacobpeterson.spigot.location.LocationSerializer;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 public class GsonManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
     private JsonParser jsonParser;
+    private LocationSerializer locationSerializer;
     private ItemStackSerializer itemStackSerializer;
     private ItemStackArraySerializer itemStackArraySerializer;
     private ArenaSerializer arenaSerializer;
@@ -27,6 +30,7 @@ public class GsonManager implements Initializers {
      */
     public GsonManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
+        this.locationSerializer = new LocationSerializer();
         this.itemStackSerializer = new ItemStackSerializer();
         this.itemStackArraySerializer = new ItemStackArraySerializer();
         this.arenaSerializer = new ArenaSerializer(pvpPlugin);
@@ -37,6 +41,7 @@ public class GsonManager implements Initializers {
         this.jsonParser = new JsonParser();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Location.class, locationSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack.class, itemStackSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack[].class, itemStackArraySerializer);
         gsonBuilder.registerTypeAdapter(Arena.class, arenaSerializer);

@@ -46,15 +46,17 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
         if (!referenceDeserialization) {
             return jsonDeserializationContext.deserialize(jsonElement, type);
         }
-        if (jsonElement instanceof JsonObject) {
-            ArenaManager arenaManager = pvpPlugin.getArenaManager();
-            
-            String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
+        if (!(jsonElement instanceof JsonObject)) {
+            throw new JsonParseException("Arena must be JSON Object!");
+        }
 
-            for (Arena arena : arenaManager.getAllArenas()) {
-                if (arena.getName().equals(arenaName)) {
-                    return arena;
-                }
+        ArenaManager arenaManager = pvpPlugin.getArenaManager();
+
+        String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
+
+        for (Arena arena : arenaManager.getAllArenas()) {
+            if (arena.getName().equals(arenaName)) {
+                return arena;
             }
         }
         return null;

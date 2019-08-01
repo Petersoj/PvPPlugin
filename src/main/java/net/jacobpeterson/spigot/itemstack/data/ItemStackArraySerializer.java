@@ -44,21 +44,24 @@ public class ItemStackArraySerializer implements JsonSerializer<ItemStack[]>, Js
     public ItemStack[] deserialize(JsonElement jsonElement, Type type,
                                    JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         ItemStack[] contents = null;
-        if (jsonElement instanceof JsonArray) {
-            JsonArray jsonItemStackArray = (JsonArray) jsonElement;
-
-            if (jsonItemStackArray.size() > 0) {
-                int size = jsonItemStackArray.get(0).getAsJsonObject().getAsJsonPrimitive("size").getAsInt();
-                contents = new ItemStack[size];
-            }
-
-            for (int index = 1; index < jsonItemStackArray.size(); index++) {
-                JsonObject slotJsonObject = jsonItemStackArray.get(index).getAsJsonObject();
-                ItemStack itemStack = jsonDeserializationContext.deserialize(slotJsonObject.getAsJsonObject("item"),
-                        ItemStack.class);
-                contents[slotJsonObject.getAsJsonPrimitive("slot").getAsInt()] = itemStack;
-            }
+        if (!(jsonElement instanceof JsonArray)) {
+            throw new JsonParseException("ItemStack Array must be JSON Array!");
         }
+
+        JsonArray jsonItemStackArray = (JsonArray) jsonElement;
+
+        if (jsonItemStackArray.size() > 0) {
+            int size = jsonItemStackArray.get(0).getAsJsonObject().getAsJsonPrimitive("size").getAsInt();
+            contents = new ItemStack[size];
+        }
+
+        for (int index = 1; index < jsonItemStackArray.size(); index++) {
+            JsonObject slotJsonObject = jsonItemStackArray.get(index).getAsJsonObject();
+            ItemStack itemStack = jsonDeserializationContext.deserialize(slotJsonObject.getAsJsonObject("item"),
+                    ItemStack.class);
+            contents[slotJsonObject.getAsJsonPrimitive("slot").getAsInt()] = itemStack;
+        }
+
         return contents;
     }
 }
