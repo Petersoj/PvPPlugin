@@ -16,12 +16,13 @@ import java.util.logging.Logger;
 
 public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
+    protected static ItemStack ANY_ITEM;
+    protected static ItemStack BACK_ITEM;
+
     protected final Logger LOGGER;
 
     protected GUIManager guiManager;
     protected String title;
-    protected ItemStack anyItem;
-    protected ItemStack backItem;
     protected ArrayList<Arena> arenas;
 
     /**
@@ -39,15 +40,19 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     @Override
     public void init() {
-        anyItem = new ItemStack(Material.EMERALD);
-        ItemStackUtil.formatLore(anyItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Any",
-                ChatColor.GOLD + "Play on any arena (fastest)");
+        if (ANY_ITEM == null) {
+            ANY_ITEM = new ItemStack(Material.EMERALD);
+            ItemStackUtil.formatLore(ANY_ITEM, true,
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Any",
+                    ChatColor.GOLD + "Play on any arena (fastest)");
+        }
 
-        backItem = new ItemStack(Material.BOOK);
-        ItemStackUtil.formatLore(backItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Back",
-                "");
+        if (BACK_ITEM == null) {
+            BACK_ITEM = new ItemStack(Material.BOOK);
+            ItemStackUtil.formatLore(BACK_ITEM, true,
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Back",
+                    "");
+        }
 
         this.createInventory();
     }
@@ -65,8 +70,8 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
         }
         inventory = Bukkit.createInventory(null, chestLines * 9, title);
 
-        inventory.setItem(0, anyItem);
-        inventory.setItem(8, backItem);
+        inventory.setItem(0, ANY_ITEM);
+        inventory.setItem(8, BACK_ITEM);
 
         if (arenas != null) {
             int currentIndex = 2;
@@ -77,10 +82,10 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                     currentLine++;
                 }
 
-                if (arena.getItemStack() == null) {
+                if (arena.getArenaItemStack() == null) {
                     LOGGER.warning("No Arena ItemStack representation for arena: " + arena.getName());
                 } else {
-                    inventory.setItem((currentLine * 9) + currentIndex, arena.getItemStack());
+                    inventory.setItem((currentLine * 9) + currentIndex, arena.getArenaItemStack().getItemStack());
                 }
 
                 currentIndex++;

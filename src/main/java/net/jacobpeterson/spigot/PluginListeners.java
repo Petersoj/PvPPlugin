@@ -1,5 +1,6 @@
 package net.jacobpeterson.spigot;
 
+import net.jacobpeterson.spigot.gui.listener.InventoryGUIEventHandlers;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
@@ -13,7 +14,13 @@ public class PluginListeners implements Listener, Initializers {
 
     private PvPPlugin pvpPlugin;
     private PlayerEventHandlers playerEventHandlers;
+    private InventoryGUIEventHandlers inventoryGUIEventHandlers;
 
+    /**
+     * Instantiates a new Plugin Listeners class which calls various event handler classes.
+     *
+     * @param pvpPlugin the pvp plugin
+     */
     public PluginListeners(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
     }
@@ -23,6 +30,7 @@ public class PluginListeners implements Listener, Initializers {
         Bukkit.getPluginManager().registerEvents(this, pvpPlugin);
 
         this.playerEventHandlers = pvpPlugin.getPlayerManager().getPlayerEventHandlers();
+        this.inventoryGUIEventHandlers = pvpPlugin.getGUIManager().getInventoryGUIEventHandlers();
     }
 
     @Override
@@ -41,6 +49,6 @@ public class PluginListeners implements Listener, Initializers {
 
     @EventHandler
     public void onInventoryInteractEvent(InventoryInteractEvent event) {
-        // TODO InventoryListeners
+        this.inventoryGUIEventHandlers.handleOnInventoryInteractEvent(event);
     }
 }

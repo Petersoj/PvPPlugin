@@ -183,7 +183,7 @@ public class PlayerDataManager implements Initializers {
         insertPreparedStatement.setInt(9, playerData.getTeamPvPWins());
         insertPreparedStatement.setInt(10, playerData.getTeamPvPLosses());
 
-        // e.g. INSERT INTO player_data VALUES("<UUID>", 0, "{}", 0, 0, 0, 0, 0, 0);
+        // e.g. INSERT INTO player_data VALUES("<UUID>", 1000, "{}", 0, 0, 0, 0, 0, 0);
     }
 
     /**

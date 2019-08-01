@@ -42,4 +42,27 @@ public class ItemStackUtil {
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
     }
+
+    /**
+     * Insert a string at a specific line and character index.
+     *
+     * @param itemStack   the item stack
+     * @param lineIndex   the line index
+     * @param atCharIndex the at char index
+     * @param substring   the substring
+     */
+    public static void insertLoreLineSubstring(ItemStack itemStack, int lineIndex, int atCharIndex, String substring) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        List<String> lore = itemMeta.getLore();
+
+        String loreLine = lore.get(lineIndex);
+        String newLine = loreLine.substring(0, atCharIndex) + substring;
+        if (newLine.length() < loreLine.length()) {
+            newLine += loreLine.substring(substring.length());
+        }
+
+        lore.set(lineIndex, newLine);
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+    }
 }

@@ -9,7 +9,7 @@ public final class CharUtil {
 
     private static final Charset UTF_8_CHARSET = StandardCharsets.UTF_8;
 
-    public static final String DOUBLE_RIGHT_ARROW = fromUTFCode("\u2192");
+    public static final String DOUBLE_RIGHT_ARROW = fromUTFHexCode("\u00BB");
 
     public static String boldColor(ChatColor color) {
         return color.toString() + ChatColor.BOLD.toString();
@@ -19,7 +19,7 @@ public final class CharUtil {
         return ChatColor.RESET + color.toString();
     }
 
-    private static String fromUTFCode(String code) {
+    private static String fromUTFHexCode(String code) {
         return new String(code.getBytes(UTF_8_CHARSET), UTF_8_CHARSET);
     }
 

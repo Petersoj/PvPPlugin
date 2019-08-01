@@ -36,6 +36,8 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
         ItemStackUtil.formatLore(backItem, true,
                 CharUtil.boldColor(ChatColor.YELLOW) + "Back",
                 "");
+
+        this.createInventory();
     }
 
     @Override

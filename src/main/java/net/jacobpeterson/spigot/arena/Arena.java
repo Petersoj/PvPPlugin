@@ -1,12 +1,12 @@
 package net.jacobpeterson.spigot.arena;
 
+import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
 
 public abstract class Arena {
 
     private String name;
-    private ItemStack itemStack;
+    private ArenaItemStack arenaItemStack;
     private Location spawnLocation;
 
     /**
@@ -37,21 +37,21 @@ public abstract class Arena {
     }
 
     /**
-     * Gets item stack representing this arena.
+     * Gets arena item stack.
      *
-     * @return the item stack representing this arena
+     * @return the arena item stack
      */
-    public ItemStack getItemStack() {
-        return itemStack;
+    public ArenaItemStack getArenaItemStack() {
+        return arenaItemStack;
     }
 
     /**
-     * Sets item stack representing this arena.
+     * Sets arena item stack.
      *
-     * @param itemStack the item stack to represent this arena
+     * @param arenaItemStack the arena item stack
      */
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
+    public void setArenaItemStack(ArenaItemStack arenaItemStack) {
+        this.arenaItemStack = arenaItemStack;
     }
 
     /**

@@ -2,7 +2,6 @@ package net.jacobpeterson.spigot.gui;
 
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -45,9 +44,7 @@ public abstract class AbstractInventoryGUI implements Initializers {
      */
     public void closeViewers() {
         if (inventory != null) {
-            inventory.getViewers().stream()
-                    .filter(humanEntity -> humanEntity instanceof Player)
-                    .forEach(HumanEntity::closeInventory);
+            inventory.getViewers().forEach(HumanEntity::closeInventory);
         }
     }
 

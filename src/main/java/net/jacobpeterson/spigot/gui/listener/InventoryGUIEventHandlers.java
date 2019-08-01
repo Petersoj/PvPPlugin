@@ -2,8 +2,8 @@ package net.jacobpeterson.spigot.gui.listener;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.gui.GUIManager;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 
 import java.util.logging.Logger;
 
@@ -28,16 +28,10 @@ public class InventoryGUIEventHandlers {
      * @param event the event
      */
     public void handleOnInventoryInteractEvent(InventoryInteractEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getWhoClicked();
 
     }
-
-    /**
-     * Handle on inventory open event.
-     *
-     * @param event the event
-     */
-    public void handleOnInventoryOpenEvent(InventoryOpenEvent event) {
-
-    }
-
 }
