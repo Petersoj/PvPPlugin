@@ -133,6 +133,9 @@ public class PlayerDataManager implements Initializers {
         // Table name
         updatePreparedStatement.setString(1, databaseTableName);
 
+        // UUID
+        updatePreparedStatement.setString(10, pvpPlayer.getPlayer().getUniqueId().toString());
+
         // Arena times played parsing logic
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
         String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),

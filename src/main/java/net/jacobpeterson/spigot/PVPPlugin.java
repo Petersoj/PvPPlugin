@@ -75,6 +75,7 @@ public class PvPPlugin extends JavaPlugin {
             LOGGER.log(Level.SEVERE, "Cannot enable " + this.getName(), exception);
 
             Bukkit.getPluginManager().disablePlugin(this); // Disable plugin because of error in initializing plugin
+            return;
         }
 
         LOGGER.info("Finished Initializing " + this.getName());

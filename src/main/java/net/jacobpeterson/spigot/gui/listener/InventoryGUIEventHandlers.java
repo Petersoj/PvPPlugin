@@ -39,6 +39,6 @@ public class InventoryGUIEventHandlers {
             return;
         }
 
-
+        // Call onInventoryClick in AbstractInventoryGUI for the proper inventory
     }
 }

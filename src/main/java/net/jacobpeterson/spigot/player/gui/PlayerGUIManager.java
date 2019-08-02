@@ -27,11 +27,20 @@ public class PlayerGUIManager implements Initializers, AbstractInventoryReferenc
      */
     public PlayerGUIManager(PvPPlayer pvpPlayer) {
         this.pvpPlayer = pvpPlayer;
+        this.ranked1v1Menu = new Ranked1v1Menu(this);
+        this.teamPvPMenu = new TeamPvPMenu(this);
+        this.teamPvPArenaMenu = new TeamPvPArenaMenu(this);
+        this.teamPvPCraftTeamMenu = new TeamPvPCraftTeamMenu(this);
     }
 
     @Override
     public void init() {
         this.guiManager = pvpPlayer.getPlayerManager().getPvPPlugin().getGUIManager();
+
+        ranked1v1Menu.init();
+        teamPvPMenu.init();
+        teamPvPArenaMenu.init();
+        teamPvPCraftTeamMenu.init();
     }
 
     @Override

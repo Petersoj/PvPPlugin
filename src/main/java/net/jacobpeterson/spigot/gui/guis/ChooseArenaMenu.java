@@ -23,6 +23,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     protected static ItemStack BACK_ITEM;
 
     protected final Logger LOGGER;
+
     protected final PlayerGUIManager playerGUIManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
