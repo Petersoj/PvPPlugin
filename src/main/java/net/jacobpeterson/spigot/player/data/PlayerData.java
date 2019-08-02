@@ -45,20 +45,20 @@ public class PlayerData {
     }
 
     /**
-     * Gets arena times played.
+     * Gets arena times played map.
      *
-     * @return the arena times played
+     * @return the arena times played map
      */
-    public HashMap<Arena, Integer> getArenaTimesPlayed() {
+    public HashMap<Arena, Integer> getArenaTimesPlayedMap() {
         return arenaTimesPlayed;
     }
 
     /**
-     * Sets arena times played.
+     * Sets arena times played map.
      *
-     * @param arenaTimesPlayed the arena times played
+     * @param arenaTimesPlayed the arena times played map
      */
-    public void setArenaTimesPlayed(HashMap<Arena, Integer> arenaTimesPlayed) {
+    public void setArenaTimesPlayedMap(HashMap<Arena, Integer> arenaTimesPlayed) {
         this.arenaTimesPlayed = arenaTimesPlayed;
     }
 

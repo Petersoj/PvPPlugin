@@ -2,8 +2,8 @@ package net.jacobpeterson.spigot.gui.guis.teampvp;
 
 import net.jacobpeterson.spigot.gamemode.team2v2pvp.Team2v2;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
-import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,27 +15,32 @@ import java.util.HashMap;
 
 public class TeamPvPMenu extends AbstractInventoryGUI {
 
-    private GUIManager guiManager;
-    private ItemStack craftTeamItem;
-    private ItemStack backItem;
-    private HashMap<ItemStack, Team2v2> teamItems;
+    private static ItemStack CRAFT_TEAM_ITEM;
+    private static ItemStack BACK_ITEM;
 
-    public TeamPvPMenu(GUIManager guiManager) {
-        this.guiManager = guiManager;
-        this.teamItems = new HashMap<>();
+    private final PlayerGUIManager playerGUIManager;
+    private HashMap<Team2v2, ItemStack> team2v2ItemsMap;
+
+    public TeamPvPMenu(PlayerGUIManager playerGUIManager) {
+        this.playerGUIManager = playerGUIManager;
+        this.team2v2ItemsMap = new HashMap<>();
     }
 
     @Override
     public void init() {
-        craftTeamItem = new ItemStack(Material.WORKBENCH, 2);
-        ItemStackUtil.formatLore(craftTeamItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
-                ChatColor.GOLD + "Be the leader of a team and invite others.");
+        if (CRAFT_TEAM_ITEM == null) {
+            CRAFT_TEAM_ITEM = new ItemStack(Material.WORKBENCH, 2);
+            ItemStackUtil.formatLore(CRAFT_TEAM_ITEM, true,
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
+                    ChatColor.GOLD + "Be the leader of a team and invite others.");
+        }
 
-        backItem = new ItemStack(Material.BOOK);
-        ItemStackUtil.formatLore(backItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Back",
-                "");
+        if (BACK_ITEM == null) {
+            BACK_ITEM = new ItemStack(Material.BOOK);
+            ItemStackUtil.formatLore(BACK_ITEM, true,
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Back",
+                    "");
+        }
 
         this.createInventory();
     }

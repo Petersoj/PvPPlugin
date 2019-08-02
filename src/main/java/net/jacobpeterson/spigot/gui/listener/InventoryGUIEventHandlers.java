@@ -2,6 +2,7 @@ package net.jacobpeterson.spigot.gui.listener;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.gui.GUIManager;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 
@@ -32,6 +33,12 @@ public class InventoryGUIEventHandlers {
             return;
         }
         Player player = (Player) event.getWhoClicked();
+        PvPPlayer pvpPlayer = guiManager.getPvPPlugin().getPlayerManager().getPvPPlayer(player);
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
 
     }
 }

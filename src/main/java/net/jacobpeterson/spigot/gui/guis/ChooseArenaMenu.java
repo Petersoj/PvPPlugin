@@ -2,9 +2,12 @@ package net.jacobpeterson.spigot.gui.guis;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
-import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.PvPPlayer;
+import net.jacobpeterson.spigot.player.data.PlayerData;
+import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,22 +23,21 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     protected static ItemStack BACK_ITEM;
 
     protected final Logger LOGGER;
-
-    protected GUIManager guiManager;
+    protected final PlayerGUIManager playerGUIManager;
     protected String title;
-    protected ArrayList<Arena> arenas;
+    protected ArrayList<ArenaItemStack> arenaItemStacks;
 
     /**
      * Instantiates a new 'Choose Arena' menu. This is meant to be extended by other GUI/menus as this is a general viewer.
      *
-     * @param guiManager the gui manager
-     * @param title      the title
+     * @param playerGUIManager the player gui manager
+     * @param title            the title
      */
-    public ChooseArenaMenu(GUIManager guiManager, String title) {
+    public ChooseArenaMenu(PlayerGUIManager playerGUIManager, String title) {
         this.LOGGER = PvPPlugin.getPluginLogger();
-        this.guiManager = guiManager;
+        this.playerGUIManager = playerGUIManager;
         this.title = title;
-        this.arenas = guiManager.getPvPPlugin().getArenaManager().getAllArenas();
+        this.arenaItemStacks = new ArrayList<>();
     }
 
     @Override
@@ -59,13 +61,9 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     @Override
     public void createInventory() {
-        if (arenas == null) {
-            LOGGER.warning("Null Arenas ArrayList in ChooseArenaMenu!");
-            return;
-        }
-
-        int chestLines = (int) Math.ceil((arenas.size() == 0 ? 2 : arenas.size()) / 5); // 5 Arena ItemStacks per chest row
-        if (chestLines > 6) {
+        // 5 Arena ItemStacks per chest row
+        int chestLines = (int) Math.ceil((arenaItemStacks.size() == 0 ? 2 : arenaItemStacks.size()) / 5);
+        if (chestLines > 6) { // Max lines for Bukkit Chest GUI is 6
             throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
         }
         inventory = Bukkit.createInventory(null, chestLines * 9, title);
@@ -73,19 +71,19 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
         inventory.setItem(0, ANY_ITEM);
         inventory.setItem(8, BACK_ITEM);
 
-        if (arenas != null) {
+        if (arenaItemStacks != null) {
             int currentIndex = 2;
             int currentLine = 0;
-            for (Arena arena : arenas) {
+            for (ArenaItemStack arenaItemStack : arenaItemStacks) {
                 if (currentIndex > 7) {
                     currentIndex = 2;
                     currentLine++;
                 }
 
-                if (arena.getArenaItemStack() == null) {
-                    LOGGER.warning("No Arena ItemStack representation for arena: " + arena.getName());
+                if (arenaItemStack.getItemStack() == null) {
+                    LOGGER.warning("No Arena ItemStack representation for arena: " + arenaItemStack.getArena().getName());
                 } else {
-                    inventory.setItem((currentLine * 9) + currentIndex, arena.getArenaItemStack().getItemStack());
+                    inventory.setItem((currentLine * 9) + currentIndex, arenaItemStack.getItemStack());
                 }
 
                 currentIndex++;
@@ -94,30 +92,59 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     }
 
     /**
-     * Update arenas shown in the GUI.
-     * Note that this simply execute {@link AbstractInventoryGUI#closeViewers()}
-     * and then {@link AbstractInventoryGUI#createInventory()} respectively.
+     * Update arena item stacks lore.
+     * Used for updating the player-specific 'times played' for an arena
+     *
+     * @param pvpPlayer              the pvp player
+     * @param arenas                 the arenas
+     * @param createAllNewItemStacks whether or not to update previously created {@link ArenaItemStack} or create new ones
      */
-    public void updateArenas() {
-        this.closeViewers();
-        this.createInventory();
+    public void updateArenaItemStacks(PvPPlayer pvpPlayer, ArrayList<Arena> arenas, boolean createAllNewItemStacks) {
+        PlayerData playerData = pvpPlayer.getPlayerData();
+
+        if (createAllNewItemStacks) {
+            for (Arena arena : arenas) {
+                ArenaItemStack arenaItemStack = new ArenaItemStack(arena.getArenaItemStack()); // Copies ArenaItemStack
+                Integer timesPlayed = playerData.getArenaTimesPlayedMap().get(arena);
+
+                if (timesPlayed == null) {
+                    LOGGER.warning("PlayerData does not contain 'times played' entry for: " + arena.getName() + " arena.");
+                    timesPlayed = 0;
+                }
+
+                arenaItemStack.updateTimesPlayed(timesPlayed);
+                arenaItemStacks.add(arenaItemStack);
+            }
+        } else {
+            for (ArenaItemStack arenaItemStack : arenaItemStacks) {
+                Arena arena = arenaItemStack.getArena();
+                Integer timesPlayed = playerData.getArenaTimesPlayedMap().get(arena);
+
+                if (timesPlayed == null) {
+                    LOGGER.warning("PlayerData does not contain 'times played' entry for: " + arena.getName() + " arena.");
+                    timesPlayed = 0;
+                }
+
+                arenaItemStack.updateTimesPlayed(timesPlayed);
+            }
+        }
     }
 
     /**
-     * Gets arenas.
+     * Gets arena item stacks.
      *
-     * @return the arenas
+     * @return the arena item stacks
      */
-    public ArrayList<Arena> getArenas() {
-        return arenas;
+    public ArrayList<ArenaItemStack> getArenaItemStacks() {
+        return arenaItemStacks;
     }
 
     /**
-     * Sets arenas.
+     * Sets arena item stacks.
      *
-     * @param arenas the arenas
+     * @param arenaItemStacks the arena item stacks
      */
-    public void setArenas(ArrayList<Arena> arenas) {
-        this.arenas = arenas;
+    public void setArenaItemStacks(ArrayList<ArenaItemStack> arenaItemStacks) {
+        this.arenaItemStacks = arenaItemStacks;
     }
 }

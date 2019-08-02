@@ -91,9 +91,9 @@ public class PlayerDataManager implements Initializers {
 
         // Arenas times played parsing from DB logic
         gsonManager.getArenaSerializer().setReferenceDeserialization(true); // Turn on referencing to already-created Arenas
-        HashMap arenaTimesPlayed = gsonManager.getGson().fromJson(resultSet.getString(3),
-                playerData.getArenaTimesPlayed().getClass());
-        playerData.setArenaTimesPlayed(arenaTimesPlayed);
+        HashMap arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(3),
+                playerData.getArenaTimesPlayedMap().getClass());
+        playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
 
         // Set other primitives
         playerData.setELO(resultSet.getInt(2));
@@ -135,9 +135,9 @@ public class PlayerDataManager implements Initializers {
 
         // Arena times played parsing logic
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
-        String arenaTimesPlayedJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayed(),
-                playerData.getArenaTimesPlayed().getClass());
-        updatePreparedStatement.setString(3, arenaTimesPlayedJson);
+        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
+                playerData.getArenaTimesPlayedMap().getClass());
+        updatePreparedStatement.setString(3, arenaTimesPlayedMapJson);
 
         // Other primitives
         updatePreparedStatement.setInt(2, playerData.getELO());
@@ -169,9 +169,9 @@ public class PlayerDataManager implements Initializers {
 
         // Arena times played parsing logic
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
-        String arenaTimesPlayedJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayed(),
-                playerData.getArenaTimesPlayed().getClass());
-        insertPreparedStatement.setString(4, arenaTimesPlayedJson);
+        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
+                playerData.getArenaTimesPlayedMap().getClass());
+        insertPreparedStatement.setString(4, arenaTimesPlayedMapJson);
 
         // Other primitives
         insertPreparedStatement.setString(2, pvpPlayer.getPlayer().getUniqueId().toString());

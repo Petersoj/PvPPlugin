@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.gui.guis;
+package net.jacobpeterson.spigot.gui.guis.main;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
@@ -19,7 +19,7 @@ public class MainMenu extends AbstractInventoryGUI {
     private String currentlyPlayingLine;
 
     /**
-     * Instantiates a new Main menu.
+     * Instantiates a new Main menu (should be a singleton).
      *
      * @param guiManager the gui manager
      */

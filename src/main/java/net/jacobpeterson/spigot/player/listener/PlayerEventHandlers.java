@@ -60,5 +60,6 @@ public class PlayerEventHandlers {
      */
     public void handleOnPlayerQuitEvent(PlayerQuitEvent event) {
         // TODO async pushing player data
+        // Call deinit() on PvPPlayer
     }
 }

@@ -1,8 +1,8 @@
 package net.jacobpeterson.spigot.gui.guis.teampvp;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
-import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,11 +11,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class TeamPvPCraftTeamMenu extends AbstractInventoryGUI {
 
-    private GUIManager guiManager;
+    private final PlayerGUIManager playerGUIManager;
     private ItemStack backItem;
 
-    public TeamPvPCraftTeamMenu(GUIManager guiManager) {
-        this.guiManager = guiManager;
+    public TeamPvPCraftTeamMenu(PlayerGUIManager playerGUIManager) {
+        this.playerGUIManager = playerGUIManager;
     }
 
     @Override

@@ -1,15 +1,15 @@
 package net.jacobpeterson.spigot.gui.guis.teampvp;
 
-import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.gui.guis.ChooseArenaMenu;
+import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 
-public class TeamPvPArena extends ChooseArenaMenu {
+public class TeamPvPArenaMenu extends ChooseArenaMenu {
 
-    public TeamPvPArena(GUIManager guiManager) {
-        super(guiManager, ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Team PvP " +
+    public TeamPvPArenaMenu(PlayerGUIManager playerGUIManager) {
+        super(playerGUIManager, ChatColor.DARK_GRAY + "Play " + CharUtil.DOUBLE_RIGHT_ARROW + " Team PvP " +
                 CharUtil.DOUBLE_RIGHT_ARROW + " Arena");
     }
 

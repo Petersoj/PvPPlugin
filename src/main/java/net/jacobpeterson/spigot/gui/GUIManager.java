@@ -1,17 +1,16 @@
 package net.jacobpeterson.spigot.gui;
 
 import net.jacobpeterson.spigot.PvPPlugin;
-import net.jacobpeterson.spigot.gui.guis.MainMenu;
+import net.jacobpeterson.spigot.gui.guis.main.MainMenu;
 import net.jacobpeterson.spigot.gui.listener.InventoryGUIEventHandlers;
-import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.Inventory;
 
-public class GUIManager implements Initializers {
+public class GUIManager implements Initializers, AbstractInventoryReferenceMatcher {
 
     private final PvPPlugin pvpPlugin;
     private InventoryGUIEventHandlers inventoryGUIEventHandlers;
-    private MainMenu mainMenu;
+    private MainMenu mainMenu; // A global, non-player-specific GUI
 
     /**
      * Instantiates a new GUI manager.
@@ -34,15 +33,11 @@ public class GUIManager implements Initializers {
         mainMenu.deinit();
     }
 
-    /**
-     * Gets the {@link AbstractInventoryGUI} associated with the passed in Bukkit Inventory (if exists).
-     *
-     * @param inventory        the inventory
-     * @param playerGUIManager the player GUI manager
-     * @return the {@link AbstractInventoryGUI} (null if nothing was matched)
-     */
-    public AbstractInventoryGUI getInventoryGUI(Inventory inventory, PlayerGUIManager playerGUIManager) {
-        // TODO search instantiated inventories
+    @Override
+    public AbstractInventoryGUI getInventoryGUI(Inventory inventory) {
+        if (mainMenu.getInventory().equals(inventory)) {
+            return mainMenu;
+        }
         return null;
     }
 
