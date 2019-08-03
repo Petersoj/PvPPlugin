@@ -63,7 +63,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     @Override
     public void createInventory() {
         // 5 Arena ItemStacks per chest row
-        int chestLines = (int) Math.ceil((arenaItemStacks.size() == 0 ? 2 : arenaItemStacks.size()) / 5);
+        int chestLines = (int) Math.ceil(arenaItemStacks.size() == 0 ? 1 : arenaItemStacks.size() / 5f);
         if (chestLines > 6) { // Max lines for Bukkit Chest GUI is 6
             throw new UnsupportedOperationException("Pagination not implemented! Too many arenas created!");
         }

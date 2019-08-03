@@ -55,12 +55,15 @@ public class PlayerDataManager implements Initializers {
         };
 
         if (!this.doesPlayerDataTableExists()) { // Check if PlayerData table exists
+
             this.createPlayerDataTable(); // Create the table if it doesn't exist
+            LOGGER.info("Created " + databaseTableName + " database table");
+
             if (!this.doesPlayerDataTableExists()) { // Check again after creating table
                 throw new SQLException("Cannot create " + databaseTableName + " table!");
             }
         }
-        LOGGER.info("Found " + databaseTableName + " table in database");
+        LOGGER.info(databaseTableName + " table is in database");
     }
 
     @Override
@@ -79,11 +82,15 @@ public class PlayerDataManager implements Initializers {
     public synchronized PlayerData fetchPlayerDataDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = new PlayerData();
 
-        String selectPlayerDataSQL = "SELECT * from '" + databaseTableName + "' WHERE uuid='"
-                + pvpPlayer.getPlayer().getUniqueId().toString() + "';";
+        String selectPlayerDataPreparedSQL = "SELECT * FROM " + databaseTableName + " WHERE uuid = ?";
 
-        Statement selectPlayerDataStatement = databaseManager.getMysqlConnection().createStatement();
-        ResultSet resultSet = selectPlayerDataStatement.executeQuery(selectPlayerDataSQL);
+        PreparedStatement selectPreparedStatement = databaseManager.getMysqlConnection().
+                prepareStatement(selectPlayerDataPreparedSQL);
+
+        // UUID
+        selectPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
+
+        ResultSet resultSet = selectPreparedStatement.executeQuery();
 
         if (resultSet.getRow() == 0) { // 0th row means no data returned
             return null;
@@ -116,7 +123,7 @@ public class PlayerDataManager implements Initializers {
     public synchronized void updatePlayerDataDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = pvpPlayer.getPlayerData();
 
-        String updatePlayerDataPreparedSQL = "UPDATE ? SET " +
+        String updatePlayerDataPreparedSQL = "UPDATE " + databaseTableName + " SET " +
                 "elo=? " +
                 "arena_times_played=? " +
                 "unranked_ffa_kills=? " +
@@ -130,26 +137,23 @@ public class PlayerDataManager implements Initializers {
         PreparedStatement updatePreparedStatement = databaseManager.getMysqlConnection()
                 .prepareStatement(updatePlayerDataPreparedSQL);
 
-        // Table name
-        updatePreparedStatement.setString(1, databaseTableName);
-
         // UUID
-        updatePreparedStatement.setString(10, pvpPlayer.getPlayer().getUniqueId().toString());
+        updatePreparedStatement.setString(9, pvpPlayer.getPlayer().getUniqueId().toString());
 
         // Arena times played parsing logic
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
         String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
                 playerData.getArenaTimesPlayedMap().getClass());
-        updatePreparedStatement.setString(3, arenaTimesPlayedMapJson);
+        updatePreparedStatement.setString(2, arenaTimesPlayedMapJson);
 
         // Other primitives
-        updatePreparedStatement.setInt(2, playerData.getELO());
-        updatePreparedStatement.setInt(4, playerData.getUnrankedFFAKills());
-        updatePreparedStatement.setInt(5, playerData.getUnrankedFFADeaths());
-        updatePreparedStatement.setInt(6, playerData.getRanked1v1Kills());
-        updatePreparedStatement.setInt(7, playerData.getRanked1v1Deaths());
-        updatePreparedStatement.setInt(8, playerData.getTeamPvPWins());
-        updatePreparedStatement.setInt(9, playerData.getTeamPvPLosses());
+        updatePreparedStatement.setInt(1, playerData.getELO());
+        updatePreparedStatement.setInt(3, playerData.getUnrankedFFAKills());
+        updatePreparedStatement.setInt(4, playerData.getUnrankedFFADeaths());
+        updatePreparedStatement.setInt(5, playerData.getRanked1v1Kills());
+        updatePreparedStatement.setInt(6, playerData.getRanked1v1Deaths());
+        updatePreparedStatement.setInt(7, playerData.getTeamPvPWins());
+        updatePreparedStatement.setInt(8, playerData.getTeamPvPLosses());
 
         updatePreparedStatement.executeUpdate();
     }
@@ -163,30 +167,29 @@ public class PlayerDataManager implements Initializers {
     public synchronized void insertNewPlayerDataInDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = pvpPlayer.getPlayerData();
 
-        String insertPlayerDataPreparedSQL = "INSERT INTO ? VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // e.g. INSERT INTO player_data VALUES("<UUID>", 1000, "{}", 0, 0, 0, 0, 0, 0);
+
+        String insertPlayerDataPreparedSQL = "INSERT INTO " + databaseTableName + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement insertPreparedStatement = databaseManager.getMysqlConnection()
                 .prepareStatement(insertPlayerDataPreparedSQL);
-
-        // Table name
-        insertPreparedStatement.setString(1, databaseTableName);
 
         // Arena times played parsing logic
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
         String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
                 playerData.getArenaTimesPlayedMap().getClass());
-        insertPreparedStatement.setString(4, arenaTimesPlayedMapJson);
+        insertPreparedStatement.setString(3, arenaTimesPlayedMapJson);
 
         // Other primitives
-        insertPreparedStatement.setString(2, pvpPlayer.getPlayer().getUniqueId().toString());
-        insertPreparedStatement.setInt(3, playerData.getELO());
-        insertPreparedStatement.setInt(5, playerData.getUnrankedFFAKills());
-        insertPreparedStatement.setInt(6, playerData.getUnrankedFFADeaths());
-        insertPreparedStatement.setInt(7, playerData.getRanked1v1Kills());
-        insertPreparedStatement.setInt(8, playerData.getRanked1v1Deaths());
-        insertPreparedStatement.setInt(9, playerData.getTeamPvPWins());
-        insertPreparedStatement.setInt(10, playerData.getTeamPvPLosses());
+        insertPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
+        insertPreparedStatement.setInt(2, playerData.getELO());
+        insertPreparedStatement.setInt(4, playerData.getUnrankedFFAKills());
+        insertPreparedStatement.setInt(5, playerData.getUnrankedFFADeaths());
+        insertPreparedStatement.setInt(6, playerData.getRanked1v1Kills());
+        insertPreparedStatement.setInt(7, playerData.getRanked1v1Deaths());
+        insertPreparedStatement.setInt(8, playerData.getTeamPvPWins());
+        insertPreparedStatement.setInt(9, playerData.getTeamPvPLosses());
 
-        // e.g. INSERT INTO player_data VALUES("<UUID>", 1000, "{}", 0, 0, 0, 0, 0, 0);
+        insertPreparedStatement.executeUpdate();
     }
 
     /**
@@ -211,8 +214,6 @@ public class PlayerDataManager implements Initializers {
 
         Statement createTableStatement = databaseManager.getMysqlConnection().createStatement();
         createTableStatement.execute(createTableSQL);
-
-        LOGGER.info("Created " + databaseTableName + " with the following SQL: \n" + createTableSQL);
     }
 
     /**
