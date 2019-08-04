@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FetchPlayerDataRunnable extends BukkitRunnable {
+public class PlayerDataSelectRunnable extends BukkitRunnable {
 
     private final Logger LOGGER;
 
@@ -18,14 +18,14 @@ public class FetchPlayerDataRunnable extends BukkitRunnable {
 
     /**
      * Instantiates a new FetchPlayerDataRunnable which is meant to be run async to fetch from the SQL Database
-     * and populate {@link PlayerData} via {@link PlayerDataManager#fetchPlayerDataDatabase(PvPPlayer)} (may call
+     * and populate {@link PlayerData} via {@link PlayerDataManager#selectPlayerDataFromDatabase(PvPPlayer)} (may call
      * {@link PlayerDataManager#insertNewPlayerDataInDatabase(PvPPlayer)} if necessary).
      *
      * @param pvpPlayer          the pvp player
      * @param playerDataManager  the player data manager
      * @param completionRunnable the completion runnable (will get called after all data has been fetched) (can be null)
      */
-    public FetchPlayerDataRunnable(PvPPlayer pvpPlayer, PlayerDataManager playerDataManager, Runnable completionRunnable) {
+    public PlayerDataSelectRunnable(PvPPlayer pvpPlayer, PlayerDataManager playerDataManager, Runnable completionRunnable) {
         LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlayer = pvpPlayer;
         this.playerDataManager = playerDataManager;
@@ -37,9 +37,9 @@ public class FetchPlayerDataRunnable extends BukkitRunnable {
         PlayerData playerData = null;
 
         try {
-            playerData = playerDataManager.fetchPlayerDataDatabase(pvpPlayer);
+            playerData = playerDataManager.selectPlayerDataFromDatabase(pvpPlayer);
         } catch (SQLException exception) {
-            LOGGER.log(Level.SEVERE, "Error fetching Player Data for: " + pvpPlayer.getPlayer().getName(), exception);
+            LOGGER.log(Level.SEVERE, "Error fetching player data for: " + pvpPlayer.getPlayer().getName(), exception);
         }
 
         boolean insertNewPlayer = false;
@@ -55,7 +55,7 @@ public class FetchPlayerDataRunnable extends BukkitRunnable {
             try {
                 playerDataManager.insertNewPlayerDataInDatabase(pvpPlayer);
             } catch (SQLException exception) {
-                LOGGER.log(Level.SEVERE, "Error inserting Player Data for: " + pvpPlayer.getPlayer().getName(), exception);
+                LOGGER.log(Level.SEVERE, "Error inserting player data for: " + pvpPlayer.getPlayer().getName(), exception);
             }
         }
 

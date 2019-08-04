@@ -72,27 +72,27 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
-     * Fetch PlayerData from SQL database.
+     * Selects PlayerData from SQL database.
      *
      * @param pvpPlayer the pvp player
      * @return the player data (null if no data exists)
      * @throws SQLException the sql exception
      */
     @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
-    public synchronized PlayerData fetchPlayerDataDatabase(PvPPlayer pvpPlayer) throws SQLException {
+    public synchronized PlayerData selectPlayerDataFromDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = new PlayerData();
 
-        String selectPlayerDataPreparedSQL = "SELECT * FROM " + databaseTableName + " WHERE uuid = ?";
+        String selectPlayerDataPreparedSQL = "SELECT * FROM " + databaseTableName + " WHERE uuid=?";
 
         PreparedStatement selectPreparedStatement = databaseManager.getMysqlConnection().
                 prepareStatement(selectPlayerDataPreparedSQL);
 
-        // UUID
+        // Set UUID
         selectPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
 
         ResultSet resultSet = selectPreparedStatement.executeQuery();
 
-        if (resultSet.getRow() == 0) { // 0th row means no data returned
+        if (!resultSet.next()) { // no row means present if .next() is false
             return null;
         }
 
@@ -120,24 +120,24 @@ public class PlayerDataManager implements Initializers {
      * @param pvpPlayer the pvp player
      * @throws SQLException the sql exception
      */
-    public synchronized void updatePlayerDataDatabase(PvPPlayer pvpPlayer) throws SQLException {
+    public synchronized void updatePlayerDataInDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = pvpPlayer.getPlayerData();
 
         String updatePlayerDataPreparedSQL = "UPDATE " + databaseTableName + " SET " +
-                "elo=? " +
-                "arena_times_played=? " +
-                "unranked_ffa_kills=? " +
-                "unranked_ffa_deaths=? " +
-                "ranked_1v1_kills=? " +
-                "ranked_1v1_deaths=? " +
-                "team_pvp_wins=? " +
+                "elo=?, " +
+                "arena_times_played=?, " +
+                "unranked_ffa_kills=?, " +
+                "unranked_ffa_deaths=?, " +
+                "ranked_1v1_kills=?, " +
+                "ranked_1v1_deaths=?, " +
+                "team_pvp_wins=?, " +
                 "team_pvp_losses=? " +
                 "WHERE uuid=?";
 
         PreparedStatement updatePreparedStatement = databaseManager.getMysqlConnection()
                 .prepareStatement(updatePlayerDataPreparedSQL);
 
-        // UUID
+        // Set UUID
         updatePreparedStatement.setString(9, pvpPlayer.getPlayer().getUniqueId().toString());
 
         // Arena times played parsing logic
@@ -146,7 +146,7 @@ public class PlayerDataManager implements Initializers {
                 playerData.getArenaTimesPlayedMap().getClass());
         updatePreparedStatement.setString(2, arenaTimesPlayedMapJson);
 
-        // Other primitives
+        // Set other primitives
         updatePreparedStatement.setInt(1, playerData.getELO());
         updatePreparedStatement.setInt(3, playerData.getUnrankedFFAKills());
         updatePreparedStatement.setInt(4, playerData.getUnrankedFFADeaths());
@@ -179,7 +179,7 @@ public class PlayerDataManager implements Initializers {
                 playerData.getArenaTimesPlayedMap().getClass());
         insertPreparedStatement.setString(3, arenaTimesPlayedMapJson);
 
-        // Other primitives
+        // Set other primitives
         insertPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
         insertPreparedStatement.setInt(2, playerData.getELO());
         insertPreparedStatement.setInt(4, playerData.getUnrankedFFAKills());

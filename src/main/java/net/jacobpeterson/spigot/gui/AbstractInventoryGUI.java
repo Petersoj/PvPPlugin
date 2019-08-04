@@ -44,7 +44,7 @@ public abstract class AbstractInventoryGUI implements Initializers {
      */
     public void closeViewers() {
         if (inventory != null) {
-            inventory.getViewers().forEach(HumanEntity::closeInventory);
+            inventory.getViewers().iterator().forEachRemaining(HumanEntity::closeInventory);
         }
     }
 

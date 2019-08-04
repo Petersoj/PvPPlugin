@@ -3,8 +3,9 @@ package net.jacobpeterson.spigot.player.listener;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.player.data.FetchPlayerDataRunnable;
+import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
+import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -37,17 +38,27 @@ public class PlayerEventHandlers {
 
         PvPPlayer pvpPlayer = playerManager.createNewPvPPlayer(player);
 
-        FetchPlayerDataRunnable fetchPlayerDataRunnable = new FetchPlayerDataRunnable(pvpPlayer, playerDataManager, null);
-        fetchPlayerDataRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
+        PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(pvpPlayer, playerDataManager, null);
+        playerDataSelectRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
     }
 
     /**
-     * Handle on player quit event (save player data, clean up, etc.).
+     * Handle on player quit event (save player data, deinit, etc.).
      *
      * @param event the event
      */
     public void handleOnPlayerQuitEvent(PlayerQuitEvent event) {
-        // TODO async pushing player data
-        // Call deinit() on PvPPlayer
+        Player player = event.getPlayer();
+        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
+        PlayerDataManager playerDataManager = playerManager.getPlayerDataManager();
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        pvpPlayer.deinit();
+
+        PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, playerDataManager, null);
+        playerDataUpdateRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
     }
 }

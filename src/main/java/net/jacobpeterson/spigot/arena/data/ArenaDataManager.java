@@ -28,6 +28,7 @@ public class ArenaDataManager implements Initializers {
 
     private final Logger LOGGER;
     private ArenaManager arenaManager;
+    private GsonManager gsonManager;
     private File arenaDataFile;
 
     /**
@@ -35,9 +36,10 @@ public class ArenaDataManager implements Initializers {
      *
      * @param arenaManager the arena manager
      */
-    public ArenaDataManager(ArenaManager arenaManager) {
+    public ArenaDataManager(ArenaManager arenaManager, GsonManager gsonManager) {
         this.LOGGER = PvPPlugin.getPluginLogger();
         this.arenaManager = arenaManager;
+        this.gsonManager = gsonManager;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class ArenaDataManager implements Initializers {
         this.arenaDataFile = new File(pluginDataFolder, "arenas.json");
 
         try {
-            this.loadArenas(arenaManager.getPvPPlugin().getGsonManager());
+            this.loadArenas();
 
             LOGGER.info("Loaded Arenas");
         } catch (FileNotFoundException exception) {
@@ -55,16 +57,17 @@ public class ArenaDataManager implements Initializers {
     }
 
     @Override
-    public void deinit() {
+    public void deinit() throws IOException {
+        this.saveArenas();
     }
 
     /**
      * Save arenas to JSON in {@link ArenaDataManager#getArenaDataFile()}.
      * Should probably be called after an arena is added or modified
      *
-     * @param gsonManager the gson manager
+     * @throws IOException the io exception
      */
-    public void saveArenas(GsonManager gsonManager) throws IOException {
+    public void saveArenas() throws IOException {
         Gson gson = gsonManager.getGson();
 
         ArenaSerializer arenaSerializer = gsonManager.getArenaSerializer();
@@ -90,13 +93,12 @@ public class ArenaDataManager implements Initializers {
     /**
      * Load arenas from JSON in {@link ArenaDataManager#getArenaDataFile()}.
      *
-     * @param gsonManager the gson manager
      * @throws IOException           the io exception
      * @throws ClassCastException    the class cast exception
      * @throws FileNotFoundException the file not found exception
      */
     @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
-    public void loadArenas(GsonManager gsonManager) throws IOException, ClassCastException, FileNotFoundException {
+    public void loadArenas() throws IOException, ClassCastException, FileNotFoundException {
         Gson gson = gsonManager.getGson();
 
         ArenaSerializer arenaSerializer = gsonManager.getArenaSerializer();

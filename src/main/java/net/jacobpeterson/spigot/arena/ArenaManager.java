@@ -23,7 +23,7 @@ public class ArenaManager implements Initializers {
 
     public ArenaManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
-        this.arenaDataManager = new ArenaDataManager(this);
+        this.arenaDataManager = new ArenaDataManager(this, pvpPlugin.getGsonManager());
         // Instantiate these to empty Arraylists because we need the types via getClass() for Gson
         this.ffaArenas = new ArrayList<>();
         this.ranked1v1Arenas = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ArenaManager implements Initializers {
     }
 
     @Override
-    public void deinit() {
+    public void deinit() throws IOException {
         arenaDataManager.deinit();
     }
 
