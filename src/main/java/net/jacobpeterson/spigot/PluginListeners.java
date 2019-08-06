@@ -1,12 +1,14 @@
 package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.gui.listener.InventoryGUIEventHandlers;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -38,6 +40,13 @@ public class PluginListeners implements Listener, Initializers {
     }
 
     @EventHandler
+    public void onTESTPlayerCommandPreProcessEvent(PlayerCommandPreprocessEvent event) {
+        PvPPlayer pvpPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(event.getPlayer());
+        pvpPlayer.getPlayerData().setELO(pvpPlayer.getPlayerData().getELO() + 3);
+        event.getPlayer().openInventory(pvpPlugin.getGUIManager().getMainMenu().getInventory());
+    }
+
+    @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         this.playerEventHandlers.handleOnPlayerJoinEvent(event);
     }
@@ -48,7 +57,7 @@ public class PluginListeners implements Listener, Initializers {
     }
 
     @EventHandler
-    public void onInventoryInteractEvent(InventoryInteractEvent event) {
-        this.inventoryGUIEventHandlers.handleOnInventoryInteractEvent(event);
+    public void onInventoryClickEvent(InventoryClickEvent event) {
+        this.inventoryGUIEventHandlers.handleOnInventoryClickEvent(event);
     }
 }

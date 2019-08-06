@@ -6,7 +6,7 @@ import net.jacobpeterson.spigot.gui.listener.InventoryGUIEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.Inventory;
 
-public class GUIManager implements Initializers, AbstractInventoryReferenceMatcher {
+public class GUIManager implements Initializers, InventoryReferenceMatcher {
 
     private final PvPPlugin pvpPlugin;
     private InventoryGUIEventHandlers inventoryGUIEventHandlers;
@@ -35,9 +35,7 @@ public class GUIManager implements Initializers, AbstractInventoryReferenceMatch
 
     @Override
     public AbstractInventoryGUI getInventoryGUI(Inventory inventory) {
-        if (mainMenu.getInventory().equals(inventory)) {
-            return mainMenu;
-        }
+        if (mainMenu.getInventory().equals(inventory)) return mainMenu;
         return null;
     }
 

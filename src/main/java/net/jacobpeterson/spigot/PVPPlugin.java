@@ -96,6 +96,8 @@ public class PvPPlugin extends JavaPlugin {
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot disable " + this.getName(), exception);
         }
+
+        LOGGER.info("Finished Deinitializing " + this.getName());
     }
 
     @Override

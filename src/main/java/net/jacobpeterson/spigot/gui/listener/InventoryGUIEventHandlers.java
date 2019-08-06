@@ -1,10 +1,12 @@
 package net.jacobpeterson.spigot.gui.listener;
 
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 
 import java.util.logging.Logger;
 
@@ -24,21 +26,36 @@ public class InventoryGUIEventHandlers {
     }
 
     /**
-     * Handle on inventory interact event.
+     * Handle on inventory click event.
      *
      * @param event the event
      */
-    public void handleOnInventoryInteractEvent(InventoryInteractEvent event) {
+    public void handleOnInventoryClickEvent(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
         Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
         PvPPlayer pvpPlayer = guiManager.getPvPPlugin().getPlayerManager().getPvPPlayer(player);
 
         if (pvpPlayer == null) {
             return;
         }
 
-        // Call onInventoryClick in AbstractInventoryGUI for the proper inventory
+        // Two different types of Inventory Managers to search and match a reference to:
+        // GUIManager
+        // PlayerGUIManager
+
+        AbstractInventoryGUI guiManagerInventory = guiManager.getInventoryGUI(inventory);
+        if (guiManagerInventory != null) {
+            guiManagerInventory.onInventoryClickEvent(event);
+            return;
+        }
+
+        AbstractInventoryGUI playerGUIManagerInventory = pvpPlayer.getPlayerGUIManager().getInventoryGUI(inventory);
+        if (playerGUIManagerInventory != null) {
+            playerGUIManagerInventory.onInventoryClickEvent(event);
+            return;
+        }
     }
 }

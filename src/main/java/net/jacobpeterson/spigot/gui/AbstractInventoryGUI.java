@@ -2,8 +2,10 @@ package net.jacobpeterson.spigot.gui;
 
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+
+import java.util.ArrayList;
 
 /**
  * The type Abstract Inventory GUI.
@@ -33,18 +35,19 @@ public abstract class AbstractInventoryGUI implements Initializers {
     public abstract void createInventory();
 
     /**
-     * Method triggered on player inventory interact event.
+     * Method triggered on player inventory click event.
      *
-     * @param event the Inventory interact event
+     * @param event the Inventory click event
      */
-    public abstract void onInventoryInteractEvent(InventoryInteractEvent event);
+    public abstract void onInventoryClickEvent(InventoryClickEvent event);
 
     /**
      * Will close the inventory for all current viewers.
      */
     public void closeViewers() {
         if (inventory != null) {
-            inventory.getViewers().iterator().forEachRemaining(HumanEntity::closeInventory);
+            ArrayList<HumanEntity> viewers = new ArrayList<>(inventory.getViewers()); // Must copy references to prevent CME
+            viewers.forEach(HumanEntity::closeInventory);
         }
     }
 

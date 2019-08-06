@@ -7,6 +7,7 @@ import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,7 +54,7 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
     }
 
     @Override
-    public void onInventoryInteractEvent(InventoryInteractEvent event) {
+    public void onInventoryClickEvent(InventoryClickEvent event) {
         event.setCancelled(true);
         // TODO TeamPvP inventory
     }

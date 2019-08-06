@@ -2,7 +2,7 @@ package net.jacobpeterson.spigot.gui;
 
 import org.bukkit.inventory.Inventory;
 
-public interface AbstractInventoryReferenceMatcher {
+public interface InventoryReferenceMatcher {
 
     /**
      * This method is used by InventoryGUI managers as a way to get an {@link AbstractInventoryGUI}

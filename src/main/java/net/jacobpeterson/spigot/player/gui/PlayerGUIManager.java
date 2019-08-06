@@ -1,7 +1,7 @@
 package net.jacobpeterson.spigot.player.gui;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
-import net.jacobpeterson.spigot.gui.AbstractInventoryReferenceMatcher;
+import net.jacobpeterson.spigot.gui.InventoryReferenceMatcher;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.gui.guis.ranked1v1.Ranked1v1Menu;
 import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPArenaMenu;
@@ -11,7 +11,7 @@ import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.Inventory;
 
-public class PlayerGUIManager implements Initializers, AbstractInventoryReferenceMatcher {
+public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher {
 
     private final PvPPlayer pvpPlayer;
     private GUIManager guiManager;

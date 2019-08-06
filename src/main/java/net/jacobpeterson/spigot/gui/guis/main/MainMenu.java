@@ -3,16 +3,20 @@ package net.jacobpeterson.spigot.gui.guis.main;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.PlayerManager;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class MainMenu extends AbstractInventoryGUI {
 
     private GUIManager guiManager;
+    private PlayerManager playerManager;
     private ItemStack ranked1v1Item;
     private ItemStack unrankedFFAItem;
     private ItemStack teamPvPItem;
@@ -25,6 +29,7 @@ public class MainMenu extends AbstractInventoryGUI {
      */
     public MainMenu(GUIManager guiManager) {
         this.guiManager = guiManager;
+        this.playerManager = guiManager.getPvPPlugin().getPlayerManager();
         this.currentlyPlayingLine = ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": ";
     }
 
@@ -66,9 +71,27 @@ public class MainMenu extends AbstractInventoryGUI {
     }
 
     @Override
-    public void onInventoryInteractEvent(InventoryInteractEvent event) {
+    public void onInventoryClickEvent(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
         event.setCancelled(true);
-        // TODO MainMenu Inventory Interact
+
+        ItemStack currentItem = event.getCurrentItem();
+        PvPPlayer pvpPlayer = playerManager.getPvPPlayer((Player) event.getWhoClicked());
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        if (currentItem.equals(ranked1v1Item)) {
+            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
+        } else if (currentItem.equals(unrankedFFAItem)) {
+            // TODO send player to UnRanked FFA
+        } else if (currentItem.equals(teamPvPItem)) {
+            // TODO Check if player has already created team, if so, open the craft team menu.
+            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeamPvPMenu().getInventory());
+        }
     }
 
     /**
