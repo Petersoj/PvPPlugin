@@ -3,8 +3,9 @@ package net.jacobpeterson.spigot.player.listener;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
+import net.jacobpeterson.spigot.player.data.PlayerBukkitDataRemoveRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
+import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -60,5 +61,10 @@ public class PlayerEventHandlers {
 
         PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, playerDataManager, null);
         playerDataUpdateRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
+
+        PlayerBukkitDataRemoveRunnable playerBukkitDataRemoveRunnable = new PlayerBukkitDataRemoveRunnable(pvpPlayer,
+                playerDataManager, null);
+        // Run 20 ticks later (1 second) to ensure deletion
+        playerBukkitDataRemoveRunnable.runTaskLaterAsynchronously(playerManager.getPvPPlugin(), 20);
     }
 }

@@ -1,6 +1,8 @@
 package net.jacobpeterson.spigot.player;
 
+import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerData;
+import net.jacobpeterson.spigot.player.gamemode.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
@@ -9,8 +11,9 @@ public class PvPPlayer implements Initializers {
 
     private final PlayerManager playerManager;
     private final Player player;
-    private PlayerData playerData;
+    private PlayerGameManager playerGameManager;
     private PlayerGUIManager playerGUIManager;
+    private PlayerData playerData;
 
     /**
      * Instantiates a new PvP Player which is like a pseudo super-class to {@link Player}.
@@ -22,17 +25,29 @@ public class PvPPlayer implements Initializers {
     PvPPlayer(PlayerManager playerManager, Player player) {
         this.playerManager = playerManager;
         this.player = player;
+        this.playerGameManager = new PlayerGameManager(this);
         this.playerGUIManager = new PlayerGUIManager(this);
     }
 
     @Override
     public void init() {
+        playerGameManager.init();
         playerGUIManager.init();
     }
 
     @Override
     public void deinit() {
+        playerGameManager.deinit();
         playerGUIManager.deinit();
+    }
+
+    /**
+     * Gets {@link PvPPlugin#getGroupManager()} prefixed name.
+     *
+     * @return the prefixed name
+     */
+    public String getPrefixedName() {
+        return playerManager.getPlayerGroupPrefix(player) + player.getName();
     }
 
     /**
@@ -54,21 +69,21 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Gets player data.
+     * Gets player game manager.
      *
-     * @return the player data
+     * @return the player game manager
      */
-    public PlayerData getPlayerData() {
-        return playerData;
+    public PlayerGameManager getPlayerGameManager() {
+        return playerGameManager;
     }
 
     /**
-     * Sets player data.
+     * Sets player gamemode manager.
      *
-     * @param playerData the player data
+     * @param playerGameManager the player gamemode manager
      */
-    public void setPlayerData(PlayerData playerData) {
-        this.playerData = playerData;
+    public void setPlayerGameManager(PlayerGameManager playerGameManager) {
+        this.playerGameManager = playerGameManager;
     }
 
     /**
@@ -87,5 +102,23 @@ public class PvPPlayer implements Initializers {
      */
     public void setPlayerGUIManager(PlayerGUIManager playerGUIManager) {
         this.playerGUIManager = playerGUIManager;
+    }
+
+    /**
+     * Gets player data.
+     *
+     * @return the player data
+     */
+    public PlayerData getPlayerData() {
+        return playerData;
+    }
+
+    /**
+     * Sets player data.
+     *
+     * @param playerData the player data
+     */
+    public void setPlayerData(PlayerData playerData) {
+        this.playerData = playerData;
     }
 }

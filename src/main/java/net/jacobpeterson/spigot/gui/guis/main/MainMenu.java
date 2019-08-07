@@ -1,5 +1,6 @@
 package net.jacobpeterson.spigot.gui.guis.main;
 
+import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
@@ -9,7 +10,6 @@ import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,19 +17,21 @@ public class MainMenu extends AbstractInventoryGUI {
 
     private GUIManager guiManager;
     private PlayerManager playerManager;
+    private ArenaManager arenaManager;
+    private String currentlyPlayingLine;
     private ItemStack ranked1v1Item;
     private ItemStack unrankedFFAItem;
     private ItemStack teamPvPItem;
-    private String currentlyPlayingLine;
 
     /**
      * Instantiates a new Main menu (should be a singleton).
      *
      * @param guiManager the gui manager
      */
-    public MainMenu(GUIManager guiManager) {
+    public MainMenu(GUIManager guiManager, PlayerManager playerManager, ArenaManager arenaManager) {
         this.guiManager = guiManager;
-        this.playerManager = guiManager.getPvPPlugin().getPlayerManager();
+        this.playerManager = playerManager;
+        this.arenaManager = arenaManager;
         this.currentlyPlayingLine = ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": ";
     }
 
@@ -71,14 +73,10 @@ public class MainMenu extends AbstractInventoryGUI {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
+    public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
         event.setCancelled(true);
 
         ItemStack currentItem = event.getCurrentItem();
-        PvPPlayer pvpPlayer = playerManager.getPvPPlayer((Player) event.getWhoClicked());
 
         if (pvpPlayer == null) {
             return;
@@ -87,7 +85,7 @@ public class MainMenu extends AbstractInventoryGUI {
         if (currentItem.equals(ranked1v1Item)) {
             pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
         } else if (currentItem.equals(unrankedFFAItem)) {
-            // TODO send player to UnRanked FFA
+            // TODO send player to Unranked FFA
         } else if (currentItem.equals(teamPvPItem)) {
             // TODO Check if player has already created team, if so, open the craft team menu.
             pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeamPvPMenu().getInventory());

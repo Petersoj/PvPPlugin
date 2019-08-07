@@ -48,13 +48,13 @@ public class InventoryGUIEventHandlers {
 
         AbstractInventoryGUI guiManagerInventory = guiManager.getInventoryGUI(inventory);
         if (guiManagerInventory != null) {
-            guiManagerInventory.onInventoryClickEvent(event);
+            guiManagerInventory.onInventoryClickEvent(pvpPlayer, event);
             return;
         }
 
         AbstractInventoryGUI playerGUIManagerInventory = pvpPlayer.getPlayerGUIManager().getInventoryGUI(inventory);
         if (playerGUIManagerInventory != null) {
-            playerGUIManagerInventory.onInventoryClickEvent(event);
+            playerGUIManagerInventory.onInventoryClickEvent(pvpPlayer, event);
             return;
         }
     }

@@ -20,7 +20,7 @@ public class GUIManager implements Initializers, InventoryReferenceMatcher {
     public GUIManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
         this.inventoryGUIEventHandlers = new InventoryGUIEventHandlers(this);
-        this.mainMenu = new MainMenu(this);
+        this.mainMenu = new MainMenu(this, pvpPlugin.getPlayerManager(), pvpPlugin.getArenaManager());
     }
 
     @Override

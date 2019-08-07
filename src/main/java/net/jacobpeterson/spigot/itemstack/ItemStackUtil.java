@@ -15,7 +15,7 @@ public class ItemStackUtil {
      * @param itemStack the item stack
      * @param showItem  is a show item (apply durability)
      * @param name      the name
-     * @param lore      the lore string array
+     * @param lore      the lore string array (can be null)
      */
     public static void formatLore(ItemStack itemStack, boolean showItem, String name, String... lore) {
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -24,7 +24,7 @@ public class ItemStackUtil {
             itemMeta.spigot().setUnbreakable(true);
         }
         itemMeta.setDisplayName(name);
-        itemMeta.setLore(Arrays.asList(lore));
+        itemMeta.setLore(lore == null ? null : Arrays.asList(lore));
         itemStack.setItemMeta(itemMeta);
     }
 

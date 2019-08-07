@@ -1,13 +1,14 @@
 package net.jacobpeterson.spigot.arena;
 
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
-import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class Arena {
 
     private String name;
     private ArenaItemStack arenaItemStack;
-    private Location spawnLocation;
+    private ItemStack[] inventory;
+    private boolean disabled;
 
     /**
      * Instantiates a new Arena.
@@ -55,20 +56,38 @@ public abstract class Arena {
     }
 
     /**
-     * Gets spawn location.
+     * Get inventory item stack [].
      *
-     * @return the spawn location
+     * @return the item stack []
      */
-    public Location getSpawnLocation() {
-        return spawnLocation;
+    public ItemStack[] getInventory() {
+        return inventory;
     }
 
     /**
-     * Sets spawn location.
+     * Sets inventory.
      *
-     * @param spawnLocation the spawn location
+     * @param inventory the inventory
      */
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
+    public void setInventory(ItemStack[] inventory) {
+        this.inventory = inventory;
+    }
+
+    /**
+     * Is disabled boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * Sets disabled.
+     *
+     * @param disabled the disabled
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

@@ -53,8 +53,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
         if (BACK_ITEM == null) {
             BACK_ITEM = new ItemStack(Material.BOOK);
             ItemStackUtil.formatLore(BACK_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Back",
-                    "");
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
         }
 
         this.createInventory();

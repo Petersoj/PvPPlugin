@@ -1,5 +1,6 @@
 package net.jacobpeterson.spigot.gui;
 
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -37,9 +38,10 @@ public abstract class AbstractInventoryGUI implements Initializers {
     /**
      * Method triggered on player inventory click event.
      *
-     * @param event the Inventory click event
+     * @param pvpPlayer the pvp player
+     * @param event     the Inventory click event
      */
-    public abstract void onInventoryClickEvent(InventoryClickEvent event);
+    public abstract void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event);
 
     /**
      * Will close the inventory for all current viewers.

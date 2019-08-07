@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.player.data;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
@@ -11,6 +12,7 @@ public class PlayerData {
 
     private int elo;
     private HashMap<Arena, Integer> arenaTimesPlayed;
+    private HashMap<Arena, ItemStack[]> arenaInventory;
     private int unrankedFFAKills;
     private int unrankedFFADeaths;
     private int ranked1v1Kills;
@@ -23,7 +25,9 @@ public class PlayerData {
      */
     public PlayerData() {
         this.elo = 1000; // For first-timers
-        this.arenaTimesPlayed = new HashMap<>(); // Instantiate so that getClass() of this variable for Gson is not null
+        // Instantiate so that getClass() of these objects for Gson is not null
+        this.arenaTimesPlayed = new HashMap<>();
+        this.arenaInventory = new HashMap<>();
     }
 
     /**
@@ -60,6 +64,24 @@ public class PlayerData {
      */
     public void setArenaTimesPlayedMap(HashMap<Arena, Integer> arenaTimesPlayed) {
         this.arenaTimesPlayed = arenaTimesPlayed;
+    }
+
+    /**
+     * Gets arena inventory.
+     *
+     * @return the arena inventory
+     */
+    public HashMap<Arena, ItemStack[]> getArenaInventory() {
+        return arenaInventory;
+    }
+
+    /**
+     * Sets arena inventory.
+     *
+     * @param arenaInventory the arena inventory
+     */
+    public void setArenaInventory(HashMap<Arena, ItemStack[]> arenaInventory) {
+        this.arenaInventory = arenaInventory;
     }
 
     /**

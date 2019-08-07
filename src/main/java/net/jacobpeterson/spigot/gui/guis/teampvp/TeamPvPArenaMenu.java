@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.gui.guis.teampvp;
 
 import net.jacobpeterson.spigot.gui.guis.ChooseArenaMenu;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
@@ -15,7 +16,7 @@ public class TeamPvPArenaMenu extends ChooseArenaMenu {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryClickEvent event) {
+    public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
         // TODO Ranked1v1 Inventory Interact
     }
 }

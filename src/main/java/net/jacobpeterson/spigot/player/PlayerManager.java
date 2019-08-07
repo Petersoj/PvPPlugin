@@ -4,6 +4,7 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
@@ -74,10 +75,18 @@ public class PlayerManager implements Initializers {
      * Gets player group prefix from the GroupManager spigot plugin.
      *
      * @param player the player
-     * @return the player's GroupManager group prefix
+     * @return the player's GroupManager group prefix (will be empty string if prefix doesn't exist)
      */
     public String getPlayerGroupPrefix(Player player) {
-        return pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(player).getUserPrefix(player.getName());
+        AnjoPermissionsHandler anjoPermissionsHandler =
+                pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(player);
+        if (anjoPermissionsHandler != null) {
+            String userPrefix = anjoPermissionsHandler.getUserPrefix(player.getName());
+            if (userPrefix != null) {
+                return userPrefix;
+            }
+        }
+        return "";
     }
 
     /**

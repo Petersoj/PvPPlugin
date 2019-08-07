@@ -123,8 +123,7 @@ Commands:
 /1v1 -> Opens the 1v1 menu (Screenshot: )
 /challenge <player> or /duel <player> -> Sends a 1v1 duel to a player
 /1v1 arena add <arena> -> Creates a 1v1 arena
-/1v1 arena remove <arena> -> Removes a 2v2 arena
-/1v1 arena setSpectate <arena> -> Sets the spectate position
+/1v1 arena remove <arena> -> Removes a 1v1 arena
 /1v1 arena setSpawn1 <arena> -> Sets the first spawn when joining the arena
 /1v1 arena setSpawn2 <arena> -> Sets the second spawn when joining the arena
 /1v1 arena setFinish <arena> -> Sets the position where the losser and winner teleports after the game

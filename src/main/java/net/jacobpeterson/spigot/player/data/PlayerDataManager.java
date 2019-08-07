@@ -6,11 +6,17 @@ import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -22,7 +28,7 @@ public class PlayerDataManager implements Initializers {
     private final GsonManager gsonManager;
     private final DatabaseManager databaseManager;
     private String databaseTableName;
-    private String[] databaseColumns; // For reference
+    private ArrayList<AbstractMap.SimpleEntry<String, String>> databaseColumnsList;
 
     /**
      * Instantiates a new Player Data Manager which is used to read/write {@link PlayerData} via {@link DatabaseManager}.
@@ -42,33 +48,55 @@ public class PlayerDataManager implements Initializers {
     public void init() throws SQLException {
         this.databaseTableName = "player_data";
 
-        this.databaseColumns = new String[]{
-                "uuid",
-                "elo",
-                "arena_times_played",
-                "unranked_ffa_kills",
-                "unranked_ffa_deaths",
-                "ranked_1v1_kills",
-                "ranked_1v1_deaths",
-                "team_pvp_wins",
-                "team_pvp_losses"
-        };
+        // Create list of table columns and their associated SQL characteristics
+        this.databaseColumnsList = new ArrayList<>();
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("uuid", "CHAR(36) NOT NULL"));
 
-        if (!this.doesPlayerDataTableExists()) { // Check if PlayerData table exists
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("elo", "INT NOT NULL"));
 
-            this.createPlayerDataTable(); // Create the table if it doesn't exist
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("arena_times_played", "TEXT NOT NULL"));
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("arena_inventory", "TEXT NOT NULL"));
+
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("unranked_ffa_kills", "INT NOT NULL"));
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("unranked_ffa_deaths", "INT NOT NULL"));
+
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_kills", "INT NOT NULL"));
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_deaths", "INT NOT NULL"));
+
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_wins", "INT NOT NULL"));
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_losses", "INT NOT NULL"));
+
+        if (!this.doesPlayerDataTableExist()) { // If PlayerData table does NOT exists
+
+            this.createPlayerDataTable(); // Create the table
             LOGGER.info("Created " + databaseTableName + " database table");
 
-            if (!this.doesPlayerDataTableExists()) { // Check again after creating table
+            if (!this.doesPlayerDataTableExist()) { // Check again after creating table
                 throw new SQLException("Cannot create " + databaseTableName + " table!");
             }
         }
-        LOGGER.info(databaseTableName + " table is in database");
+        if (!this.isPlayerDataTableValid()) { // If PlayerData table is NOT valid
+            throw new SQLException("Table " + databaseTableName + " is NOT valid!");
+        }
+        LOGGER.info("Valid " + databaseTableName + " table is in database");
     }
 
+    /**
+     * {@inheritDoc}
+     * Will execute {@link PlayerDataUpdateRunnable} for all {@link PvPPlayer}s and deinitialize them.
+     */
     @Override
     public void deinit() {
+        LOGGER.info("Pushing all online player's data into database");
+        for (PvPPlayer pvpPlayer : playerManager.getPvPPlayers()) {
+            pvpPlayer.deinit();
 
+            PlayerDataUpdateRunnable playerDataUpdateRunnable =
+                    new PlayerDataUpdateRunnable(pvpPlayer, this, null);
+            // Run the task synchronously without registering as the server is shutting down and cannot queue bukkit tasks
+            playerDataUpdateRunnable.run();
+        }
+        LOGGER.info("Successfully updated the database");
     }
 
     /**
@@ -82,28 +110,43 @@ public class PlayerDataManager implements Initializers {
     public synchronized PlayerData selectPlayerDataFromDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = new PlayerData();
 
-        String selectPlayerDataPreparedSQL = "SELECT * FROM " + databaseTableName + " WHERE uuid=?";
+        StringBuilder selectPlayerDataPreparedSQL = new StringBuilder("SELECT ");
+        // Add columns in specific order so that code below doesn't get column index wrong
+        for (int i = 1; i < databaseColumnsList.size(); i++) { // Start at 1 b/c no need to get 'uuid'
+            selectPlayerDataPreparedSQL.append(databaseColumnsList.get(i).getKey());
+            if (i != databaseColumnsList.size() - 1) {
+                selectPlayerDataPreparedSQL.append(",");
+            }
+        }
+        selectPlayerDataPreparedSQL.append(" FROM ");
+        selectPlayerDataPreparedSQL.append(databaseTableName);
+        selectPlayerDataPreparedSQL.append(" WHERE uuid=?");
 
-        PreparedStatement selectPreparedStatement = databaseManager.getMysqlConnection().
-                prepareStatement(selectPlayerDataPreparedSQL);
+        PreparedStatement selectPreparedStatement = databaseManager.getMySQLConnection().
+                prepareStatement(selectPlayerDataPreparedSQL.toString());
 
         // Set UUID
         selectPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
 
         ResultSet resultSet = selectPreparedStatement.executeQuery();
 
-        if (!resultSet.next()) { // no row means present if .next() is false
+        if (!resultSet.next()) { // no row present if .next() is false
             return null;
         }
 
         // Arenas times played parsing from DB logic
         gsonManager.getArenaSerializer().setReferenceDeserialization(true); // Turn on referencing to already-created Arenas
-        HashMap arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(3),
+        HashMap arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
                 playerData.getArenaTimesPlayedMap().getClass());
         playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
 
+        // Arena Inventory parsing from DB logic
+        HashMap arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
+                playerData.getArenaInventory().getClass());
+        playerData.setArenaInventory(arenaInventory);
+
         // Set other primitives
-        playerData.setELO(resultSet.getInt(2));
+        playerData.setELO(resultSet.getInt(1));
         playerData.setUnrankedFFAKills(resultSet.getInt(4));
         playerData.setUnrankedFFADeaths(resultSet.getInt(5));
         playerData.setRanked1v1Kills(resultSet.getInt(6));
@@ -123,37 +166,24 @@ public class PlayerDataManager implements Initializers {
     public synchronized void updatePlayerDataInDatabase(PvPPlayer pvpPlayer) throws SQLException {
         PlayerData playerData = pvpPlayer.getPlayerData();
 
-        String updatePlayerDataPreparedSQL = "UPDATE " + databaseTableName + " SET " +
-                "elo=?, " +
-                "arena_times_played=?, " +
-                "unranked_ffa_kills=?, " +
-                "unranked_ffa_deaths=?, " +
-                "ranked_1v1_kills=?, " +
-                "ranked_1v1_deaths=?, " +
-                "team_pvp_wins=?, " +
-                "team_pvp_losses=? " +
-                "WHERE uuid=?";
+        StringBuilder updatePlayerDataPreparedSQL = new StringBuilder("UPDATE " + databaseTableName + " SET ");
+        for (int i = 1; i < databaseColumnsList.size(); i++) { // Start at 1 b/c no need to update 'uuid'
+            updatePlayerDataPreparedSQL.append(databaseColumnsList.get(i).getKey()); // key is column name
+            updatePlayerDataPreparedSQL.append("=? ");
+            if (i != databaseColumnsList.size() - 1) {
+                updatePlayerDataPreparedSQL.append(",");
+            }
+        }
 
-        PreparedStatement updatePreparedStatement = databaseManager.getMysqlConnection()
-                .prepareStatement(updatePlayerDataPreparedSQL);
+        updatePlayerDataPreparedSQL.append("WHERE uuid=?");
+
+        PreparedStatement updatePreparedStatement = databaseManager.getMySQLConnection()
+                .prepareStatement(updatePlayerDataPreparedSQL.toString());
 
         // Set UUID
-        updatePreparedStatement.setString(9, pvpPlayer.getPlayer().getUniqueId().toString());
+        updatePreparedStatement.setString(10, pvpPlayer.getPlayer().getUniqueId().toString());
 
-        // Arena times played parsing logic
-        gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
-        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
-                playerData.getArenaTimesPlayedMap().getClass());
-        updatePreparedStatement.setString(2, arenaTimesPlayedMapJson);
-
-        // Set other primitives
-        updatePreparedStatement.setInt(1, playerData.getELO());
-        updatePreparedStatement.setInt(3, playerData.getUnrankedFFAKills());
-        updatePreparedStatement.setInt(4, playerData.getUnrankedFFADeaths());
-        updatePreparedStatement.setInt(5, playerData.getRanked1v1Kills());
-        updatePreparedStatement.setInt(6, playerData.getRanked1v1Deaths());
-        updatePreparedStatement.setInt(7, playerData.getTeamPvPWins());
-        updatePreparedStatement.setInt(8, playerData.getTeamPvPLosses());
+        this.setPreparedStatementWithPlayerData(updatePreparedStatement, playerData, 1); // start at index 1
 
         updatePreparedStatement.executeUpdate();
     }
@@ -169,27 +199,56 @@ public class PlayerDataManager implements Initializers {
 
         // e.g. INSERT INTO player_data VALUES("<UUID>", 1000, "{}", 0, 0, 0, 0, 0, 0);
 
-        String insertPlayerDataPreparedSQL = "INSERT INTO " + databaseTableName + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement insertPreparedStatement = databaseManager.getMysqlConnection()
-                .prepareStatement(insertPlayerDataPreparedSQL);
+        StringBuilder insertPlayerDataPreparedSQL = new StringBuilder("INSERT INTO " + databaseTableName + " VALUES(");
+        for (int i = 0; i < databaseColumnsList.size(); i++) {
+            insertPlayerDataPreparedSQL.append("?");
+            if (i != databaseColumnsList.size() - 1) {
+                insertPlayerDataPreparedSQL.append(",");
+            }
+        }
+        insertPlayerDataPreparedSQL.append(")");
 
-        // Arena times played parsing logic
-        gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
-        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
-                playerData.getArenaTimesPlayedMap().getClass());
-        insertPreparedStatement.setString(3, arenaTimesPlayedMapJson);
+        PreparedStatement insertPreparedStatement = databaseManager.getMySQLConnection()
+                .prepareStatement(insertPlayerDataPreparedSQL.toString());
 
-        // Set other primitives
         insertPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
-        insertPreparedStatement.setInt(2, playerData.getELO());
-        insertPreparedStatement.setInt(4, playerData.getUnrankedFFAKills());
-        insertPreparedStatement.setInt(5, playerData.getUnrankedFFADeaths());
-        insertPreparedStatement.setInt(6, playerData.getRanked1v1Kills());
-        insertPreparedStatement.setInt(7, playerData.getRanked1v1Deaths());
-        insertPreparedStatement.setInt(8, playerData.getTeamPvPWins());
-        insertPreparedStatement.setInt(9, playerData.getTeamPvPLosses());
+
+        this.setPreparedStatementWithPlayerData(insertPreparedStatement, playerData, 2); // start at index 2
 
         insertPreparedStatement.executeUpdate();
+    }
+
+    /**
+     * Sets player data values within prepared statement according to {@link #getDatabaseColumnsList()}
+     * (excludes Primary Key aka UUID).
+     *
+     * @param preparedStatement      the prepared statement
+     * @param playerData             the player data
+     * @param questionMarkStartIndex the question mark start index (inclusive)
+     * @throws SQLException the sql exception
+     */
+    private void setPreparedStatementWithPlayerData(PreparedStatement preparedStatement,
+                                                    PlayerData playerData, int questionMarkStartIndex) throws SQLException {
+        gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
+
+        // Arena times played parsing logic
+        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
+                playerData.getArenaTimesPlayedMap().getClass());
+        preparedStatement.setString(questionMarkStartIndex + 1, arenaTimesPlayedMapJson);
+
+        // Arena Inventory parsing logic
+        String arenaInventoryMapJson = gsonManager.getGson().toJson(playerData.getArenaInventory(),
+                playerData.getArenaInventory().getClass());
+        preparedStatement.setString(questionMarkStartIndex + 2, arenaInventoryMapJson);
+
+        // Set other primitives
+        preparedStatement.setInt(questionMarkStartIndex, playerData.getELO());
+        preparedStatement.setInt(questionMarkStartIndex + 3, playerData.getUnrankedFFAKills());
+        preparedStatement.setInt(questionMarkStartIndex + 4, playerData.getUnrankedFFADeaths());
+        preparedStatement.setInt(questionMarkStartIndex + 5, playerData.getRanked1v1Kills());
+        preparedStatement.setInt(questionMarkStartIndex + 6, playerData.getRanked1v1Deaths());
+        preparedStatement.setInt(questionMarkStartIndex + 7, playerData.getTeamPvPWins());
+        preparedStatement.setInt(questionMarkStartIndex + 8, playerData.getTeamPvPLosses());
     }
 
     /**
@@ -197,23 +256,22 @@ public class PlayerDataManager implements Initializers {
      *
      * @throws SQLException the sql exception
      */
+    @SuppressWarnings("concat")
     public synchronized void createPlayerDataTable() throws SQLException {
         // Table modeled after PlayerData object
-        String createTableSQL = "CREATE TABLE " + databaseTableName + " (\n" +
-                "    uuid CHAR(36) NOT NULL,\n" +
-                "    elo INT NOT NULL,\n" +
-                "    arena_times_played TEXT NOT NULL,\n" +
-                "    unranked_ffa_kills INT NOT NULL,\n" +
-                "    unranked_ffa_deaths INT NOT NULL,\n" +
-                "    ranked_1v1_kills INT NOT NULL,\n" +
-                "    ranked_1v1_deaths INT NOT NULL,\n" +
-                "    team_pvp_wins INT NOT NULL,\n" +
-                "    team_pvp_losses INT NOT NULL,\n" +
-                "    PRIMARY KEY (UUID)\n" +
-                ");";
+        StringBuilder createTableSQL = new StringBuilder("CREATE TABLE " + databaseTableName + " (\n");
 
-        Statement createTableStatement = databaseManager.getMysqlConnection().createStatement();
-        createTableStatement.execute(createTableSQL);
+        for (AbstractMap.SimpleEntry column : databaseColumnsList) {
+            createTableSQL.append(column.getKey())
+                    .append(" ")
+                    .append(column.getValue())
+                    .append(",");
+        }
+        createTableSQL.append("PRIMARY KEY (UUID)");
+        createTableSQL.append(");");
+
+        Statement createTableStatement = databaseManager.getMySQLConnection().createStatement();
+        createTableStatement.execute(createTableSQL.toString());
     }
 
     /**
@@ -222,18 +280,71 @@ public class PlayerDataManager implements Initializers {
      * @return the boolean
      * @throws SQLException the sql exception
      */
-    public synchronized boolean doesPlayerDataTableExists() throws SQLException {
+    public synchronized boolean doesPlayerDataTableExist() throws SQLException {
         String tableExistsSQL = "SHOW TABLES LIKE '" + databaseTableName + "';";
 
-        Statement tableExistsStatement = databaseManager.getMysqlConnection().createStatement();
+        Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(tableExistsSQL);
         while (resultSet.next()) {
-            if (resultSet.getString(1).equals(databaseTableName)) {
+            if (resultSet.getString(1).equals(databaseTableName)) { // Only 1 column and that is the table names
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Checks if player data table is valid (comparing columns in DB to {@link #getDatabaseColumnsList()}).
+     *
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
+    public synchronized boolean isPlayerDataTableValid() throws SQLException {
+        String describeTableSQL = "DESCRIBE " + databaseTableName + ";";
+
+        Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
+
+        ResultSet resultSet = tableExistsStatement.executeQuery(describeTableSQL);
+        while (resultSet.next()) {
+            String databaseColumnName = resultSet.getString(1); // 1st column is 'Field' which is column name
+            String databaseColumnType = resultSet.getString(2); // 2nd column is 'type' which is column type
+
+            // Search required column list because description table from SQL might be out of order
+            for (AbstractMap.SimpleEntry<String, String> column : databaseColumnsList) {
+                String requiredColumnName = column.getKey();
+
+                if (requiredColumnName.equals(databaseColumnName)) { // If found exact column name that is required
+                    String requiredColumnType = column.getValue().split(" ")[0]; // 1st word in value is column type
+
+                    // If the columns types (e.g. INT, TEXT) are NOT somewhat resembled in the description table
+                    if (!databaseColumnType.toLowerCase().contains(requiredColumnType.toLowerCase())) {
+                        return false;
+                    }
+                    break; // Break out of database column list search and go on to next column from description table
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Deletes all bukkit player data files created by bukkit e.g. delete <world>/playerdata/<UUID>.dat for every world.
+     *
+     * @param pvpPlayer the pvp player
+     * @throws IOException the io exception
+     */
+    public synchronized void deleteBukkitPlayerDataFile(PvPPlayer pvpPlayer) throws IOException {
+        for (World world : Bukkit.getWorlds()) {
+            File playerDataFile = new File(world.getWorldFolder(),
+                    "playerdata/" + pvpPlayer.getPlayer().getUniqueId().toString() + ".dat");
+            if (playerDataFile.exists()) {
+                boolean deleteSuccess = playerDataFile.delete();
+                if (!deleteSuccess) {
+                    throw new IOException("Could not delete " + playerDataFile.getName() + " data file!");
+                }
+            }
+        }
     }
 
     /**
@@ -243,5 +354,15 @@ public class PlayerDataManager implements Initializers {
      */
     public String getDatabaseTableName() {
         return databaseTableName;
+    }
+
+    /**
+     * Gets database columns list.
+     * The key is the column name and the value is the column type (e.g. INT NOT NULL)
+     *
+     * @return the database columns list
+     */
+    public ArrayList<AbstractMap.SimpleEntry<String, String>> getDatabaseColumnsList() {
+        return databaseColumnsList;
     }
 }

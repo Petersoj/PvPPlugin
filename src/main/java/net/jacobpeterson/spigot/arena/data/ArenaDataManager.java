@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonReader;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.ArenaManager;
+import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.util.Initializers;
 
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 
 public class ArenaDataManager implements Initializers {
 
-    private static final String FFA_ARENAS_KEY = "ffa";
+    private static final String FFA_ARENA_KEY = "ffa";
     private static final String RANKED_1V1_ARENAS_KEY = "ranked_1v1";
     private static final String TEAM_2V2_ARENAS = "team_2v2";
 
@@ -74,16 +75,13 @@ public class ArenaDataManager implements Initializers {
         arenaSerializer.setReferenceSerialization(false); // This will serialize the entire object via Gson
 
         JsonObject arenasObject = new JsonObject();
-        JsonElement ffaArenasArray = gson.toJsonTree(arenaManager.getFFAArenas(),
-                arenaManager.getFFAArenas().getClass());
-        JsonElement ranked1v1ArenasArray = gson.toJsonTree(arenaManager.getRanked1v1Arenas(),
-                arenaManager.getRanked1v1Arenas().getClass());
-        JsonElement team2v2ArenasArray = gson.toJsonTree(arenaManager.getTeam2v2Arenas(),
-                arenaManager.getTeam2v2Arenas().getClass());
+        JsonElement ffaArenaJson = gson.toJsonTree(arenaManager.getFFAArena());
+        JsonElement ranked1v1ArenasJsonArray = gson.toJsonTree(arenaManager.getRanked1v1Arenas());
+        JsonElement team2v2ArenasJsonArray = gson.toJsonTree(arenaManager.getTeam2v2Arenas());
 
-        arenasObject.add(FFA_ARENAS_KEY, ffaArenasArray);
-        arenasObject.add(RANKED_1V1_ARENAS_KEY, ranked1v1ArenasArray);
-        arenasObject.add(TEAM_2V2_ARENAS, team2v2ArenasArray);
+        arenasObject.add(FFA_ARENA_KEY, ffaArenaJson);
+        arenasObject.add(RANKED_1V1_ARENAS_KEY, ranked1v1ArenasJsonArray);
+        arenasObject.add(TEAM_2V2_ARENAS, team2v2ArenasJsonArray);
 
         byte[] jsonBytes = gson.toJson(arenasObject).getBytes(StandardCharsets.UTF_8);
 
@@ -113,14 +111,14 @@ public class ArenaDataManager implements Initializers {
 
         JsonObject arenasObject = (JsonObject) arenasElement;
 
-        ArrayList ffaArenas = gson.fromJson(arenasObject.getAsJsonArray(FFA_ARENAS_KEY),
-                arenaManager.getFFAArenas().getClass());
+        FFAArena ffaArena = gson.fromJson(arenasObject.getAsJsonArray(FFA_ARENA_KEY),
+                arenaManager.getFFAArena().getClass());
         ArrayList ranked1v1Arenas = gson.fromJson(arenasObject.getAsJsonArray(RANKED_1V1_ARENAS_KEY),
                 arenaManager.getRanked1v1Arenas().getClass());
         ArrayList team2v2Arenas = gson.fromJson(arenasObject.getAsJsonArray(TEAM_2V2_ARENAS),
                 arenaManager.getTeam2v2Arenas().getClass());
 
-        arenaManager.setFFAArenas(ffaArenas);
+        arenaManager.setFFAArena(ffaArena);
         arenaManager.setRanked1v1Arenas(ranked1v1Arenas);
         arenaManager.setTeam2v2Arenas(team2v2Arenas);
     }

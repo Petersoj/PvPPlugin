@@ -17,7 +17,7 @@ public class ArenaManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
     private ArenaDataManager arenaDataManager;
-    private ArrayList<FFAArena> ffaArenas;
+    private FFAArena ffaArena;
     private ArrayList<Ranked1v1Arena> ranked1v1Arenas;
     private ArrayList<Team2v2Arena> team2v2Arenas;
 
@@ -25,7 +25,6 @@ public class ArenaManager implements Initializers {
         this.pvpPlugin = pvpPlugin;
         this.arenaDataManager = new ArenaDataManager(this, pvpPlugin.getGsonManager());
         // Instantiate these to empty Arraylists because we need the types via getClass() for Gson
-        this.ffaArenas = new ArrayList<>();
         this.ranked1v1Arenas = new ArrayList<>();
         this.team2v2Arenas = new ArrayList<>();
     }
@@ -61,7 +60,7 @@ public class ArenaManager implements Initializers {
      */
     public ArrayList<Arena> getAllArenas() {
         ArrayList<Arena> arenas = new ArrayList<>();
-        arenas.addAll(ffaArenas);
+        arenas.add(ffaArena);
         arenas.addAll(ranked1v1Arenas);
         arenas.addAll(team2v2Arenas);
         return arenas;
@@ -86,21 +85,21 @@ public class ArenaManager implements Initializers {
     }
 
     /**
-     * Gets ffa arenas.
+     * Gets ffa arena.
      *
-     * @return the ffa arenas
+     * @return the ffa arena
      */
-    public ArrayList<FFAArena> getFFAArenas() {
-        return ffaArenas;
+    public FFAArena getFFAArena() {
+        return ffaArena;
     }
 
     /**
-     * Sets ffa arenas.
+     * Sets ffa arena.
      *
-     * @param ffaArenas the ffa arenas
+     * @param ffaArena the ffa arena
      */
-    public void setFFAArenas(ArrayList<FFAArena> ffaArenas) {
-        this.ffaArenas = ffaArenas;
+    public void setFFAArena(FFAArena ffaArena) {
+        this.ffaArena = ffaArena;
     }
 
     /**

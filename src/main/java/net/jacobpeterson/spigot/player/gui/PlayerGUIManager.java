@@ -1,8 +1,8 @@
 package net.jacobpeterson.spigot.player.gui;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
-import net.jacobpeterson.spigot.gui.InventoryReferenceMatcher;
 import net.jacobpeterson.spigot.gui.GUIManager;
+import net.jacobpeterson.spigot.gui.InventoryReferenceMatcher;
 import net.jacobpeterson.spigot.gui.guis.ranked1v1.Ranked1v1Menu;
 import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPArenaMenu;
 import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPCraftTeamMenu;
@@ -45,6 +45,10 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
 
     @Override
     public void deinit() {
+        ranked1v1Menu.deinit();
+        teamPvPMenu.deinit();
+        teamPvPArenaMenu.deinit();
+        teamPvPCraftTeamMenu.deinit();
     }
 
     @Override

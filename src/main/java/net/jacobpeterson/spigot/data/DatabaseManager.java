@@ -54,7 +54,7 @@ public class DatabaseManager implements Initializers {
      *
      * @return the mysql connection
      */
-    public Connection getMysqlConnection() {
+    public Connection getMySQLConnection() {
         return mysqlConnection;
     }
 }

@@ -1,31 +1,48 @@
-package net.jacobpeterson.spigot.gamemode.team2v2pvp;
+package net.jacobpeterson.spigot.game.games.team2v2;
 
+import net.jacobpeterson.spigot.game.games.team2v2.itemstack.Team2v2ItemStack;
 import net.jacobpeterson.spigot.player.PvPPlayer;
+import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-public class Team2v2 {
+public class Team2v2 implements Initializers {
 
+    private Team2v2Game team2v2Game;
     private Player teamLeader;
     private Player teamMember;
     private ArrayList<PvPPlayer> prospectivePlayers;
-
-    /**
-     * Instantiates a new Team 2v2.
-     */
-    public Team2v2() {
-        this.prospectivePlayers = new ArrayList<>();
-    }
+    private Team2v2ItemStack team2v2ItemStack;
 
     /**
      * Instantiates a new Team 2v2.
      *
-     * @param teamLeader the team leader
+     * @param team2v2Game the team 2v2 game
      */
-    public Team2v2(Player teamLeader) {
-        this();
-        this.teamLeader = teamLeader;
+    public Team2v2(Team2v2Game team2v2Game) {
+        this.team2v2Game = team2v2Game;
+        this.prospectivePlayers = new ArrayList<>();
+        this.team2v2ItemStack = new Team2v2ItemStack(this);
+    }
+
+    @Override
+    public void init() {
+        team2v2ItemStack.init();
+    }
+
+    @Override
+    public void deinit() {
+        team2v2ItemStack.deinit();
+    }
+
+    /**
+     * Gets team 2v2 game.
+     *
+     * @return the team 2v2 game
+     */
+    public Team2v2Game getTeam2v2Game() {
+        return team2v2Game;
     }
 
     /**
@@ -80,5 +97,23 @@ public class Team2v2 {
      */
     public void setProspectivePlayers(ArrayList<PvPPlayer> prospectivePlayers) {
         this.prospectivePlayers = prospectivePlayers;
+    }
+
+    /**
+     * Gets team 2v2 item stack.
+     *
+     * @return the team 2v2 item stack
+     */
+    public Team2v2ItemStack getTeam2v2ItemStack() {
+        return team2v2ItemStack;
+    }
+
+    /**
+     * Sets team 2v2 item stack.
+     *
+     * @param team2v2ItemStack the team 2v2 item stack
+     */
+    public void setTeam2v2ItemStack(Team2v2ItemStack team2v2ItemStack) {
+        this.team2v2ItemStack = team2v2ItemStack;
     }
 }

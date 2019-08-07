@@ -1,14 +1,14 @@
 package net.jacobpeterson.spigot.gui.guis.teampvp;
 
-import net.jacobpeterson.spigot.gamemode.team2v2pvp.Team2v2;
+import net.jacobpeterson.spigot.game.games.team2v2.Team2v2;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -39,8 +39,7 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
         if (BACK_ITEM == null) {
             BACK_ITEM = new ItemStack(Material.BOOK);
             ItemStackUtil.formatLore(BACK_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Back",
-                    "");
+                    CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
         }
 
         this.createInventory();
@@ -54,13 +53,13 @@ public class TeamPvPMenu extends AbstractInventoryGUI {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryClickEvent event) {
+    public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
         event.setCancelled(true);
         // TODO TeamPvP inventory
     }
 
-    public void updateTeams(ArrayList<Team2v2> teams) {
-        for (Team2v2 team2v2 : teams) {
+    public void updateTeams(ArrayList<Team2v2> team2v2s) {
+        for (Team2v2 team2v2 : team2v2s) {
             // TODO
         }
     }
