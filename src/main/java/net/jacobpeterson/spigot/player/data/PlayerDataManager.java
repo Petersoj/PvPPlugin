@@ -91,8 +91,7 @@ public class PlayerDataManager implements Initializers {
         for (PvPPlayer pvpPlayer : playerManager.getPvPPlayers()) {
             pvpPlayer.deinit();
 
-            PlayerDataUpdateRunnable playerDataUpdateRunnable =
-                    new PlayerDataUpdateRunnable(pvpPlayer, this, null);
+            PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, this);
             // Run the task synchronously without registering as the server is shutting down and cannot queue bukkit tasks
             playerDataUpdateRunnable.run();
         }

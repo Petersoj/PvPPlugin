@@ -101,6 +101,7 @@ public class PvPPlugin extends JavaPlugin {
             gsonManager.deinit();
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot disable " + this.getName(), exception);
+            return;
         }
 
         LOGGER.info("Finished Deinitializing " + this.getName());

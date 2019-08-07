@@ -6,6 +6,8 @@ import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -74,19 +76,34 @@ public class PlayerManager implements Initializers {
     /**
      * Gets player group prefix from the GroupManager spigot plugin.
      *
-     * @param player the player
+     * @param pvpPlayer the pvp player
      * @return the player's GroupManager group prefix (will be empty string if prefix doesn't exist)
      */
-    public String getPlayerGroupPrefix(Player player) {
+    public String getPlayerGroupPrefix(PvPPlayer pvpPlayer) {
         AnjoPermissionsHandler anjoPermissionsHandler =
-                pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(player);
+                pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(pvpPlayer.getPlayer());
         if (anjoPermissionsHandler != null) {
-            String userPrefix = anjoPermissionsHandler.getUserPrefix(player.getName());
+            String userPrefix = anjoPermissionsHandler.getUserPrefix(pvpPlayer.getPlayer().getName());
             if (userPrefix != null) {
                 return userPrefix;
             }
         }
         return "";
+    }
+
+    /**
+     * Kicks player synchronously via {@link org.bukkit.scheduler.BukkitRunnable#runTask(Plugin)} on the
+     * next tick.
+     *
+     * @param pvpPlayer the pvp player
+     */
+    public void kickPlayerSync(PvPPlayer pvpPlayer, String message) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                pvpPlayer.getPlayer().kickPlayer(message);
+            }
+        }.runTask(pvpPlugin);
     }
 
     /**

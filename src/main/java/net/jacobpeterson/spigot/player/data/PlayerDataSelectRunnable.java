@@ -2,23 +2,19 @@ package net.jacobpeterson.spigot.player.data;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.util.ExceptionTracker;
-import net.jacobpeterson.spigot.util.InstanceRunnable;
+import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PlayerDataSelectRunnable extends BukkitRunnable implements ExceptionTracker {
+public class PlayerDataSelectRunnable extends BukkitRunnable {
 
     private final Logger LOGGER;
 
     private PvPPlayer pvpPlayer;
     private PlayerDataManager playerDataManager;
-    private InstanceRunnable<PlayerDataSelectRunnable> instanceRunnable;
-    private ArrayList<AbstractMap.SimpleEntry<String, Exception>> exceptions;
 
     /**
      * Instantiates a new FetchPlayerDataRunnable which is meant to be run async to fetch from the SQL Database
@@ -27,15 +23,11 @@ public class PlayerDataSelectRunnable extends BukkitRunnable implements Exceptio
      *
      * @param pvpPlayer         the pvp player
      * @param playerDataManager the player data manager
-     * @param instanceRunnable  the instance runnable (will get called after all data has been fetched) (can be null)
      */
-    public PlayerDataSelectRunnable(PvPPlayer pvpPlayer, PlayerDataManager playerDataManager,
-                                    InstanceRunnable<PlayerDataSelectRunnable> instanceRunnable) {
+    public PlayerDataSelectRunnable(PvPPlayer pvpPlayer, PlayerDataManager playerDataManager) {
         LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlayer = pvpPlayer;
         this.playerDataManager = playerDataManager;
-        this.instanceRunnable = instanceRunnable;
-        this.exceptions = new ArrayList<>();
     }
 
     @Override
@@ -48,23 +40,26 @@ public class PlayerDataSelectRunnable extends BukkitRunnable implements Exceptio
             if (playerData == null) { // If no exception occurs and player data is null
                 insertNewPlayer = true;
                 pvpPlayer.setPlayerData(new PlayerData()); // Create a fresh PlayerData for the player
+            } else {
+                pvpPlayer.setPlayerData(playerData);
             }
         } catch (SQLException exception) {
-            exceptions.add(new AbstractMap.SimpleEntry<>("Could not select player data for: " +
-                    pvpPlayer.getPlayer().getName(), exception));
+            LOGGER.log(Level.SEVERE, "Could not select player data for: " + pvpPlayer.getPlayer().getName(), exception);
+            playerDataManager.getPlayerManager().kickPlayerSync(pvpPlayer,
+                    ChatColor.RED + "Could not get your data from database!\n" +
+                            ChatColor.WHITE + "Contact the server admins!");
         }
 
-        if (insertNewPlayer && !didExceptionOccur()) {
+        if (insertNewPlayer) {
             try {
                 playerDataManager.insertNewPlayerDataInDatabase(pvpPlayer);
             } catch (SQLException exception) {
-                exceptions.add(new AbstractMap.SimpleEntry<>("Could not insert new player data for: " +
-                        pvpPlayer.getPlayer().getName(), exception));
+                LOGGER.log(Level.SEVERE, "Could not insert new player data for: " +
+                        pvpPlayer.getPlayer().getName(), exception);
+                playerDataManager.getPlayerManager().kickPlayerSync(pvpPlayer,
+                        ChatColor.RED + "Could not insert your data in database!\n" +
+                                ChatColor.WHITE + "Contact the server admins!");
             }
-        }
-
-        if (instanceRunnable != null) {
-            instanceRunnable.run(this);
         }
     }
 
@@ -84,33 +79,5 @@ public class PlayerDataSelectRunnable extends BukkitRunnable implements Exceptio
      */
     public PlayerDataManager getPlayerDataManager() {
         return playerDataManager;
-    }
-
-    @Override
-    public boolean didExceptionOccur() {
-        return exceptions.size() > 0;
-    }
-
-    @Override
-    public ArrayList<AbstractMap.SimpleEntry<String, Exception>> getExceptions() {
-        return exceptions;
-    }
-
-    /**
-     * Used for the instance runnable for {@link PlayerDataSelectRunnable} which will check if an exception occured
-     * and kick the player if needs be.
-     */
-    public static class PlayerDataSelectInstanceRunnable implements InstanceRunnable<PlayerDataSelectRunnable> {
-        @Override
-        public void run(PlayerDataSelectRunnable playerDataSelectRunnable) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (playerDataSelectRunnable.didExceptionOccur()) {
-                        // TODO sync kick player
-                    }
-                }
-            }.runTask(playerDataSelectRunnable.getPlayerDataManager().getPlayerManager().getPvPPlugin());
-        }
     }
 }

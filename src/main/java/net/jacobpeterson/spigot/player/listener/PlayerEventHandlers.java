@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerEventHandlers {
@@ -46,8 +45,7 @@ public class PlayerEventHandlers {
         PvPPlayer pvpPlayer = playerManager.createNewPvPPlayer(player);
         pvpPlayer.getPlayerItemManager().loadSpawnInventory();
 
-        PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(pvpPlayer, playerDataManager,
-                new PlayerDataSelectRunnable.PlayerDataSelectInstanceRunnable());
+        PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(pvpPlayer, playerDataManager);
         playerDataSelectRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
     }
 
@@ -67,22 +65,11 @@ public class PlayerEventHandlers {
 
         pvpPlayer.deinit();
 
-        PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, playerDataManager,
-                playerDataUpdateRunnableInstance -> {
-                    if (playerDataUpdateRunnableInstance.didExceptionOccur()) {
-                        playerDataUpdateRunnableInstance.getExceptions()
-                                .forEach(e -> LOGGER.log(Level.SEVERE, "Could not update Player Data in Database!", e));
-                    }
-                });
+        PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, playerDataManager);
         playerDataUpdateRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
 
-        PlayerBukkitDataRemoveRunnable playerBukkitDataRemoveRunnable = new PlayerBukkitDataRemoveRunnable(
-                pvpPlayer, playerDataManager, playerBukkitDataRemoveRunnableInstance -> {
-            if (playerBukkitDataRemoveRunnableInstance.didExceptionOccur()) {
-                playerBukkitDataRemoveRunnableInstance.getExceptions()
-                        .forEach(e -> LOGGER.log(Level.SEVERE, "Could not remove Player Bukkit Data!", e));
-            }
-        });
+        PlayerBukkitDataRemoveRunnable playerBukkitDataRemoveRunnable =
+                new PlayerBukkitDataRemoveRunnable(pvpPlayer, playerDataManager);
         // Run 20 ticks later (1 second) to ensure deletion
         playerBukkitDataRemoveRunnable.runTaskLaterAsynchronously(playerManager.getPvPPlugin(), 20);
     }

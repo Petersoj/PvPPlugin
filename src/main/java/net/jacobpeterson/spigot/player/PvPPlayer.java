@@ -52,7 +52,7 @@ public class PvPPlayer implements Initializers {
      * @return the prefixed name
      */
     public String getPrefixedName() {
-        return playerManager.getPlayerGroupPrefix(player) + player.getName();
+        return playerManager.getPlayerGroupPrefix(this) + player.getName();
     }
 
     /**
