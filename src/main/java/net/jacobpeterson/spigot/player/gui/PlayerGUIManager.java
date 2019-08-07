@@ -4,9 +4,9 @@ import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.gui.InventoryReferenceMatcher;
 import net.jacobpeterson.spigot.gui.guis.ranked1v1.Ranked1v1Menu;
-import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPArenaMenu;
-import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPCraftTeamMenu;
-import net.jacobpeterson.spigot.gui.guis.teampvp.TeamPvPMenu;
+import net.jacobpeterson.spigot.gui.guis.team2v2.Team2v2ArenaMenu;
+import net.jacobpeterson.spigot.gui.guis.team2v2.Team2v2CraftTeamMenu;
+import net.jacobpeterson.spigot.gui.guis.team2v2.Team2v2Menu;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.Inventory;
@@ -16,9 +16,9 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
     private final PvPPlayer pvpPlayer;
     private GUIManager guiManager;
     private Ranked1v1Menu ranked1v1Menu;
-    private TeamPvPMenu teamPvPMenu;
-    private TeamPvPArenaMenu teamPvPArenaMenu;
-    private TeamPvPCraftTeamMenu teamPvPCraftTeamMenu;
+    private Team2v2Menu team2v2Menu;
+    private Team2v2ArenaMenu team2v2ArenaMenu;
+    private Team2v2CraftTeamMenu team2v2CraftTeamMenu;
 
     /**
      * Instantiates a new Player GUI Manager which is used to handle player-specific Inventory GUIs.
@@ -28,9 +28,9 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
     public PlayerGUIManager(PvPPlayer pvpPlayer) {
         this.pvpPlayer = pvpPlayer;
         this.ranked1v1Menu = new Ranked1v1Menu(this);
-        this.teamPvPMenu = new TeamPvPMenu(this);
-        this.teamPvPArenaMenu = new TeamPvPArenaMenu(this);
-        this.teamPvPCraftTeamMenu = new TeamPvPCraftTeamMenu(this);
+        this.team2v2Menu = new Team2v2Menu(this);
+        this.team2v2ArenaMenu = new Team2v2ArenaMenu(this);
+        this.team2v2CraftTeamMenu = new Team2v2CraftTeamMenu(this);
     }
 
     @Override
@@ -38,25 +38,25 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
         this.guiManager = pvpPlayer.getPlayerManager().getPvPPlugin().getGUIManager();
 
         ranked1v1Menu.init();
-        teamPvPMenu.init();
-        teamPvPArenaMenu.init();
-        teamPvPCraftTeamMenu.init();
+        team2v2Menu.init();
+        team2v2ArenaMenu.init();
+        team2v2CraftTeamMenu.init();
     }
 
     @Override
     public void deinit() {
         ranked1v1Menu.deinit();
-        teamPvPMenu.deinit();
-        teamPvPArenaMenu.deinit();
-        teamPvPCraftTeamMenu.deinit();
+        team2v2Menu.deinit();
+        team2v2ArenaMenu.deinit();
+        team2v2CraftTeamMenu.deinit();
     }
 
     @Override
     public AbstractInventoryGUI getInventoryGUI(Inventory inventory) {
         if (ranked1v1Menu.getInventory().equals(inventory)) return ranked1v1Menu;
-        if (teamPvPMenu.getInventory().equals(inventory)) return ranked1v1Menu;
-        if (teamPvPArenaMenu.getInventory().equals(inventory)) return teamPvPArenaMenu;
-        if (teamPvPCraftTeamMenu.getInventory().equals(inventory)) return teamPvPArenaMenu;
+        if (team2v2Menu.getInventory().equals(inventory)) return ranked1v1Menu;
+        if (team2v2ArenaMenu.getInventory().equals(inventory)) return team2v2ArenaMenu;
+        if (team2v2CraftTeamMenu.getInventory().equals(inventory)) return team2v2ArenaMenu;
         return null;
     }
 
@@ -88,56 +88,56 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
     }
 
     /**
-     * Gets team pvp menu.
+     * Gets team 2v2 menu.
      *
-     * @return the team pvp menu
+     * @return the team 2v2 menu
      */
-    public TeamPvPMenu getTeamPvPMenu() {
-        return teamPvPMenu;
+    public Team2v2Menu getTeam2v2Menu() {
+        return team2v2Menu;
     }
 
     /**
-     * Sets team pvp menu.
+     * Sets team 2v2 menu.
      *
-     * @param teamPvPMenu the team pvp menu
+     * @param team2v2Menu the team 2v2 menu
      */
-    public void setTeamPvPMenu(TeamPvPMenu teamPvPMenu) {
-        this.teamPvPMenu = teamPvPMenu;
+    public void setTeam2v2Menu(Team2v2Menu team2v2Menu) {
+        this.team2v2Menu = team2v2Menu;
     }
 
     /**
-     * Gets team pvp arena menu.
+     * Gets team 2v2 arena menu.
      *
-     * @return the team pvp arena menu
+     * @return the team 2v2 arena menu
      */
-    public TeamPvPArenaMenu getTeamPvPArenaMenu() {
-        return teamPvPArenaMenu;
+    public Team2v2ArenaMenu getTeam2v2ArenaMenu() {
+        return team2v2ArenaMenu;
     }
 
     /**
-     * Sets team pvp arena menu.
+     * Sets team 2v2 arena menu.
      *
-     * @param teamPvPArenaMenu the team pvp arena menu
+     * @param team2v2ArenaMenu the team 2v2 arena menu
      */
-    public void setTeamPvPArenaMenu(TeamPvPArenaMenu teamPvPArenaMenu) {
-        this.teamPvPArenaMenu = teamPvPArenaMenu;
+    public void setTeam2v2ArenaMenu(Team2v2ArenaMenu team2v2ArenaMenu) {
+        this.team2v2ArenaMenu = team2v2ArenaMenu;
     }
 
     /**
-     * Gets team pvp craft team menu.
+     * Gets team 2v2 craft team menu.
      *
-     * @return the team pvp craft team menu
+     * @return the team 2v2 craft team menu
      */
-    public TeamPvPCraftTeamMenu getTeamPvPCraftTeamMenu() {
-        return teamPvPCraftTeamMenu;
+    public Team2v2CraftTeamMenu getTeam2v2CraftTeamMenu() {
+        return team2v2CraftTeamMenu;
     }
 
     /**
-     * Sets team pvp craft team menu.
+     * Sets team 2v2 craft team menu.
      *
-     * @param teamPvPCraftTeamMenu the team pvp craft team menu
+     * @param team2v2CraftTeamMenu the team 2v2 craft team menu
      */
-    public void setTeamPvPCraftTeamMenu(TeamPvPCraftTeamMenu teamPvPCraftTeamMenu) {
-        this.teamPvPCraftTeamMenu = teamPvPCraftTeamMenu;
+    public void setTeam2v2CraftTeamMenu(Team2v2CraftTeamMenu team2v2CraftTeamMenu) {
+        this.team2v2CraftTeamMenu = team2v2CraftTeamMenu;
     }
 }

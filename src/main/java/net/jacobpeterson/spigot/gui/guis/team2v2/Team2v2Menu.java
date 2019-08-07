@@ -1,6 +1,7 @@
-package net.jacobpeterson.spigot.gui.guis.teampvp;
+package net.jacobpeterson.spigot.gui.guis.team2v2;
 
 import net.jacobpeterson.spigot.game.games.team2v2.Team2v2;
+import net.jacobpeterson.spigot.game.games.team2v2.itemstack.Team2v2ItemStack;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
@@ -12,19 +13,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class TeamPvPMenu extends AbstractInventoryGUI {
+public class Team2v2Menu extends AbstractInventoryGUI {
 
     private static ItemStack CRAFT_TEAM_ITEM;
     private static ItemStack BACK_ITEM;
 
     private final PlayerGUIManager playerGUIManager;
-    private HashMap<Team2v2, ItemStack> team2v2ItemsMap;
+    private ArrayList<Team2v2ItemStack> team2v2ItemStacks;
 
-    public TeamPvPMenu(PlayerGUIManager playerGUIManager) {
+    public Team2v2Menu(PlayerGUIManager playerGUIManager) {
         this.playerGUIManager = playerGUIManager;
-        this.team2v2ItemsMap = new HashMap<>();
+        this.team2v2ItemStacks = new ArrayList<>();
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.gamemode.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
+import net.jacobpeterson.spigot.player.item.PlayerItemManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 
@@ -13,6 +14,7 @@ public class PvPPlayer implements Initializers {
     private final Player player;
     private PlayerGameManager playerGameManager;
     private PlayerGUIManager playerGUIManager;
+    private PlayerItemManager playerItemManager;
     private PlayerData playerData;
 
     /**
@@ -27,18 +29,21 @@ public class PvPPlayer implements Initializers {
         this.player = player;
         this.playerGameManager = new PlayerGameManager(this);
         this.playerGUIManager = new PlayerGUIManager(this);
+        this.playerItemManager = new PlayerItemManager(this);
     }
 
     @Override
     public void init() {
         playerGameManager.init();
         playerGUIManager.init();
+        playerItemManager.init();
     }
 
     @Override
     public void deinit() {
         playerGameManager.deinit();
         playerGUIManager.deinit();
+        playerItemManager.deinit();
     }
 
     /**
@@ -102,6 +107,24 @@ public class PvPPlayer implements Initializers {
      */
     public void setPlayerGUIManager(PlayerGUIManager playerGUIManager) {
         this.playerGUIManager = playerGUIManager;
+    }
+
+    /**
+     * Gets player item manager.
+     *
+     * @return the player item manager
+     */
+    public PlayerItemManager getPlayerItemManager() {
+        return playerItemManager;
+    }
+
+    /**
+     * Sets player item manager.
+     *
+     * @param playerItemManager the player item manager
+     */
+    public void setPlayerItemManager(PlayerItemManager playerItemManager) {
+        this.playerItemManager = playerItemManager;
     }
 
     /**

@@ -96,7 +96,6 @@ public class PlayerDataManager implements Initializers {
             // Run the task synchronously without registering as the server is shutting down and cannot queue bukkit tasks
             playerDataUpdateRunnable.run();
         }
-        LOGGER.info("Successfully updated the database");
     }
 
     /**
@@ -345,6 +344,15 @@ public class PlayerDataManager implements Initializers {
                 }
             }
         }
+    }
+
+    /**
+     * Gets player manager.
+     *
+     * @return the player manager
+     */
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
     /**

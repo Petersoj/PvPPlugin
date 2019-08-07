@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.gui.guis.teampvp;
+package net.jacobpeterson.spigot.gui.guis.team2v2;
 
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
@@ -10,12 +10,12 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class TeamPvPCraftTeamMenu extends AbstractInventoryGUI {
+public class Team2v2CraftTeamMenu extends AbstractInventoryGUI {
 
     private final PlayerGUIManager playerGUIManager;
     private ItemStack backItem;
 
-    public TeamPvPCraftTeamMenu(PlayerGUIManager playerGUIManager) {
+    public Team2v2CraftTeamMenu(PlayerGUIManager playerGUIManager) {
         this.playerGUIManager = playerGUIManager;
     }
 

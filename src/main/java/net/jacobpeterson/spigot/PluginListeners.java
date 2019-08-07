@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -48,16 +50,27 @@ public class PluginListeners implements Listener, Initializers {
 
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        this.playerEventHandlers.handleOnPlayerJoinEvent(event);
+        this.playerEventHandlers.handlePlayerJoinEvent(event);
     }
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        this.playerEventHandlers.handleOnPlayerQuitEvent(event);
+        this.playerEventHandlers.handlePlayerQuitEvent(event);
+    }
+
+    @EventHandler
+    public void onPlayerInteractEvent(PlayerInteractEvent event) {
+        this.playerEventHandlers.handlePlayerInteractEvent(event);
+    }
+
+    @EventHandler
+    public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
+        this.playerEventHandlers.handlePlayerDropItemEvent(event);
     }
 
     @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent event) {
+        this.playerEventHandlers.handleInventoryClickEvent(event);
         this.inventoryGUIEventHandlers.handleOnInventoryClickEvent(event);
     }
 }

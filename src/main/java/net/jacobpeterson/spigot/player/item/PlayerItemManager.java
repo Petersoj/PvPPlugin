@@ -35,7 +35,6 @@ public class PlayerItemManager implements Initializers {
 
     @Override
     public void deinit() {
-
     }
 
     /**
@@ -46,6 +45,15 @@ public class PlayerItemManager implements Initializers {
         playerInventory.clear();
 
         playerInventory.setItem(0, PLAY_NOW_COMPASS_ITEM);
+    }
+
+    /**
+     * Gets "play now" compass item.
+     *
+     * @return the "play now" compass item
+     */
+    public ItemStack getPlayNowCompassItem() {
+        return PLAY_NOW_COMPASS_ITEM;
     }
 
     /**

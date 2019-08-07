@@ -88,7 +88,7 @@ public class MainMenu extends AbstractInventoryGUI {
             // TODO send player to Unranked FFA
         } else if (currentItem.equals(teamPvPItem)) {
             // TODO Check if player has already created team, if so, open the craft team menu.
-            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeamPvPMenu().getInventory());
+            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeam2v2Menu().getInventory());
         }
     }
 
