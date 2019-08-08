@@ -44,7 +44,9 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
     public Arena deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
         if (!referenceDeserialization) {
-            return jsonDeserializationContext.deserialize(jsonElement, type);
+            Arena arena = jsonDeserializationContext.deserialize(jsonElement, type);
+            arena.getArenaItemStack().setArena(arena); // Set the reference in ArenaItemStack
+            return arena;
         }
         if (!(jsonElement instanceof JsonObject)) {
             throw new JsonParseException("Arena must be JSON Object!");

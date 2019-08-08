@@ -112,7 +112,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                     timesPlayed = 0;
                 }
 
-                arenaItemStack.updateTimesPlayed(timesPlayed);
+                arenaItemStack.updateItemStack(pvpPlayer);
                 arenaItemStacks.add(arenaItemStack);
             }
         } else {
@@ -125,7 +125,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                     timesPlayed = 0;
                 }
 
-                arenaItemStack.updateTimesPlayed(timesPlayed);
+                arenaItemStack.updateItemStack(pvpPlayer);
             }
         }
     }

@@ -10,9 +10,6 @@ import net.jacobpeterson.spigot.util.Initializers;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * The type Arena manager.
- */
 public class ArenaManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
@@ -21,6 +18,11 @@ public class ArenaManager implements Initializers {
     private ArrayList<Ranked1v1Arena> ranked1v1Arenas;
     private ArrayList<Team2v2Arena> team2v2Arenas;
 
+    /**
+     * Instantiates a new Arena manager.
+     *
+     * @param pvpPlugin the pvp plugin
+     */
     public ArenaManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
         this.arenaDataManager = new ArenaDataManager(this, pvpPlugin.getGsonManager());

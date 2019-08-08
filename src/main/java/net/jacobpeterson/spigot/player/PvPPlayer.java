@@ -56,6 +56,15 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
+     * {@link PlayerManager#isPlayerPremium(PvPPlayer)}
+     *
+     * @return the boolean
+     */
+    public boolean isPremium() {
+        return playerManager.isPlayerPremium(this);
+    }
+
+    /**
      * Gets player manager.
      *
      * @return the player manager

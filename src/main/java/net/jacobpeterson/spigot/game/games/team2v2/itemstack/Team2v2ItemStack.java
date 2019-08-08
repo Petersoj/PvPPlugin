@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.game.games.team2v2.itemstack;
 
-import net.jacobpeterson.spigot.game.GameManager;
+import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.game.games.team2v2.Team2v2;
 import net.jacobpeterson.spigot.gui.guis.team2v2.Team2v2Menu;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
@@ -53,12 +54,13 @@ public class Team2v2ItemStack implements Initializers {
     /**
      * Updates this Team 2v2 item stack (lore, wool color).
      *
-     * @param pvpPlayer   the pvp player that sees this ItemStack
-     * @param gameManager the game manager
+     * @param pvpPlayer the pvp player that sees this ItemStack
      */
-    public void updateItemStack(PvPPlayer pvpPlayer, GameManager gameManager) {
-        int queuePosition = gameManager.getTeam2v2GameQueue().indexOf(team2v2.getTeam2v2Game());
-        int queueSize = gameManager.getTeam2v2GameQueue().size();
+    public void updateItemStack(ArenaManager arenaManager, PvPPlayer pvpPlayer) {
+        Arena arena = team2v2.getTeam2v2Game().getArena();
+
+        int queuePosition = arena.getGameQueue().indexOf(team2v2.getTeam2v2Game());
+        int queueSize = arena.getGameQueue().size();
 
         String teamJoiningStatus;
         if (team2v2.getProspectivePlayers().contains(pvpPlayer)) {

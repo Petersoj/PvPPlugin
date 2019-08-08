@@ -92,6 +92,25 @@ public class PlayerManager implements Initializers {
     }
 
     /**
+     * Checks if a player is premium via {@link org.anjocaido.groupmanager.GroupManager}.
+     *
+     * @return the premium boolean
+     */
+    public boolean isPlayerPremium(PvPPlayer pvpPlayer) {
+        Player player = pvpPlayer.getPlayer();
+        AnjoPermissionsHandler anjoPermissionsHandler = pvpPlugin.getGroupManager().getWorldsHolder()
+                .getWorldPermissions(player);
+        String[] groups = anjoPermissionsHandler.getGroups(player.getName());
+        for (String group : groups) {
+            String lowerCaseGroup = group.toLowerCase();
+            if (lowerCaseGroup.equals("iron") || lowerCaseGroup.equals("gold") || lowerCaseGroup.equals("diamond")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Kicks player synchronously via {@link org.bukkit.scheduler.BukkitRunnable#runTask(Plugin)} on the
      * next tick.
      *

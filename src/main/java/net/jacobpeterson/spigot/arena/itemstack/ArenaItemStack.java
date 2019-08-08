@@ -1,19 +1,20 @@
 package net.jacobpeterson.spigot.arena.itemstack;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
+import net.jacobpeterson.spigot.player.PvPPlayer;
+import net.jacobpeterson.spigot.util.CharUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ArenaItemStack {
 
-    private transient static final String TIMES_PLAYED_PLACEHOLDER = "<times_played>";
     private transient Arena arena; // Used strictly for reference
-    private ItemStack itemStack;
-    private int timesPlayedLineIndex;
-    private int timesPlayedFromCharIndex;
-    private int timesPlayedToCharIndex;
+    private transient ItemStack itemStack; // No need to serialize because methods below can create it new
+    private Material material;
 
     /**
      * Instantiates a new ArenaItemStack which is used as a wrapper for the {@link ItemStack} representing the Arena.
@@ -37,42 +38,32 @@ public class ArenaItemStack {
     }
 
     /**
-     * Update times played in itemstack lore.
+     * Updates the ItemStack lore.
      *
-     * @param timesPlayed the times played
+     * @param pvpPlayer the pvp player who is viewing this ArenaItemStack
      */
-    public void updateTimesPlayed(int timesPlayed) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        List<String> lore = itemMeta.getLore();
-
-        String loreLine = lore.get(timesPlayedLineIndex);
-        String newLine = loreLine.substring(0, timesPlayedFromCharIndex) + timesPlayed
-                + loreLine.substring(timesPlayedToCharIndex);
-
-        this.timesPlayedToCharIndex = String.valueOf(timesPlayed).length(); // Update the 'to' replace position
-
-        lore.set(timesPlayedLineIndex, newLine);
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
-    }
-
-    /**
-     * Gets position of {@link ArenaItemStack#TIMES_PLAYED_PLACEHOLDER} in the lore (line index and char index).
-     *
-     * @return whether or not the ItemStack lore lines contained {@link ArenaItemStack#TIMES_PLAYED_PLACEHOLDER}.
-     */
-    public boolean setIndexOfTimesPlayedPlaceholder() {
-        List<String> lore = itemStack.getItemMeta().getLore();
-        for (int lineIndex = 0; lineIndex < lore.size(); lineIndex++) {
-            int indexOfPlaceholder = lore.get(lineIndex).indexOf(TIMES_PLAYED_PLACEHOLDER);
-            if (indexOfPlaceholder == -1) {
-                this.timesPlayedLineIndex = lineIndex;
-                this.timesPlayedFromCharIndex = indexOfPlaceholder;
-                this.timesPlayedToCharIndex = timesPlayedFromCharIndex + TIMES_PLAYED_PLACEHOLDER.length();
-                return true;
-            }
+    public void updateItemStack(PvPPlayer pvpPlayer) {
+        if (itemStack == null) {
+            this.itemStack = new ItemStack(material, 1);
         }
-        return false;
+
+        ArrayList<String> lore = new ArrayList<>();
+        if (!pvpPlayer.isPremium()) {
+            lore.add(ChatColor.GOLD + "You need premium to choose this 1v1 arena.");
+            lore.add(ChatColor.GOLD + "For premium, visit " + ChatColor.AQUA + "shop.mcsiege.com");
+        }
+        lore.add(ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": " +
+                ChatColor.AQUA + arena.getGameQueue().size());
+        lore.add(ChatColor.GOLD + "Total times played" + ChatColor.GRAY + ": " +
+                ChatColor.AQUA + pvpPlayer.getPlayerData().getArenaTimesPlayedMap().get(arena));
+        lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +
+                ChatColor.GREEN + arena.getBuiltByName());
+        for (String descriptionLine : arena.getDescription().split("\n")) {
+            lore.add(ChatColor.GOLD + descriptionLine);
+        }
+
+        ItemStackUtil.formatLore(itemStack, true, CharUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
+                (String[]) lore.toArray());
     }
 
     /**
@@ -112,29 +103,20 @@ public class ArenaItemStack {
     }
 
     /**
-     * Gets times played line index.
+     * Gets material.
      *
-     * @return the times played line index
+     * @return the material
      */
-    public int getTimesPlayedLineIndex() {
-        return timesPlayedLineIndex;
+    public Material getMaterial() {
+        return material;
     }
 
     /**
-     * Gets times played from char index.
+     * Sets material.
      *
-     * @return the times played from char index
+     * @param material the material
      */
-    public int getTimesPlayedFromCharIndex() {
-        return timesPlayedFromCharIndex;
-    }
-
-    /**
-     * Gets times played to char index.
-     *
-     * @return the times played to char index
-     */
-    public int getTimesPlayedToCharIndex() {
-        return timesPlayedToCharIndex;
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 }

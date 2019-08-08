@@ -1,14 +1,21 @@
 package net.jacobpeterson.spigot.arena;
 
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
+import net.jacobpeterson.spigot.game.Game;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.LinkedList;
 
 public abstract class Arena {
 
-    private String name;
-    private ArenaItemStack arenaItemStack;
-    private ItemStack[] inventory;
-    private boolean disabled;
+    protected String name;
+    protected ArenaItemStack arenaItemStack;
+    protected ItemStack[] inventory;
+    protected boolean disabled;
+    protected boolean premium;
+    protected String builtByName;
+    protected String description;
+    protected transient LinkedList<Game> gameQueue;
 
     /**
      * Instantiates a new Arena.
@@ -17,6 +24,12 @@ public abstract class Arena {
      */
     public Arena(String name) {
         this.name = name;
+        this.arenaItemStack = new ArenaItemStack(this, null);
+        this.disabled = false;
+        this.premium = false;
+        this.builtByName = "";
+        this.description = "";
+        this.gameQueue = new LinkedList<>();
     }
 
     /**
@@ -89,5 +102,77 @@ public abstract class Arena {
      */
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    /**
+     * Is premium boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isPremium() {
+        return premium;
+    }
+
+    /**
+     * Sets premium.
+     *
+     * @param premium the premium
+     */
+    public void setPremium(boolean premium) {
+        this.premium = premium;
+    }
+
+    /**
+     * Gets built by name.
+     *
+     * @return the built by name
+     */
+    public String getBuiltByName() {
+        return builtByName;
+    }
+
+    /**
+     * Sets built by name.
+     *
+     * @param builtByName the built by name
+     */
+    public void setBuiltByName(String builtByName) {
+        this.builtByName = builtByName;
+    }
+
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets description.
+     *
+     * @param description the description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Gets game queue.
+     *
+     * @return the game queue
+     */
+    public LinkedList<Game> getGameQueue() {
+        return gameQueue;
+    }
+
+    /**
+     * Sets game queue.
+     *
+     * @param gameQueue the game queue
+     */
+    public void setGameQueue(LinkedList<Game> gameQueue) {
+        this.gameQueue = gameQueue;
     }
 }
