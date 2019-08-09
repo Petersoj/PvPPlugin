@@ -68,7 +68,7 @@ public class MainMenu extends AbstractInventoryGUI {
         this.inventory = Bukkit.createInventory(null, 9, title);
 
         inventory.setItem(0, ranked1v1Item);
-        this.updateFFACurrentlyPlaying(0); // Also set ItemStack in Inventory at index 1
+        this.updateFFACurrentlyPlaying(0); // Also sets ItemStack in Inventory at index 1
         inventory.setItem(2, teamPvPItem);
     }
 

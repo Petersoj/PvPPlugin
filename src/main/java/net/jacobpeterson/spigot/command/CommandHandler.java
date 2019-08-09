@@ -15,6 +15,10 @@ public class CommandHandler {
         this.pvpPlugin = pvpPlugin;
     }
 
+    public void handleArenaAddCommand() {
+        // TODO make sure infor that \n should be used for multiple lines
+    }
+
     /**
      * Gets pvp plugin.
      *

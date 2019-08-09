@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerDataManager implements Initializers {
@@ -79,6 +80,13 @@ public class PlayerDataManager implements Initializers {
             throw new SQLException("Table " + databaseTableName + " is NOT valid!");
         }
         LOGGER.info("Valid " + databaseTableName + " table is in database");
+
+        try {
+            this.deleteBukkitPlayerDataFile(null); // Null will delete all bukkit player data files
+            LOGGER.info("Successfully delete Bukkit player data files");
+        } catch (IOException exception) {
+            LOGGER.log(Level.SEVERE, "Could not delete Bukkit player data files!", exception);
+        }
     }
 
     /**
@@ -91,8 +99,9 @@ public class PlayerDataManager implements Initializers {
         for (PvPPlayer pvpPlayer : playerManager.getPvPPlayers()) {
             pvpPlayer.deinit();
 
+            // Run the tasks synchronously without registering as the server is shutting down and cannot queue bukkit tasks
+
             PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, this);
-            // Run the task synchronously without registering as the server is shutting down and cannot queue bukkit tasks
             playerDataUpdateRunnable.run();
         }
     }
@@ -329,17 +338,30 @@ public class PlayerDataManager implements Initializers {
     /**
      * Deletes all bukkit player data files created by bukkit e.g. delete <world>/playerdata/<UUID>.dat for every world.
      *
-     * @param pvpPlayer the pvp player
+     * @param pvpPlayer the pvp player (null to delete all bukkit player data in all worlds)
      * @throws IOException the io exception
      */
     public synchronized void deleteBukkitPlayerDataFile(PvPPlayer pvpPlayer) throws IOException {
         for (World world : Bukkit.getWorlds()) {
-            File playerDataFile = new File(world.getWorldFolder(),
-                    "playerdata/" + pvpPlayer.getPlayer().getUniqueId().toString() + ".dat");
-            if (playerDataFile.exists()) {
-                boolean deleteSuccess = playerDataFile.delete();
-                if (!deleteSuccess) {
-                    throw new IOException("Could not delete " + playerDataFile.getName() + " data file!");
+            if (pvpPlayer == null) {
+                File playerDataFolder = new File(world.getWorldFolder(), "playerdata");
+                File[] playerDataFiles = playerDataFolder.listFiles();
+                if (playerDataFiles != null) {
+                    for (File playerDataFile : playerDataFiles) {
+                        boolean deleteSuccess = playerDataFile.delete();
+                        if (!deleteSuccess) {
+                            throw new IOException("Could not delete " + playerDataFile.getName() + " data file!");
+                        }
+                    }
+                }
+            } else {
+                File playerDataFile = new File(world.getWorldFolder(),
+                        "playerdata/" + pvpPlayer.getPlayer().getUniqueId().toString() + ".dat");
+                if (playerDataFile.exists()) {
+                    boolean deleteSuccess = playerDataFile.delete();
+                    if (!deleteSuccess) {
+                        throw new IOException("Could not delete " + playerDataFile.getName() + " data file!");
+                    }
                 }
             }
         }

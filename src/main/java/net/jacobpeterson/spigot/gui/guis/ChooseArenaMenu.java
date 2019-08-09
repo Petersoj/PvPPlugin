@@ -2,11 +2,11 @@ package net.jacobpeterson.spigot.gui.guis;
 
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.util.CharUtil;
 import org.bukkit.Bukkit;
@@ -25,6 +25,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     protected final Logger LOGGER;
 
     protected final PlayerGUIManager playerGUIManager;
+    protected  ArenaManager arenaManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
 
@@ -55,8 +56,6 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
             ItemStackUtil.formatLore(BACK_ITEM, true,
                     CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
         }
-
-        this.createInventory();
     }
 
     @Override
@@ -100,31 +99,14 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      * @param createAllNewItemStacks whether or not to update previously created {@link ArenaItemStack} or create new ones
      */
     public void updateArenaItemStacks(PvPPlayer pvpPlayer, ArrayList<Arena> arenas, boolean createAllNewItemStacks) {
-        PlayerData playerData = pvpPlayer.getPlayerData();
-
         if (createAllNewItemStacks) {
             for (Arena arena : arenas) {
                 ArenaItemStack arenaItemStack = new ArenaItemStack(arena.getArenaItemStack()); // Copies ArenaItemStack
-                Integer timesPlayed = playerData.getArenaTimesPlayedMap().get(arena);
-
-                if (timesPlayed == null) {
-                    LOGGER.warning("PlayerData does not contain 'times played' entry for: " + arena.getName() + " arena.");
-                    timesPlayed = 0;
-                }
-
                 arenaItemStack.updateItemStack(pvpPlayer);
                 arenaItemStacks.add(arenaItemStack);
             }
         } else {
             for (ArenaItemStack arenaItemStack : arenaItemStacks) {
-                Arena arena = arenaItemStack.getArena();
-                Integer timesPlayed = playerData.getArenaTimesPlayedMap().get(arena);
-
-                if (timesPlayed == null) {
-                    LOGGER.warning("PlayerData does not contain 'times played' entry for: " + arena.getName() + " arena.");
-                    timesPlayed = 0;
-                }
-
                 arenaItemStack.updateItemStack(pvpPlayer);
             }
         }

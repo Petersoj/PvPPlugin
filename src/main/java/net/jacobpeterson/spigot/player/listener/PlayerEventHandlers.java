@@ -8,17 +8,19 @@ import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
 import net.jacobpeterson.spigot.player.item.PlayerItemManager;
+import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.logging.Logger;
 
-public class PlayerEventHandlers {
+public class PlayerEventHandlers implements Initializers {
 
     private final Logger LOGGER;
     private PlayerManager playerManager;
@@ -31,6 +33,21 @@ public class PlayerEventHandlers {
     public PlayerEventHandlers(PlayerManager playerManager) {
         LOGGER = PvPPlugin.getPluginLogger();
         this.playerManager = playerManager;
+    }
+
+    @Override
+    public void init() {
+    }
+
+    /**
+     * {@inheritDoc}
+     * This will call {@link #handlePlayerQuitEvent(PlayerQuitEvent)} for all PvPPlayers.
+     */
+    @Override
+    public void deinit() {
+        for (PvPPlayer pvpPlayer : playerManager.getPvPPlayers()) {
+            this.handlePlayerQuitEvent(new PlayerQuitEvent(pvpPlayer.getPlayer(), "Deinitializing"));
+        }
     }
 
     /**
@@ -64,6 +81,7 @@ public class PlayerEventHandlers {
         }
 
         pvpPlayer.deinit();
+        playerManager.getPvPPlayers().remove(pvpPlayer);
 
         PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, playerDataManager);
         playerDataUpdateRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
