@@ -10,6 +10,8 @@ public final class CharUtil {
     private static final Charset UTF_8_CHARSET = StandardCharsets.UTF_8;
 
     public static final String DOUBLE_RIGHT_ARROW = fromUTFHexCode("\u00BB");
+    public static final String SERVER_MESSAGE_PREFIX = ChatColor.YELLOW + "Siege " +
+            ChatColor.DARK_GRAY + DOUBLE_RIGHT_ARROW + ChatColor.RESET + " ";
 
     public static String boldColor(ChatColor color) {
         return color.toString() + ChatColor.BOLD.toString();

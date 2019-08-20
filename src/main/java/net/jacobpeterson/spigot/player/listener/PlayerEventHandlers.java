@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.logging.Logger;
@@ -132,7 +131,7 @@ public class PlayerEventHandlers implements Initializers {
 
         PlayerItemManager playerItemManager = pvpPlayer.getPlayerItemManager();
 
-        if (playerItemManager.getPlayNowCompassItem().equals(event.getItemDrop().getItemStack())) {
+        if (playerItemManager.getPlayNowCompassItem().equals(event.getItemDrop().getItemStack()) && !player.isOp()) {
             event.setCancelled(true);
         }
     }

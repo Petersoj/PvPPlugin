@@ -78,7 +78,7 @@ public class MainMenu extends AbstractInventoryGUI {
 
         ItemStack currentItem = event.getCurrentItem();
 
-        if (pvpPlayer == null) {
+        if (pvpPlayer == null || currentItem == null) {
             return;
         }
 

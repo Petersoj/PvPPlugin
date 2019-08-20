@@ -27,7 +27,7 @@ Global commands to these plugins:
 /setlobby -> Sets the lobby (when joining the lobby)
 /lobby -> Teleports to lobby, 0 seconds cooldown
 /record or /records -> See personal stats
-/record <player -> See a players stats
+/record <player> -> See a players stats
 /save -> Saves the in-game hotbar while playing 1v1/2v2
 /scoreboard -> Top 10 players (most elo)
 /accept <player> -> Accepts a duel challenge/team invite
@@ -82,7 +82,7 @@ Commands:
 /leave -> Leaves the ffa arena
 /ffa setInv -> Sets the join inventory for ffa arena
 /ffa setSpawn -> Sets the spawn point when joining ffa arena
-/ffa setLeave -> Sets the leave point when leaving ffa arena
+/ffa setLeave -> Sets the leave point when leaving ffa arena//
 
 Messages:
 Join FFA:
