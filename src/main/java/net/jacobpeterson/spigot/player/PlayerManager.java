@@ -92,22 +92,14 @@ public class PlayerManager implements Initializers {
     }
 
     /**
-     * Checks if a player is premium via {@link org.anjocaido.groupmanager.GroupManager}.
+     * Checks if a player is premium (aka if the player has the 'premium' permission which can be
+     * granted via {@link org.anjocaido.groupmanager.GroupManager} in a given group).
      *
      * @return the premium boolean
      */
     public boolean isPlayerPremium(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
-        AnjoPermissionsHandler anjoPermissionsHandler = pvpPlugin.getGroupManager().getWorldsHolder()
-                .getWorldPermissions(player);
-        String[] groups = anjoPermissionsHandler.getGroups(player.getName());
-        for (String group : groups) {
-            String lowerCaseGroup = group.toLowerCase();
-            if (lowerCaseGroup.equals("iron") || lowerCaseGroup.equals("gold") || lowerCaseGroup.equals("diamond")) {
-                return true;
-            }
-        }
-        return false;
+        return player.hasPermission("premium");
     }
 
     /**

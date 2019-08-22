@@ -114,16 +114,16 @@ public class CommandListener implements CommandExecutor {
      */
     private void sendRecordMessage(PvPPlayer pvpPlayer, PlayerData playerData) {
         Player player = pvpPlayer.getPlayer();
-//        player.sendMessage(pvp);
+        // player.sendMessage(pvp);
 
         /*
-<displayname>&6's Stats&8:
-&6Rank&8: &b%vault_rank%
-&6Ranked 1v1 ELO&8/&6Game Rank&8: &b1v1_elo>&8- #&b<game_rank>
-&6Ranked 1v1 Wins&8/&6Losses&8: &b<1v1_wins>&8/&b<1v1_losses>
-&6Unranked FFA Kills&8/&6Deaths&8: &b<ffa_kills>&8/&b<ffa_deaths>
-&6Team PvP Victories&8: &b<teampvp_wins>
-&6Team PvP Defeats&8: &b<teampvp_losses>
+        <displayname>&6's Stats&8:
+        &6Rank&8: &b%vault_rank%
+        &6Ranked 1v1 ELO&8/&6Game Rank&8: &b1v1_elo>&8- #&b<game_rank>
+        &6Ranked 1v1 Wins&8/&6Losses&8: &b<1v1_wins>&8/&b<1v1_losses>
+        &6Unranked FFA Kills&8/&6Deaths&8: &b<ffa_kills>&8/&b<ffa_deaths>
+        &6Team PvP Victories&8: &b<teampvp_wins>
+        &6Team PvP Defeats&8: &b<teampvp_losses>
          */
     }
 

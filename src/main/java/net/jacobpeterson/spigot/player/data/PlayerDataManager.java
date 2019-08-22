@@ -83,7 +83,7 @@ public class PlayerDataManager implements Initializers {
 
         try {
             this.deleteBukkitPlayerDataFile(null); // Null will delete all bukkit player data files
-            LOGGER.info("Successfully delete Bukkit player data files");
+            LOGGER.info("Successfully deleted Bukkit player data files");
         } catch (IOException exception) {
             LOGGER.log(Level.SEVERE, "Could not delete Bukkit player data files!", exception);
         }
