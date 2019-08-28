@@ -35,6 +35,10 @@ public class DatabaseConfig implements Initializers {
     @Override
     public void init() {
         FileConfiguration fileConfiguration = pvpPlugin.getConfig();
+
+        fileConfiguration.options().copyDefaults(true); // Copy Defaults if config doesn't exist
+        pvpPlugin.saveConfig(); // Write config to plugin folder
+
         mysqlHost = fileConfiguration.getString(MYSQL_HOST_KEY);
         mysqlPort = fileConfiguration.getInt(MYSQL_PORT_KEY);
         mysqlDatabase = fileConfiguration.getString(MYSQL_DATABASE_KEY);
