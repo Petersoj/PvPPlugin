@@ -19,11 +19,11 @@ commands:
     description: Top 10 players (most elo)
   accept:
     description: Accepts a duel challenge/team invite
+  leave:
+    description: Leaves the arena
 
   ffa:
     description: Joins the ffa arena
-  leave:
-    description: Leaves the ffa arena
 
   1v1:
     description: Opens the 1v1 menu
@@ -35,6 +35,8 @@ commands:
     description: Opens the 2v2 menu
 
 permissions:
+  premium:
+    description: Gives a player the Premium permission
   game.*:
     description: All the game permissions
   game.setlobby:

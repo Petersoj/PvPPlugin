@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,8 +114,19 @@ public class PlayerDataManager implements Initializers {
      * @return the player data (null if no data exists)
      * @throws SQLException the sql exception
      */
-    @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
     public synchronized PlayerData selectPlayerDataFromDatabase(PvPPlayer pvpPlayer) throws SQLException {
+        return this.selectPlayerDataFromDatabase(pvpPlayer.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Selects PlayerData from SQL database.
+     *
+     * @param playerUUID the player uuid
+     * @return the player data (null if no data exists)
+     * @throws SQLException the sql exception
+     */
+    @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
+    public synchronized PlayerData selectPlayerDataFromDatabase(UUID playerUUID) throws SQLException {
         PlayerData playerData = new PlayerData();
 
         StringBuilder selectPlayerDataPreparedSQL = new StringBuilder("SELECT ");
@@ -133,7 +145,7 @@ public class PlayerDataManager implements Initializers {
                 prepareStatement(selectPlayerDataPreparedSQL.toString());
 
         // Set UUID
-        selectPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
+        selectPreparedStatement.setString(1, playerUUID.toString());
 
         ResultSet resultSet = selectPreparedStatement.executeQuery();
 

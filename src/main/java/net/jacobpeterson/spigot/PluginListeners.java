@@ -42,13 +42,6 @@ public class PluginListeners implements Listener, Initializers {
     }
 
     @EventHandler
-    public void onTESTPlayerCommandPreProcessEvent(PlayerCommandPreprocessEvent event) {
-        PvPPlayer pvpPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(event.getPlayer());
-        pvpPlayer.getPlayerData().setELO(pvpPlayer.getPlayerData().getELO() + 3);
-        event.getPlayer().openInventory(pvpPlugin.getGUIManager().getMainMenu().getInventory());
-    }
-
-    @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         this.playerEventHandlers.handlePlayerJoinEvent(event);
     }

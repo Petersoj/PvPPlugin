@@ -4,6 +4,7 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -13,6 +14,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
 
 public class CommandListener implements CommandExecutor {
 
@@ -41,16 +44,24 @@ public class CommandListener implements CommandExecutor {
 
             switch (commandName) {
                 case "setlobby":
-                    this.handleSetLobby(pvpPlayer);
-                    break;
+                    return handleSetLobbyCommand(pvpPlayer);
                 case "lobby":
-                    this.handleLobby(pvpPlayer);
+                    this.handleLobbyCommand(pvpPlayer);
                     break;
                 case "record":
-                    this.handleRecord(pvpPlayer, args);
+                    this.handleRecordCommand(pvpPlayer, args);
+                    break;
+                case "save":
+                    break;
+                case "scoreboard":
+                    break;
+                case "accept":
+                    break;
+
+                case "ffa":
+                    this.handleFFACommand(pvpPlayer, args);
                     break;
             }
-
 
             return true;
         } else {
@@ -59,11 +70,12 @@ public class CommandListener implements CommandExecutor {
     }
 
     /**
-     * Handle set lobby.
+     * Handle set lobby command.
      *
      * @param pvpPlayer the pvp player
+     * @return if the command was successful
      */
-    public void handleSetLobby(PvPPlayer pvpPlayer) {
+    public boolean handleSetLobbyCommand(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
         Location playerLocation = player.getLocation();
         World levelWorld = Bukkit.getWorlds().get(0); // 0th world is the default world
@@ -72,17 +84,22 @@ public class CommandListener implements CommandExecutor {
                 playerLocation.getBlockZ());
 
         player.sendMessage(CharUtil.SERVER_MESSAGE_PREFIX + ChatColor.GREEN + "Successfully set the lobby spawn!");
+
+        return true;
     }
 
     /**
-     * Handle lobby.
+     * Handle lobby command.
      *
      * @param pvpPlayer the pvp player
+     * @return if the command was successful
      */
-    public void handleLobby(PvPPlayer pvpPlayer) {
+    public boolean handleLobbyCommand(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
         World levelWorld = Bukkit.getWorlds().get(0); // 0th world is the default world
         player.teleport(levelWorld.getSpawnLocation());
+
+        return true;
     }
 
     /**
@@ -91,19 +108,41 @@ public class CommandListener implements CommandExecutor {
      * @param pvpPlayer the pvp player
      * @param args      the args
      */
-    public void handleRecord(PvPPlayer pvpPlayer, String[] args) {
+    public void handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
         if (args.length > 0) { // show another player's stats
-
+            // TODO this
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    // We need to fetch the UUID via Mojang API in order to query database
+                    UUID playerUUID = PlayerUtil.getUUID(args[0]);
+
+                    if (playerUUID == null) {
+
+                    }
+
 
                 }
-            }.runTaskAsynchronously(pvpPlugin);
+            }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
 
         } else { // show personal stats
-
+            this.sendRecordMessage(pvpPlayer, pvpPlayer.getPlayerData());
         }
+    }
+
+    /**
+     * Send record message on Main Bukkit Thread.
+     *
+     * @param pvpPlayer  the pvp player
+     * @param playerData the player data
+     */
+    private void sendSyncRecordMessage(PvPPlayer pvpPlayer, PlayerData playerData) {
+        new BukkitRunnable() { // Run sendRecordMessage on main bukkit thread
+            @Override
+            public void run() {
+                CommandListener.this.sendRecordMessage(pvpPlayer, playerData);
+            }
+        }.runTask(pvpPlugin);
     }
 
     /**
@@ -127,7 +166,31 @@ public class CommandListener implements CommandExecutor {
          */
     }
 
-    public void handleArenaAddCommand() {
+    /**
+     * Handle arena add command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     */
+    public void handleArenaAddCommand(PvPPlayer pvpPlayer, String[] args) {
         // TODO make sure info that \n should be used for multiple lines
+    }
+
+    /**
+     * Handle ffa command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return if the command was successful
+     */
+    public boolean handleFFACommand(PvPPlayer pvpPlayer, String[] args) {
+        if (args.length <= 0) {
+            return false;
+        }
+        String ffaCommand = args[0];
+//        if () {
+//
+//        }
+        return true;
     }
 }
