@@ -6,8 +6,14 @@ import org.json.simple.JSONValue;
 
 import java.net.URL;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
-public class PlayerUtil {
+public final class PlayerUtil {
+
+    /**
+     * Regex pattern to add '-' in UUID strings
+     */
+    private static final Pattern UUID_DASH_PATTERN = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
 
     /**
      * Gets a player UUID from .
@@ -15,7 +21,7 @@ public class PlayerUtil {
      * @param playerName the player name
      * @return the uuid
      */
-    public static UUID getUUID(String playerName) {
+    public static UUID getMojangUUID(String playerName) {
         try {
             String url = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
 
@@ -24,11 +30,25 @@ public class PlayerUtil {
             JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
 
             String stringUUID = UUIDObject.get("id").toString();
-            return stringUUID == null ? null : UUID.fromString(stringUUID);
+            return stringUUID == null ? null : uuidFromString(stringUUID);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    /**
+     * UUID from string uuid with or without the hyphens.
+     *
+     * @param stringUUID the string uuid
+     * @return the uuid
+     */
+    public static UUID uuidFromString(String stringUUID) {
+        if (stringUUID.contains("-")) {
+            return UUID.fromString(stringUUID);
+        } else {
+            String dashedUUID = UUID_DASH_PATTERN.matcher(stringUUID).replaceAll("$1-$2-$3-$4-$5");
+            return UUID.fromString(dashedUUID);
+        }
+    }
 }

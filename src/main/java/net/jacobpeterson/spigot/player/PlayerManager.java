@@ -92,6 +92,17 @@ public class PlayerManager implements Initializers {
     }
 
     /**
+     * Gets player group name via {@link org.anjocaido.groupmanager.GroupManager}.
+     *
+     * @param pvpPlayer the pvp player
+     * @return the player group name
+     */
+    public String getPlayerGroupName(PvPPlayer pvpPlayer) {
+        return pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(pvpPlayer.getPlayer())
+                .getGroup(pvpPlayer.getPlayer().getName());
+    }
+
+    /**
      * Checks if a player is premium (aka if the player has the 'premium' permission which can be
      * granted via {@link org.anjocaido.groupmanager.GroupManager} in a given group).
      *

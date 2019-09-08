@@ -1,9 +1,10 @@
 package net.jacobpeterson.spigot.command;
 
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class CommandListener implements CommandExecutor {
@@ -83,7 +85,7 @@ public class CommandListener implements CommandExecutor {
         levelWorld.setSpawnLocation(playerLocation.getBlockX(), playerLocation.getBlockY(),
                 playerLocation.getBlockZ());
 
-        player.sendMessage(CharUtil.SERVER_MESSAGE_PREFIX + ChatColor.GREEN + "Successfully set the lobby spawn!");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully set the lobby spawn!");
 
         return true;
     }
@@ -103,28 +105,42 @@ public class CommandListener implements CommandExecutor {
     }
 
     /**
-     * Handle record.
+     * Handle record command.
      *
      * @param pvpPlayer the pvp player
      * @param args      the args
      */
     public void handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
         if (args.length > 0) { // show another player's stats
-            // TODO this
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    // We need to fetch the UUID via Mojang API in order to query database
-                    UUID playerUUID = PlayerUtil.getUUID(args[0]);
+            Player recordPlayer = Bukkit.getPlayer(args[0]);
 
-                    if (playerUUID == null) {
+            if (recordPlayer == null) { // No online player found so have to query DB
+                new BukkitRunnable() { // Run async b/c of database querying
+                    @Override
+                    public void run() {
+                        // We need to fetch the UUID via Mojang API in order to query database b/c player is offline
+                        UUID playerUUID = PlayerUtil.getMojangUUID(args[0]);
 
+                        if (playerUUID == null) {
+                            CommandListener.this.sendSyncRecordMessage(pvpPlayer, null);
+                        } else {
+                            // Fetch playerdata
+                            PlayerData playerData = null;
+                            try {
+                                playerData = pvpPlugin.getPlayerManager().getPlayerDataManager()
+                                        .selectPlayerDataFromDatabase(playerUUID);
+                            } catch (SQLException exception) {
+                                exception.printStackTrace();
+                            } finally {
+                                CommandListener.this.sendSyncRecordMessage(pvpPlayer, playerData);
+                            }
+                        }
                     }
-
-
-                }
-            }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
-
+                }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
+            } else {
+                PvPPlayer recordPvPPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(recordPlayer);
+                this.sendRecordMessage(pvpPlayer, recordPvPPlayer.getPlayerData());
+            }
         } else { // show personal stats
             this.sendRecordMessage(pvpPlayer, pvpPlayer.getPlayerData());
         }
@@ -148,22 +164,36 @@ public class CommandListener implements CommandExecutor {
     /**
      * Send record message.
      *
-     * @param pvpPlayer  the pvp player
-     * @param playerData the player data
+     * @param pvpPlayer  the pvp player that is receiving the record data
+     * @param playerData the player data (can be null for not found)
      */
     private void sendRecordMessage(PvPPlayer pvpPlayer, PlayerData playerData) {
         Player player = pvpPlayer.getPlayer();
-        // player.sendMessage(pvp);
+        PlayerManager playerManager = pvpPlugin.getPlayerManager();
 
-        /*
-        <displayname>&6's Stats&8:
-        &6Rank&8: &b%vault_rank%
-        &6Ranked 1v1 ELO&8/&6Game Rank&8: &b1v1_elo>&8- #&b<game_rank>
-        &6Ranked 1v1 Wins&8/&6Losses&8: &b<1v1_wins>&8/&b<1v1_losses>
-        &6Unranked FFA Kills&8/&6Deaths&8: &b<ffa_kills>&8/&b<ffa_deaths>
-        &6Team PvP Victories&8: &b<teampvp_wins>
-        &6Team PvP Defeats&8: &b<teampvp_losses>
-         */
+        if (playerData == null) {
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Player record could not be found.");
+        } else {
+            String prefix = playerManager.getPlayerGroupPrefix(pvpPlayer);
+            player.sendMessage(prefix + ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
+            player.sendMessage(ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ":" +
+                    playerManager.getPlayerGroupName(pvpPlayer));
+            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
+                    playerData.getELO());
+            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 Wins" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
+                    "Losses" + ChatColor.DARK_GRAY + ":" + ChatColor.AQUA + playerData.getRanked1v1Wins() +
+                    ChatColor.GOLD + "/" + ChatColor.AQUA + playerData.getRanked1v1Losses());
+            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 Kills" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
+                    "Deaths" + ChatColor.DARK_GRAY + ":" + ChatColor.AQUA + playerData.getRanked1v1Kills() +
+                    ChatColor.GOLD + "/" + ChatColor.AQUA + playerData.getRanked1v1Deaths());
+            player.sendMessage(ChatColor.GOLD + "Unranked FFA Kills" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
+                    "Deaths" + ChatColor.DARK_GRAY + ":" + ChatColor.AQUA + playerData.getUnrankedFFAKills() +
+                    ChatColor.GOLD + "/" + ChatColor.AQUA + playerData.getUnrankedFFADeaths());
+            player.sendMessage(ChatColor.GOLD + "Team PvP Wins" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
+                    playerData.getTeamPvPWins());
+            player.sendMessage(ChatColor.GOLD + "Team PvP Losses" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
+                    playerData.getTeamPvPLosses());
+        }
     }
 
     /**

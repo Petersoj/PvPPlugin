@@ -17,6 +17,8 @@ public class PlayerData {
     private int unrankedFFADeaths;
     private int ranked1v1Kills;
     private int ranked1v1Deaths;
+    private int ranked1v1Wins;
+    private int ranked1v1Losses;
     private int teamPvPWins;
     private int teamPvPLosses;
 
@@ -121,39 +123,75 @@ public class PlayerData {
     }
 
     /**
-     * Gets ranked 1 v 1 kills.
+     * Gets ranked 1v1 kills.
      *
-     * @return the ranked 1 v 1 kills
+     * @return the ranked 1v1 kills
      */
     public int getRanked1v1Kills() {
         return ranked1v1Kills;
     }
 
     /**
-     * Sets ranked 1 v 1 kills.
+     * Sets ranked 1v1 kills.
      *
-     * @param ranked1v1Kills the ranked 1 v 1 kills
+     * @param ranked1v1Kills the ranked 1v1 kills
      */
     public void setRanked1v1Kills(int ranked1v1Kills) {
         this.ranked1v1Kills = ranked1v1Kills;
     }
 
     /**
-     * Gets ranked 1 v 1 deaths.
+     * Gets ranked 1v1 deaths.
      *
-     * @return the ranked 1 v 1 deaths
+     * @return the ranked 1v1 deaths
      */
     public int getRanked1v1Deaths() {
         return ranked1v1Deaths;
     }
 
     /**
-     * Sets ranked 1 v 1 deaths.
+     * Sets ranked 1v1 deaths.
      *
-     * @param ranked1v1Deaths the ranked 1 v 1 deaths
+     * @param ranked1v1Deaths the ranked 1v1 deaths
      */
     public void setRanked1v1Deaths(int ranked1v1Deaths) {
         this.ranked1v1Deaths = ranked1v1Deaths;
+    }
+
+    /**
+     * Gets ranked 1v1 wins.
+     *
+     * @return the ranked 1v1 wins
+     */
+    public int getRanked1v1Wins() {
+        return ranked1v1Wins;
+    }
+
+    /**
+     * Sets ranked 1v1 wins.
+     *
+     * @param ranked1v1Wins the ranked 1v1 wins
+     */
+    public void setRanked1v1Wins(int ranked1v1Wins) {
+        this.ranked1v1Wins = ranked1v1Wins;
+    }
+
+    /**
+     * Gets ranked 1v1 losses.
+     *
+     * @return the ranked 1v1 losses
+     */
+    public int getRanked1v1Losses() {
+        return ranked1v1Losses;
+    }
+
+    /**
+     * Sets ranked 1v1 losses.
+     *
+     * @param ranked1v1Losses the ranked 1v1 losses
+     */
+    public void setRanked1v1Losses(int ranked1v1Losses) {
+        this.ranked1v1Losses = ranked1v1Losses;
     }
 
     /**

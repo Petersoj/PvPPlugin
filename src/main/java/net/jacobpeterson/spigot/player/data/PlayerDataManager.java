@@ -65,6 +65,9 @@ public class PlayerDataManager implements Initializers {
         databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_kills", "INT NOT NULL"));
         databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_deaths", "INT NOT NULL"));
 
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_wins", "INT NOT NULL"));
+        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_losses", "INT NOT NULL"));
+
         databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_wins", "INT NOT NULL"));
         databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_losses", "INT NOT NULL"));
 
@@ -170,8 +173,10 @@ public class PlayerDataManager implements Initializers {
         playerData.setUnrankedFFADeaths(resultSet.getInt(5));
         playerData.setRanked1v1Kills(resultSet.getInt(6));
         playerData.setRanked1v1Deaths(resultSet.getInt(7));
-        playerData.setTeamPvPWins(resultSet.getInt(8));
-        playerData.setTeamPvPLosses(resultSet.getInt(9));
+        playerData.setRanked1v1Wins(resultSet.getInt(8));
+        playerData.setRanked1v1Losses(resultSet.getInt(9));
+        playerData.setTeamPvPWins(resultSet.getInt(10));
+        playerData.setTeamPvPLosses(resultSet.getInt(11));
 
         return playerData;
     }
@@ -200,7 +205,8 @@ public class PlayerDataManager implements Initializers {
                 .prepareStatement(updatePlayerDataPreparedSQL.toString());
 
         // Set UUID
-        updatePreparedStatement.setString(10, pvpPlayer.getPlayer().getUniqueId().toString());
+        updatePreparedStatement.setString(databaseColumnsList.size() + 1,
+                pvpPlayer.getPlayer().getUniqueId().toString());
 
         this.setPreparedStatementWithPlayerData(updatePreparedStatement, playerData, 1); // start at index 1
 
@@ -266,8 +272,10 @@ public class PlayerDataManager implements Initializers {
         preparedStatement.setInt(questionMarkStartIndex + 4, playerData.getUnrankedFFADeaths());
         preparedStatement.setInt(questionMarkStartIndex + 5, playerData.getRanked1v1Kills());
         preparedStatement.setInt(questionMarkStartIndex + 6, playerData.getRanked1v1Deaths());
-        preparedStatement.setInt(questionMarkStartIndex + 7, playerData.getTeamPvPWins());
-        preparedStatement.setInt(questionMarkStartIndex + 8, playerData.getTeamPvPLosses());
+        preparedStatement.setInt(questionMarkStartIndex + 7, playerData.getRanked1v1Wins());
+        preparedStatement.setInt(questionMarkStartIndex + 8, playerData.getRanked1v1Losses());
+        preparedStatement.setInt(questionMarkStartIndex + 9, playerData.getTeamPvPWins());
+        preparedStatement.setInt(questionMarkStartIndex + 10, playerData.getTeamPvPLosses());
     }
 
     /**
