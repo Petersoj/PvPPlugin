@@ -6,6 +6,7 @@ import net.jacobpeterson.spigot.player.gamemode.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
 import net.jacobpeterson.spigot.player.item.PlayerItemManager;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class PvPPlayer implements Initializers {
@@ -47,21 +48,22 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Gets {@link PvPPlugin#getGroupManager()} prefixed name.
+     * Gets {@link PvPPlugin#getPermissionsEx()} prefixed name.
      *
      * @return the prefixed name
      */
     public String getPrefixedName() {
-        return playerManager.getPlayerGroupPrefix(this) + player.getName();
+        return ChatColor.translateAlternateColorCodes('&', playerManager.getPlayerGroupPrefix(player.getName()))
+                + player.getName();
     }
 
     /**
-     * {@link PlayerManager#isPlayerPremium(PvPPlayer)}
+     * {@link PlayerManager#isPlayerPremium(Player)}
      *
      * @return the boolean
      */
     public boolean isPremium() {
-        return playerManager.isPlayerPremium(this);
+        return playerManager.isPlayerPremium(this.getPlayer());
     }
 
     /**

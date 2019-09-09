@@ -4,13 +4,15 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
-import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.tehkode.permissions.PermissionGroup;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manager to manage the PvPPlayer players.
@@ -74,42 +76,36 @@ public class PlayerManager implements Initializers {
     }
 
     /**
-     * Gets player group prefix from the GroupManager spigot plugin.
+     * Gets player group prefix from the PermissionsEx spigot plugin.
      *
-     * @param pvpPlayer the pvp player
-     * @return the player's GroupManager group prefix (will be empty string if prefix doesn't exist)
+     * @param playerName the player name
+     * @return the player's PermissionsEx group prefix (will be empty string if prefix doesn't exist)
      */
-    public String getPlayerGroupPrefix(PvPPlayer pvpPlayer) {
-        AnjoPermissionsHandler anjoPermissionsHandler =
-                pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(pvpPlayer.getPlayer());
-        if (anjoPermissionsHandler != null) {
-            String userPrefix = anjoPermissionsHandler.getUserPrefix(pvpPlayer.getPlayer().getName());
-            if (userPrefix != null) {
-                return userPrefix;
-            }
-        }
-        return "";
+    public String getPlayerGroupPrefix(String playerName) {
+        return PermissionsEx.getUser(playerName).getPrefix();
     }
 
     /**
-     * Gets player group name via {@link org.anjocaido.groupmanager.GroupManager}.
+     * Gets player group name.
      *
-     * @param pvpPlayer the pvp player
+     * @param playerName the player name
      * @return the player group name
      */
-    public String getPlayerGroupName(PvPPlayer pvpPlayer) {
-        return pvpPlugin.getGroupManager().getWorldsHolder().getWorldPermissions(pvpPlayer.getPlayer())
-                .getGroup(pvpPlayer.getPlayer().getName());
+    public String getPlayerGroupName(String playerName) {
+        List<PermissionGroup> permissionGroups = PermissionsEx.getUser(playerName).getParents();
+
+        // Just first permission group since there shouldn't be any other permission groups
+        return permissionGroups.get(0).getName();
     }
 
     /**
      * Checks if a player is premium (aka if the player has the 'premium' permission which can be
-     * granted via {@link org.anjocaido.groupmanager.GroupManager} in a given group).
+     * granted via PermissionsEx in a given group).
      *
+     * @param player the player
      * @return the premium boolean
      */
-    public boolean isPlayerPremium(PvPPlayer pvpPlayer) {
-        Player player = pvpPlayer.getPlayer();
+    public boolean isPlayerPremium(Player player) {
         return player.hasPermission("premium");
     }
 

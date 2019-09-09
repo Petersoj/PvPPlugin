@@ -8,11 +8,11 @@ import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.game.GameManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
-import org.anjocaido.groupmanager.GroupManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,9 +20,10 @@ import java.util.logging.Logger;
 public class PvPPlugin extends JavaPlugin {
 
     private static Logger PLUGIN_LOGGER_INSTANCE = null; // This only for the getPluginLogger() static method
+    private static boolean PLUGIN_STARTUP_ERROR_OCCURRED = false;
 
     private final Logger LOGGER;
-    private GroupManager groupManager;
+    private PermissionsEx permissionsEx;
     private GsonManager gsonManager;
     private DatabaseConfig databaseConfig;
     private PluginListeners pluginListeners;
@@ -39,7 +40,7 @@ public class PvPPlugin extends JavaPlugin {
 
         LOGGER.info("Building " + this.getName());
 
-        this.groupManager = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+        this.permissionsEx = (PermissionsEx) Bukkit.getPluginManager().getPlugin("PermissionsEx");
         this.gsonManager = new GsonManager(this);
         this.databaseConfig = new DatabaseConfig(this);
         this.pluginListeners = new PluginListeners(this);
@@ -78,6 +79,7 @@ public class PvPPlugin extends JavaPlugin {
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot enable " + this.getName(), exception);
 
+            PLUGIN_STARTUP_ERROR_OCCURRED = true;
             Bukkit.getPluginManager().disablePlugin(this); // Disable plugin because of error in initializing plugin
             return;
         }
@@ -88,6 +90,11 @@ public class PvPPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         LOGGER.info("Deinitializing " + this.getName());
+
+        if (PLUGIN_STARTUP_ERROR_OCCURRED) {
+            LOGGER.info("Deinitializing of " + this.getName() + " prevented due to startup error");
+            return;
+        }
 
         // Call all .deinit() methods in reverse order as some deinit() might use previous managers
         try {
@@ -113,12 +120,12 @@ public class PvPPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets group manager.
+     * Gets permissions ex.
      *
-     * @return the group manager
+     * @return the permissions ex
      */
-    public GroupManager getGroupManager() {
-        return groupManager;
+    public PermissionsEx getPermissionsEx() {
+        return permissionsEx;
     }
 
     /**

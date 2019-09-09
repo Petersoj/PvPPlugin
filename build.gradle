@@ -23,7 +23,7 @@ repositories {
 dependencies {
     compile group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
-    compile name: 'EssentialsGroupManager'
+    compile name: 'PermissionsEx-1.23.3'
 }
 
 shadowJar {

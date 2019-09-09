@@ -32,9 +32,8 @@ public final class PlayerUtil {
             String stringUUID = UUIDObject.get("id").toString();
             return stringUUID == null ? null : uuidFromString(stringUUID);
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**

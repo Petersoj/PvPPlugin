@@ -205,7 +205,7 @@ public class PlayerDataManager implements Initializers {
                 .prepareStatement(updatePlayerDataPreparedSQL.toString());
 
         // Set UUID
-        updatePreparedStatement.setString(databaseColumnsList.size() + 1,
+        updatePreparedStatement.setString(databaseColumnsList.size(),
                 pvpPlayer.getPlayer().getUniqueId().toString());
 
         this.setPreparedStatementWithPlayerData(updatePreparedStatement, playerData, 1); // start at index 1
@@ -279,6 +279,15 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
+     * Gets top 10 elo players.
+     *
+     * @return the top 10 elo player list
+     */
+    public synchronized ArrayList<String> getTop10ELOPlayerList() {
+        return null;
+    }
+
+    /**
      * Create player data table.
      *
      * @throws SQLException the sql exception
@@ -333,22 +342,33 @@ public class PlayerDataManager implements Initializers {
         Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(describeTableSQL);
+
+        // Add table columns to temp list in order to compare properly to required table columns
+        ArrayList<AbstractMap.SimpleEntry<String, String>> realTableColumns = new ArrayList<>();
         while (resultSet.next()) {
             String databaseColumnName = resultSet.getString(1); // 1st column is 'Field' which is column name
             String databaseColumnType = resultSet.getString(2); // 2nd column is 'type' which is column type
+            realTableColumns.add(new AbstractMap.SimpleEntry<>(databaseColumnName, databaseColumnType));
+        }
 
-            // Search required column list because description table from SQL might be out of order
-            for (AbstractMap.SimpleEntry<String, String> column : databaseColumnsList) {
-                String requiredColumnName = column.getKey();
+        // Search required column list because description table from SQL might in different order than
+        // databaseColumnsList
+        databaseColumnsListSearch:
+        for (AbstractMap.SimpleEntry<String, String> requiredColumn : databaseColumnsList) {
+            String requiredColumnName = requiredColumn.getKey();
+            String requiredColumnsType = requiredColumn.getValue().split(" ")[0];
 
-                if (requiredColumnName.equals(databaseColumnName)) { // If found exact column name that is required
-                    String requiredColumnType = column.getValue().split(" ")[0]; // 1st word in value is column type
+            // Search realTableColumns
+            for (AbstractMap.SimpleEntry<String, String> realTableColumn : realTableColumns) {
+                String realColumnName = realTableColumn.getKey();
+                String realColumnType = realTableColumn.getValue();
 
-                    // If the columns types (e.g. INT, TEXT) are NOT somewhat resembled in the description table
-                    if (!databaseColumnType.toLowerCase().contains(requiredColumnType.toLowerCase())) {
-                        return false;
-                    }
-                    break; // Break out of database column list search and go on to next column from description table
+                // If found exact column name that is required and
+                // if the columns types (e.g. INT, TEXT) are somewhat contained in the description table
+                if (requiredColumnName.equals(realColumnName) &&
+                        realColumnType.toLowerCase().contains(requiredColumnsType.toLowerCase())) {
+                    // Break out of database column list search and go on to next column from description table
+                    continue databaseColumnsListSearch;
                 }
             }
         }
