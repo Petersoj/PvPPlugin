@@ -13,6 +13,7 @@ public class DatabaseManager implements Initializers {
     private final Logger LOGGER;
 
     private PvPPlugin pvpPlugin;
+    private String jdbcURL;
     private Connection mysqlConnection;
 
     /**
@@ -29,16 +30,15 @@ public class DatabaseManager implements Initializers {
     public void init() throws SQLException {
         DatabaseConfig databaseConfig = pvpPlugin.getDatabaseConfig();
 
-        String mysqlURL = "jdbc:mysql://" + databaseConfig.getMysqlHost() +
+        this.jdbcURL = "jdbc:mysql://" + databaseConfig.getMysqlHost() +
                 ":" +
                 databaseConfig.getMysqlPort() +
                 "/" +
                 databaseConfig.getMysqlDatabase() +
                 "?useSSL=true";
 
-        LOGGER.info("Attempting to connect to MySQL Database with URL: " + mysqlURL);
-        mysqlConnection = DriverManager.getConnection(mysqlURL, databaseConfig.getMysqlUsername(),
-                databaseConfig.getMysqlPassword());
+        LOGGER.info("Attempting to connect to MySQL Database with URL: " + jdbcURL);
+        this.createMySQLConnection();
         LOGGER.info("Database connection successful");
     }
 
@@ -46,6 +46,30 @@ public class DatabaseManager implements Initializers {
     public void deinit() throws SQLException {
         if (mysqlConnection != null && !mysqlConnection.isClosed()) {
             mysqlConnection.close();
+        }
+    }
+
+    /**
+     * Creates the MySQL connection.
+     *
+     * @throws SQLException the sql exception
+     */
+    private void createMySQLConnection() throws SQLException {
+        DatabaseConfig databaseConfig = pvpPlugin.getDatabaseConfig();
+
+        mysqlConnection = DriverManager.getConnection(jdbcURL, databaseConfig.getMysqlUsername(),
+                databaseConfig.getMysqlPassword());
+    }
+
+    /**
+     * Validate my sql connection.
+     *
+     * @throws SQLException the sql exception
+     */
+    public void validateMySQLConnection() throws SQLException {
+        if (!mysqlConnection.isValid(5)) { // Allow for 5 seconds to validate connection
+            // Try to reconnect as the connection may have timed out
+            this.createMySQLConnection();
         }
     }
 

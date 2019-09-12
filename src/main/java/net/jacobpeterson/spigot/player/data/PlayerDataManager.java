@@ -144,6 +144,7 @@ public class PlayerDataManager implements Initializers {
         selectPlayerDataPreparedSQL.append(databaseTableName);
         selectPlayerDataPreparedSQL.append(" WHERE uuid=?");
 
+        databaseManager.validateMySQLConnection();
         PreparedStatement selectPreparedStatement = databaseManager.getMySQLConnection().
                 prepareStatement(selectPlayerDataPreparedSQL.toString());
 
@@ -201,6 +202,7 @@ public class PlayerDataManager implements Initializers {
 
         updatePlayerDataPreparedSQL.append("WHERE uuid=?");
 
+        databaseManager.validateMySQLConnection();
         PreparedStatement updatePreparedStatement = databaseManager.getMySQLConnection()
                 .prepareStatement(updatePlayerDataPreparedSQL.toString());
 
@@ -233,6 +235,7 @@ public class PlayerDataManager implements Initializers {
         }
         insertPlayerDataPreparedSQL.append(")");
 
+        databaseManager.validateMySQLConnection();
         PreparedStatement insertPreparedStatement = databaseManager.getMySQLConnection()
                 .prepareStatement(insertPlayerDataPreparedSQL.toString());
 
@@ -306,6 +309,7 @@ public class PlayerDataManager implements Initializers {
         createTableSQL.append("PRIMARY KEY (UUID)");
         createTableSQL.append(");");
 
+        databaseManager.validateMySQLConnection();
         Statement createTableStatement = databaseManager.getMySQLConnection().createStatement();
         createTableStatement.execute(createTableSQL.toString());
     }
@@ -319,6 +323,7 @@ public class PlayerDataManager implements Initializers {
     public synchronized boolean doesPlayerDataTableExist() throws SQLException {
         String tableExistsSQL = "SHOW TABLES LIKE '" + databaseTableName + "';";
 
+        databaseManager.validateMySQLConnection();
         Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(tableExistsSQL);
@@ -339,6 +344,7 @@ public class PlayerDataManager implements Initializers {
     public synchronized boolean isPlayerDataTableValid() throws SQLException {
         String describeTableSQL = "DESCRIBE " + databaseTableName + ";";
 
+        databaseManager.validateMySQLConnection();
         Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(describeTableSQL);
