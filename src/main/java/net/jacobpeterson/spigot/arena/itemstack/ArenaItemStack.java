@@ -3,7 +3,7 @@ package net.jacobpeterson.spigot.arena.itemstack;
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -62,7 +62,7 @@ public class ArenaItemStack {
             lore.add(ChatColor.GOLD + descriptionLine);
         }
 
-        ItemStackUtil.formatLore(itemStack, true, CharUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
+        ItemStackUtil.formatLore(itemStack, true, ChatUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
                 (String[]) lore.toArray());
     }
 

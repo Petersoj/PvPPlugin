@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,7 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
 
     /**
      * Instantiates a new FetchPlayerDataRunnable which is meant to be run async to fetch from the SQL Database
-     * and populate {@link PlayerData} via {@link PlayerDataManager#selectPlayerDataFromDatabase(PvPPlayer)} (may call
+     * and populate {@link PlayerData} via {@link PlayerDataManager#selectPlayerDataFromDatabase(UUID)} (may call
      * {@link PlayerDataManager#insertNewPlayerDataInDatabase(PvPPlayer)} if necessary).
      *
      * @param pvpPlayer         the pvp player
@@ -35,7 +36,7 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
         boolean insertNewPlayer = false;
 
         try {
-            PlayerData playerData = playerDataManager.selectPlayerDataFromDatabase(pvpPlayer);
+            PlayerData playerData = playerDataManager.selectPlayerDataFromDatabase(pvpPlayer.getPlayer().getUniqueId());
 
             if (playerData == null) { // If no exception occurs and player data is null
                 insertNewPlayer = true;

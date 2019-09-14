@@ -7,6 +7,7 @@ import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -39,13 +40,13 @@ public class MainMenu extends AbstractInventoryGUI {
     public void init() {
         ranked1v1Item = new ItemStack(Material.IRON_SWORD);
         ItemStackUtil.formatLore(ranked1v1Item, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Play Ranked 1v1",
+                ChatUtil.boldColor(ChatColor.YELLOW) + "Play Ranked 1v1",
                 ChatColor.GOLD + "We will match up you up against the",
                 ChatColor.GOLD + "most suitable opponent possible!");
 
         unrankedFFAItem = new ItemStack(Material.BOW);
         ItemStackUtil.formatLore(unrankedFFAItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Play Unranked FFA",
+                ChatUtil.boldColor(ChatColor.YELLOW) + "Play Unranked FFA",
                 ChatColor.GOLD + "Play FFA with or against your friends for fun.",
                 ChatColor.GOLD + "Perfect activity during queues.",
                 ChatColor.RESET + "",
@@ -53,7 +54,7 @@ public class MainMenu extends AbstractInventoryGUI {
 
         teamPvPItem = new ItemStack(Material.SKULL_ITEM, 1, (short) 3); // damage of 3 = player skull
         ItemStackUtil.formatLore(teamPvPItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Play Team PvP",
+                ChatUtil.boldColor(ChatColor.YELLOW) + "Play Team PvP",
                 ChatColor.GOLD + "Here you can play 2v2s and soon 3v3s!",
                 ChatColor.GOLD + "Join a team or craft your own!",
                 ChatColor.GOLD + "For more information, please visit",

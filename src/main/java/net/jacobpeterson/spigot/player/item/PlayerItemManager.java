@@ -2,7 +2,7 @@ package net.jacobpeterson.spigot.player.item;
 
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class PlayerItemManager implements Initializers {
         if (PLAY_NOW_COMPASS_ITEM == null) {
             PLAY_NOW_COMPASS_ITEM = new ItemStack(Material.COMPASS);
             ItemStackUtil.formatLore(PLAY_NOW_COMPASS_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Play Now!", (String[]) null);
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Play Now!", (String[]) null);
         }
     }
 

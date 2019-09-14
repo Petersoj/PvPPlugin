@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+/**
+ * Just use https://github.com/NyxCode/MojangAPI in the future!
+ */
 public final class PlayerUtil {
 
     /**

@@ -4,6 +4,7 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -82,7 +83,7 @@ public class PlayerManager implements Initializers {
      * @return the player's PermissionsEx group prefix (will be empty string if prefix doesn't exist)
      */
     public String getPlayerGroupPrefix(String playerName) {
-        return PermissionsEx.getUser(playerName).getPrefix();
+        return ChatColor.translateAlternateColorCodes('&', PermissionsEx.getUser(playerName).getPrefix());
     }
 
     /**

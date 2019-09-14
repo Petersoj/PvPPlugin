@@ -6,7 +6,7 @@ import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -32,14 +32,14 @@ public class Team2v2Menu extends AbstractInventoryGUI {
         if (CRAFT_TEAM_ITEM == null) {
             CRAFT_TEAM_ITEM = new ItemStack(Material.WORKBENCH, 2);
             ItemStackUtil.formatLore(CRAFT_TEAM_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Craft Your Own 1v1 Team",
                     ChatColor.GOLD + "Be the leader of a team and invite others.");
         }
 
         if (BACK_ITEM == null) {
             BACK_ITEM = new ItemStack(Material.BOOK);
             ItemStackUtil.formatLore(BACK_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
         }
 
         this.createInventory();

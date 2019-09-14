@@ -8,7 +8,7 @@ import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,7 +25,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     protected final Logger LOGGER;
 
     protected final PlayerGUIManager playerGUIManager;
-    protected  ArenaManager arenaManager;
+    protected ArenaManager arenaManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
 
@@ -47,14 +47,14 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
         if (ANY_ITEM == null) {
             ANY_ITEM = new ItemStack(Material.EMERALD);
             ItemStackUtil.formatLore(ANY_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Any",
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Any",
                     ChatColor.GOLD + "Play on any arena (fastest)");
         }
 
         if (BACK_ITEM == null) {
             BACK_ITEM = new ItemStack(Material.BOOK);
             ItemStackUtil.formatLore(BACK_ITEM, true,
-                    CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
         }
     }
 

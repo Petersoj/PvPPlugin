@@ -4,7 +4,7 @@ import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
-import net.jacobpeterson.spigot.util.CharUtil;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +23,7 @@ public class Team2v2CraftTeamMenu extends AbstractInventoryGUI {
     public void init() {
         backItem = new ItemStack(Material.BOOK);
         ItemStackUtil.formatLore(backItem, true,
-                CharUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
+                ChatUtil.boldColor(ChatColor.YELLOW) + "Back", (String[]) null);
     }
 
     @Override

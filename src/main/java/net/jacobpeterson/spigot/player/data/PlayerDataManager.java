@@ -33,7 +33,8 @@ public class PlayerDataManager implements Initializers {
     private LinkedHashMap<String, String> databaseColumnsMap;
 
     /**
-     * Instantiates a new Player Data Manager which is used to read/write {@link PlayerData} via {@link DatabaseManager}.
+     * Instantiates a new Player Data Manager which is used to read/write {@link PlayerData} via
+     * {@link DatabaseManager}.
      *
      * @param playerManager   the player manager
      * @param gsonManager     the gson manager
@@ -53,6 +54,7 @@ public class PlayerDataManager implements Initializers {
         // Create map of table columns and their associated SQL characteristics
         databaseColumnsMap = new LinkedHashMap<>();
         databaseColumnsMap.put("uuid", "CHAR(36) NOT NULL");
+        databaseColumnsMap.put("name", "VARCHAR(100) NOT NULL");
 
         databaseColumnsMap.put("elo", "INT NOT NULL");
 
@@ -103,7 +105,8 @@ public class PlayerDataManager implements Initializers {
         for (PvPPlayer pvpPlayer : playerManager.getPvPPlayers()) {
             pvpPlayer.deinit();
 
-            // Run the tasks synchronously without registering as the server is shutting down and cannot queue bukkit tasks
+            // Run the tasks synchronously without registering as the server is shutting down and
+            // cannot queue Bukkit tasks
 
             PlayerDataUpdateRunnable playerDataUpdateRunnable = new PlayerDataUpdateRunnable(pvpPlayer, this);
             playerDataUpdateRunnable.run();
@@ -113,29 +116,46 @@ public class PlayerDataManager implements Initializers {
     /**
      * Selects PlayerData from SQL database.
      *
-     * @param pvpPlayer the pvp player
+     * @param playerUUID the player uuid
      * @return the player data (null if no data exists)
      * @throws SQLException the sql exception
      */
-    public synchronized PlayerData selectPlayerDataFromDatabase(PvPPlayer pvpPlayer) throws SQLException {
-        return this.selectPlayerDataFromDatabase(pvpPlayer.getPlayer().getUniqueId());
+    public synchronized PlayerData selectPlayerDataFromDatabase(UUID playerUUID) throws SQLException {
+        return this.selectPlayerDataFromDatabase(playerUUID, null);
     }
 
     /**
      * Selects PlayerData from SQL database.
      *
-     * @param playerUUID the player uuid
+     * @param playerName the player name
+     * @return the player data (null if no data exists)
+     * @throws SQLException the sql exception
+     */
+    public synchronized PlayerData selectPlayerDataFromDatabase(String playerName) throws SQLException {
+        return this.selectPlayerDataFromDatabase(null, playerName);
+    }
+
+    /**
+     * Selects PlayerData from SQL database.
+     *
+     * @param playerUUID the player uuid (can be null)
+     * @param playerName the player name (can be null)
      * @return the player data (null if no data exists)
      * @throws SQLException the sql exception
      */
     @SuppressWarnings("unchecked") // Easier to ignore cast checking and let the runtime throw the exception if so
-    public synchronized PlayerData selectPlayerDataFromDatabase(UUID playerUUID) throws SQLException {
+    private synchronized PlayerData selectPlayerDataFromDatabase(UUID playerUUID, String playerName)
+            throws SQLException {
+        if (playerUUID == null && playerName == null) {
+            throw new IllegalArgumentException("UUID and Name cannot both be null!");
+        }
+
         PlayerData playerData = new PlayerData();
 
         StringBuilder selectPlayerDataPreparedSQL = new StringBuilder("SELECT ");
-        // Add columns in specific order so that code below doesn't get column index wrong
+        // Add columns in order according to databaseColumnsMap so that code below doesn't get column index wrong
         ArrayList<String> databaseColumnNames = new ArrayList<>(databaseColumnsMap.keySet());
-        for (int i = 1; i < databaseColumnsMap.size(); i++) { // Start at 1 b/c no need to get 'uuid'
+        for (int i = 2; i < databaseColumnsMap.size(); i++) { // Start at 2 b/c no need to get 'uuid' or 'name'
             selectPlayerDataPreparedSQL.append(databaseColumnNames.get(i));
             if (i != databaseColumnsMap.size() - 1) {
                 selectPlayerDataPreparedSQL.append(",");
@@ -143,15 +163,16 @@ public class PlayerDataManager implements Initializers {
         }
         selectPlayerDataPreparedSQL.append(" FROM ");
         selectPlayerDataPreparedSQL.append(databaseTableName);
-        selectPlayerDataPreparedSQL.append(" WHERE uuid=?");
+        selectPlayerDataPreparedSQL.append(" WHERE ");
+        selectPlayerDataPreparedSQL.append(playerUUID != null ? "uuid=?" : "name=?");
 
         databaseManager.validateMySQLConnection();
 
         PreparedStatement selectPreparedStatement = databaseManager.getMySQLConnection().
                 prepareStatement(selectPlayerDataPreparedSQL.toString());
 
-        // Set UUID
-        selectPreparedStatement.setString(1, playerUUID.toString());
+        // Set UUID or name
+        selectPreparedStatement.setString(1, playerUUID != null ? playerUUID.toString() : playerName);
 
         ResultSet resultSet = selectPreparedStatement.executeQuery();
 
@@ -213,7 +234,8 @@ public class PlayerDataManager implements Initializers {
         updatePreparedStatement.setString(databaseColumnsMap.size(),
                 pvpPlayer.getPlayer().getUniqueId().toString());
 
-        this.setPreparedStatementWithPlayerData(updatePreparedStatement, playerData, 1); // start at index 1
+        this.setPreparedStatementWithPlayerData(updatePreparedStatement, pvpPlayer.getPlayer().getName(),
+                playerData, 1); // start at index 1
 
         updatePreparedStatement.executeUpdate();
     }
@@ -245,7 +267,8 @@ public class PlayerDataManager implements Initializers {
 
         insertPreparedStatement.setString(1, pvpPlayer.getPlayer().getUniqueId().toString());
 
-        this.setPreparedStatementWithPlayerData(insertPreparedStatement, playerData, 2); // start at index 2
+        this.setPreparedStatementWithPlayerData(insertPreparedStatement, pvpPlayer.getPlayer().getName(),
+                playerData, 2); // start at index 2
 
         insertPreparedStatement.executeUpdate();
     }
@@ -255,34 +278,36 @@ public class PlayerDataManager implements Initializers {
      * (excludes Primary Key aka UUID).
      *
      * @param preparedStatement      the prepared statement
+     * @param playerName             the player name
      * @param playerData             the player data
      * @param questionMarkStartIndex the question mark start index (inclusive)
      * @throws SQLException the sql exception
      */
-    private void setPreparedStatementWithPlayerData(PreparedStatement preparedStatement,
+    private void setPreparedStatementWithPlayerData(PreparedStatement preparedStatement, String playerName,
                                                     PlayerData playerData, int questionMarkStartIndex) throws SQLException {
         gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
 
         // Arena times played parsing logic
         String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
                 playerData.getArenaTimesPlayedMap().getClass());
-        preparedStatement.setString(questionMarkStartIndex + 1, arenaTimesPlayedMapJson);
+        preparedStatement.setString(questionMarkStartIndex + 2, arenaTimesPlayedMapJson);
 
         // Arena Inventory parsing logic
         String arenaInventoryMapJson = gsonManager.getGson().toJson(playerData.getArenaInventory(),
                 playerData.getArenaInventory().getClass());
-        preparedStatement.setString(questionMarkStartIndex + 2, arenaInventoryMapJson);
+        preparedStatement.setString(questionMarkStartIndex + 3, arenaInventoryMapJson);
 
         // Set other primitives
-        preparedStatement.setInt(questionMarkStartIndex, playerData.getELO());
-        preparedStatement.setInt(questionMarkStartIndex + 3, playerData.getUnrankedFFAKills());
-        preparedStatement.setInt(questionMarkStartIndex + 4, playerData.getUnrankedFFADeaths());
-        preparedStatement.setInt(questionMarkStartIndex + 5, playerData.getRanked1v1Kills());
-        preparedStatement.setInt(questionMarkStartIndex + 6, playerData.getRanked1v1Deaths());
-        preparedStatement.setInt(questionMarkStartIndex + 7, playerData.getRanked1v1Wins());
-        preparedStatement.setInt(questionMarkStartIndex + 8, playerData.getRanked1v1Losses());
-        preparedStatement.setInt(questionMarkStartIndex + 9, playerData.getTeamPvPWins());
-        preparedStatement.setInt(questionMarkStartIndex + 10, playerData.getTeamPvPLosses());
+        preparedStatement.setString(questionMarkStartIndex, playerName);
+        preparedStatement.setInt(questionMarkStartIndex + 1, playerData.getELO());
+        preparedStatement.setInt(questionMarkStartIndex + 4, playerData.getUnrankedFFAKills());
+        preparedStatement.setInt(questionMarkStartIndex + 5, playerData.getUnrankedFFADeaths());
+        preparedStatement.setInt(questionMarkStartIndex + 6, playerData.getRanked1v1Kills());
+        preparedStatement.setInt(questionMarkStartIndex + 7, playerData.getRanked1v1Deaths());
+        preparedStatement.setInt(questionMarkStartIndex + 8, playerData.getRanked1v1Wins());
+        preparedStatement.setInt(questionMarkStartIndex + 9, playerData.getRanked1v1Losses());
+        preparedStatement.setInt(questionMarkStartIndex + 10, playerData.getTeamPvPWins());
+        preparedStatement.setInt(questionMarkStartIndex + 11, playerData.getTeamPvPLosses());
     }
 
     /**
@@ -299,7 +324,7 @@ public class PlayerDataManager implements Initializers {
         for (String columnName : databaseColumnNames) {
             createTableSQL.append(columnName)
                     .append(" ")
-                    .append(columnName)
+                    .append(databaseColumnsMap.get(columnName))
                     .append(",");
         }
         createTableSQL.append("PRIMARY KEY (UUID)");
@@ -387,11 +412,11 @@ public class PlayerDataManager implements Initializers {
      * @return the top elo rankings where the position of each entry is the rank (0 is first/highest), the key is
      * the player name, and the value is the elo value
      */
-    public synchronized HashMap<String, Integer> getTopELORankings(int numberOfRecords)
+    public synchronized LinkedHashMap<String, Integer> getTopELORankings(int numberOfRecords)
             throws SQLException {
-        HashMap<String, Integer> stringUUIDELORankings = new HashMap<>();
+        LinkedHashMap<String, Integer> topELORankingsMap = new LinkedHashMap<>();
 
-        String getELORankingsSQL = "SELECT uuid, elo FROM " + databaseTableName +
+        String getELORankingsSQL = "SELECT name, elo FROM " + databaseTableName +
                 " ORDER BY elo desc LIMIT " + numberOfRecords;
 
         databaseManager.validateMySQLConnection();
@@ -399,28 +424,39 @@ public class PlayerDataManager implements Initializers {
         Statement createTableStatement = databaseManager.getMySQLConnection().createStatement();
         ResultSet eloRankingResults = createTableStatement.executeQuery(getELORankingsSQL);
 
-        // Go through result set and add names as String UUIDs for now
         while (eloRankingResults.next()) {
-            String uuid = eloRankingResults.getString(1);
+            String name = eloRankingResults.getString(1);
             Integer elo = eloRankingResults.getInt(2);
-            stringUUIDELORankings.put(uuid, elo);
+            topELORankingsMap.put(name, elo);
         }
 
-        HashMap<String, Integer> eloRankings = new HashMap<>();
-        for (String uuidELORanking : stringUUIDELORankings.keySet()) {
-            // TODO get all
-        }
-
-        return eloRankings;
+        return topELORankingsMap;
     }
 
-    public synchronized int getPlayerELORank(UUID playerUUID) throws SQLException {
-        // TODO
-        return 0;
+    public synchronized int getPlayerELORank(String playerName) throws SQLException {
+        String selectPlayerELORankingSQL = "SELECT `rank` FROM (SELECT `name`, @rank := @rank + 1 AS `rank` FROM `" +
+                databaseTableName + "`, (SELECT @rank := 0) `rankAlias` ORDER BY `elo` DESC) `descendingAlias` " +
+                "WHERE name = ?;";
+
+        databaseManager.validateMySQLConnection();
+
+        PreparedStatement selectPlayerELORankedStatement = databaseManager.getMySQLConnection()
+                .prepareStatement(selectPlayerELORankingSQL);
+
+        selectPlayerELORankedStatement.setString(1, playerName);
+
+        ResultSet selectPlayerELORankResult = selectPlayerELORankedStatement.executeQuery();
+
+        if (selectPlayerELORankResult.next()) {
+            return selectPlayerELORankResult.getInt(1);
+        } else {
+            return -1;
+        }
     }
 
     /**
-     * Deletes all bukkit player data files created by bukkit e.g. delete <world>/playerdata/<UUID>.dat for every world.
+     * Deletes all bukkit player data files created by bukkit e.g. delete world/playerdata/UUID.dat for
+     * every world.
      *
      * @param pvpPlayer the pvp player (null to delete all bukkit player data in all worlds)
      * @throws IOException the io exception

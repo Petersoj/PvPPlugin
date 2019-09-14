@@ -6,7 +6,6 @@ import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.util.ChatUtil;
-import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -17,11 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.LinkedHashMap;
 
 public class CommandListener implements CommandExecutor {
 
@@ -58,25 +54,10 @@ public class CommandListener implements CommandExecutor {
                     this.handleRecordCommand(pvpPlayer, args);
                     break;
                 case "save":
-                    // TODO remove below test
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                System.out.println("PretonPlayz " + PlayerUtil.getSingleMojangUUID("PrestonPlayz"));
-                                HashMap<String, UUID> nameUUIDMap = PlayerUtil.getMultipleMojangUUIDs(Arrays.asList("Dawici", "Petersoj"));
-                                nameUUIDMap.forEach((s, uuid) -> {
-                                    System.out.println(s + " " + uuid.toString());
-                                });
-                                System.out.println("Petersoj name to UUID: " +
-                                        PlayerUtil.getMojangPlayerName(UUID.fromString("4dbfefc8-62d0-4a40-8399-bd2837252682")));
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }.runTaskAsynchronously(pvpPlugin);
+
                     break;
                 case "scoreboard":
+                    this.handleScoreboardCommand(pvpPlayer, args);
                     break;
                 case "accept":
                     break;
@@ -132,6 +113,7 @@ public class CommandListener implements CommandExecutor {
      * @param pvpPlayer the pvp player
      * @param args      the args
      */
+    @SuppressWarnings("deprecation")
     public void handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
         // Do entire thing async because '/record' command needs ELO Rank which is fetched via Database
         new BukkitRunnable() {
@@ -143,34 +125,21 @@ public class CommandListener implements CommandExecutor {
                 if (args.length > 0) { // show another player's stats
                     Player recordPlayer = Bukkit.getPlayer(args[0]);
 
-                    if (recordPlayer == null) { // No online player found so have to query DB
+                    // No online player found so have to query DB
+                    if (recordPlayer == null) {
                         String recordPlayerName = args[0];
-
-                        // We need to fetch the UUID via Mojang API in order to query database b/c player is offline
-                        UUID recordPlayerUUID = null;
+                        PlayerData recordPlayerData = null;
+                        int eloRank = -1;
                         try {
-                            recordPlayerUUID = PlayerUtil.getSingleMojangUUID(recordPlayerName);
-                        } catch (IOException exception) {
+                            recordPlayerData = playerDataManager.selectPlayerDataFromDatabase(recordPlayerName);
+                            eloRank = playerDataManager.getPlayerELORank(recordPlayerName);
+                        } catch (SQLException exception) {
                             exception.printStackTrace();
+                        } finally {
+                            CommandListener.this.sendSyncRecordMessage(pvpPlayer,
+                                    recordPlayerName, recordPlayerData, eloRank);
                         }
-
-                        if (recordPlayerUUID == null) { // Couldn't find offline player UUID
-                            CommandListener.this.sendSyncRecordMessage(pvpPlayer, null, null, 0);
-                        } else {
-                            // Fetch playerdata and ELO rank
-                            PlayerData recordPlayerData = null;
-                            int eloRank = -1;
-                            try {
-                                recordPlayerData = playerDataManager.selectPlayerDataFromDatabase(recordPlayerUUID);
-                                eloRank = playerDataManager.getPlayerELORank(recordPlayerUUID);
-                            } catch (SQLException exception) {
-                                exception.printStackTrace();
-                            } finally {
-                                CommandListener.this.sendSyncRecordMessage(pvpPlayer,
-                                        recordPlayerName, recordPlayerData, eloRank);
-                            }
-                        }
-                    } else {
+                    } else { // Found online player
                         PvPPlayer recordPvPPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(recordPlayer);
                         int eloRank = -1;
                         try {
@@ -178,7 +147,7 @@ public class CommandListener implements CommandExecutor {
                             playerDataManager.updatePlayerDataInDatabase(recordPvPPlayer);
 
                             // Now fetch Rank
-                            eloRank = playerDataManager.getPlayerELORank(recordPlayer.getUniqueId());
+                            eloRank = playerDataManager.getPlayerELORank(recordPlayer.getName());
                         } catch (SQLException exception) {
                             exception.printStackTrace();
                         }
@@ -193,7 +162,7 @@ public class CommandListener implements CommandExecutor {
                         playerDataManager.updatePlayerDataInDatabase(pvpPlayer);
 
                         // Now fetch Rank
-                        eloRank = playerDataManager.getPlayerELORank(pvpPlayer.getPlayer().getUniqueId());
+                        eloRank = playerDataManager.getPlayerELORank(pvpPlayer.getPlayer().getName());
                     } catch (SQLException exception) {
                         exception.printStackTrace();
                     }
@@ -205,7 +174,7 @@ public class CommandListener implements CommandExecutor {
     }
 
     /**
-     * Send record message.
+     * Send sync record message on main Bukkit Thread.
      *
      * @param pvpPlayer        the pvp player that is receiving the record data
      * @param recordPlayerName the record player name
@@ -239,27 +208,78 @@ public class CommandListener implements CommandExecutor {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Player record could not be found.");
         } else {
             String prefix = playerManager.getPlayerGroupPrefix(recordPlayerName);
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix) + recordPlayerName +
-                    ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
-            player.sendMessage(ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
-                    playerManager.getPlayerGroupName(recordPlayerName));
-            player.sendMessage(ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + eloRank);
-            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
-                    recordPlayerData.getELO());
-            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 Wins" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
-                    "Losses" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + recordPlayerData.getRanked1v1Wins() +
-                    ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + recordPlayerData.getRanked1v1Losses());
-            player.sendMessage(ChatColor.GOLD + "Ranked 1v1 Kills" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
-                    "Deaths" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + recordPlayerData.getRanked1v1Kills() +
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.translateAlternateColorCodes('&', prefix) +
+                    recordPlayerName + ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " +
+                    ChatColor.AQUA + playerManager.getPlayerGroupName(recordPlayerName));
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " +
+                    ChatColor.AQUA + eloRank);
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY +
+                    ": " + ChatColor.AQUA + recordPlayerData.getELO());
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 Wins" + ChatColor.DARK_GRAY +
+                    "/" + ChatColor.GOLD + "Losses" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
+                    recordPlayerData.getRanked1v1Wins() + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA +
+                    recordPlayerData.getRanked1v1Losses());
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 Kills" +
+                    ChatColor.DARK_GRAY + "/" + ChatColor.GOLD + "Deaths" + ChatColor.DARK_GRAY + ": " +
+                    ChatColor.AQUA + recordPlayerData.getRanked1v1Kills() +
                     ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + recordPlayerData.getRanked1v1Deaths());
-            player.sendMessage(ChatColor.GOLD + "Unranked FFA Kills" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +
-                    "Deaths" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + recordPlayerData.getUnrankedFFAKills() +
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Unranked FFA Kills" +
+                    ChatColor.DARK_GRAY + "/" + ChatColor.GOLD + "Deaths" + ChatColor.DARK_GRAY + ": " +
+                    ChatColor.AQUA + recordPlayerData.getUnrankedFFAKills() +
                     ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + recordPlayerData.getUnrankedFFADeaths());
-            player.sendMessage(ChatColor.GOLD + "Team PvP Wins" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
-                    recordPlayerData.getTeamPvPWins());
-            player.sendMessage(ChatColor.GOLD + "Team PvP Losses" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
-                    recordPlayerData.getTeamPvPLosses());
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Team PvP Wins" + ChatColor.DARK_GRAY +
+                    ": " + ChatColor.AQUA + recordPlayerData.getTeamPvPWins());
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Team PvP Losses" + ChatColor.DARK_GRAY +
+                    ": " + ChatColor.AQUA + recordPlayerData.getTeamPvPLosses());
         }
+    }
+
+    /**
+     * Handle scoreboard command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     */
+    public void handleScoreboardCommand(PvPPlayer pvpPlayer, String[] args) {
+        // Execute ordered query to DB async
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PlayerManager playerManager = pvpPlugin.getPlayerManager();
+                PlayerDataManager playerDataManager = playerManager.getPlayerDataManager();
+                LinkedHashMap<String, Integer> topELORankingsMap = null;
+                try {
+                    topELORankingsMap = playerDataManager.getTopELORankings(10);
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+
+                final LinkedHashMap<String, Integer> topELORankingsMapReference = topELORankingsMap;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Player player = pvpPlayer.getPlayer();
+
+                        if (topELORankingsMapReference == null) {
+                            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not get " +
+                                    "ELO Scoreboard. Check console for errors.");
+                        } else {
+                            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatUtil.boldColor(ChatColor.GOLD) +
+                                    "Scoreboard (top 10 players):");
+
+                            int rankIndex = 1;
+                            for (String name : topELORankingsMapReference.keySet()) {
+                                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + rankIndex + ". " +
+                                        ChatColor.AQUA + topELORankingsMapReference.get(name) +
+                                        playerManager.getPlayerGroupPrefix(name) + " " + name);
+                                rankIndex++;
+                            }
+                        }
+                    }
+                }.runTask(pvpPlugin);
+            }
+        }.runTaskAsynchronously(pvpPlugin);
     }
 
     /**
