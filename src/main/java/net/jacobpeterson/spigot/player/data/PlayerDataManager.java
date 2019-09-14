@@ -6,7 +6,6 @@ import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
-import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -18,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,7 @@ public class PlayerDataManager implements Initializers {
     private final GsonManager gsonManager;
     private final DatabaseManager databaseManager;
     private String databaseTableName;
-    private HashMap<String, String> databaseColumnsMap;
+    private LinkedHashMap<String, String> databaseColumnsMap;
 
     /**
      * Instantiates a new Player Data Manager which is used to read/write {@link PlayerData} via {@link DatabaseManager}.
@@ -51,6 +51,7 @@ public class PlayerDataManager implements Initializers {
         this.databaseTableName = "player_data";
 
         // Create map of table columns and their associated SQL characteristics
+        databaseColumnsMap = new LinkedHashMap<>();
         databaseColumnsMap.put("uuid", "CHAR(36) NOT NULL");
 
         databaseColumnsMap.put("elo", "INT NOT NULL");
@@ -414,7 +415,8 @@ public class PlayerDataManager implements Initializers {
     }
 
     public synchronized int getPlayerELORank(UUID playerUUID) throws SQLException {
-        throw new UnsupportedOperationException("//TODO"); // TODO
+        // TODO
+        return 0;
     }
 
     /**

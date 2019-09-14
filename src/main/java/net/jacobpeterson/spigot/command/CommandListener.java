@@ -17,7 +17,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class CommandListener implements CommandExecutor {
@@ -55,6 +58,23 @@ public class CommandListener implements CommandExecutor {
                     this.handleRecordCommand(pvpPlayer, args);
                     break;
                 case "save":
+                    // TODO remove below test
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                System.out.println("PretonPlayz " + PlayerUtil.getSingleMojangUUID("PrestonPlayz"));
+                                HashMap<String, UUID> nameUUIDMap = PlayerUtil.getMultipleMojangUUIDs(Arrays.asList("Dawici", "Petersoj"));
+                                nameUUIDMap.forEach((s, uuid) -> {
+                                    System.out.println(s + " " + uuid.toString());
+                                });
+                                System.out.println("Petersoj name to UUID: " +
+                                        PlayerUtil.getMojangPlayerName(UUID.fromString("4dbfefc8-62d0-4a40-8399-bd2837252682")));
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }.runTaskAsynchronously(pvpPlugin);
                     break;
                 case "scoreboard":
                     break;
@@ -100,6 +120,7 @@ public class CommandListener implements CommandExecutor {
     public boolean handleLobbyCommand(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
         World levelWorld = Bukkit.getWorlds().get(0); // 0th world is the default world
+
         player.teleport(levelWorld.getSpawnLocation());
 
         return true;
@@ -126,7 +147,12 @@ public class CommandListener implements CommandExecutor {
                         String recordPlayerName = args[0];
 
                         // We need to fetch the UUID via Mojang API in order to query database b/c player is offline
-                        UUID recordPlayerUUID = PlayerUtil.getSingleMojangUUID(recordPlayerName);
+                        UUID recordPlayerUUID = null;
+                        try {
+                            recordPlayerUUID = PlayerUtil.getSingleMojangUUID(recordPlayerName);
+                        } catch (IOException exception) {
+                            exception.printStackTrace();
+                        }
 
                         if (recordPlayerUUID == null) { // Couldn't find offline player UUID
                             CommandListener.this.sendSyncRecordMessage(pvpPlayer, null, null, 0);
@@ -217,8 +243,7 @@ public class CommandListener implements CommandExecutor {
                     ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
             player.sendMessage(ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
                     playerManager.getPlayerGroupName(recordPlayerName));
-            player.sendMessage(ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
-                    playerManager.getPlayerGroupName(recordPlayerName));
+            player.sendMessage(ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + eloRank);
             player.sendMessage(ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
                     recordPlayerData.getELO());
             player.sendMessage(ChatColor.GOLD + "Ranked 1v1 Wins" + ChatColor.DARK_GRAY + "/" + ChatColor.GOLD +

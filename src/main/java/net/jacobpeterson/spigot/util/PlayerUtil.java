@@ -1,10 +1,7 @@
 package net.jacobpeterson.spigot.util;
 
 import com.google.common.base.Charsets;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import org.bukkit.Bukkit;
 
@@ -36,43 +33,41 @@ public final class PlayerUtil {
      *
      * @param playerName the player name
      * @return the uuid
+     * @throws IOException the IOException
      * @see <a href=https://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time>Mojang_API#Username -> UUID at time</a>
      */
-    public static UUID getSingleMojangUUID(String playerName) {
+    @SuppressWarnings("deprecation")
+    public static UUID getSingleMojangUUID(String playerName) throws IOException {
         UUID potentialUUID = Bukkit.getOfflinePlayer(playerName).getUniqueId();
         // Check if the playerName->UUID was cached by the MC server and Bukkit is not faking the UUID of an
         // offline player.
         if (potentialUUID != PlayerUtil.getBukkitFormattedFakeOfflinePlayerUUID(playerName)) {
             return potentialUUID;
         } else {
-            try {
-                // Create GET request to API
-                String uuidAPIURLString = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
-                URL uuidAPIURL = new URL(uuidAPIURLString);
-                HttpURLConnection uuidAPIConnection = (HttpURLConnection) uuidAPIURL.openConnection();
-                uuidAPIConnection.setRequestMethod("GET");
+            // Create GET request to API
+            String uuidAPIURLString = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
+            URL uuidAPIURL = new URL(uuidAPIURLString);
+            HttpURLConnection uuidAPIConnection = (HttpURLConnection) uuidAPIURL.openConnection();
+            uuidAPIConnection.setRequestMethod("GET");
 
-                // Create input stream reading
-                BufferedReader responseBufferedReader = new BufferedReader(
-                        new InputStreamReader(uuidAPIConnection.getInputStream()));
-                String responseLine;
-                StringBuilder finalResponseBuilder = new StringBuilder();
+            // Create input stream reading
+            BufferedReader responseBufferedReader = new BufferedReader(
+                    new InputStreamReader(uuidAPIConnection.getInputStream()));
+            String responseLine;
+            StringBuilder finalResponseBuilder = new StringBuilder();
 
-                // Read response lines
-                while ((responseLine = responseBufferedReader.readLine()) != null) {
-                    finalResponseBuilder.append(responseLine);
-                }
-
-                // Parse JSON response and get as JsonObject
-                JsonElement responseJsonElement = new JsonParser().parse(finalResponseBuilder.toString());
-                JsonObject responseJsonObject = responseJsonElement.getAsJsonObject();
-
-                // Get the 'id' value and convert to UUID
-                String stringUUID = responseJsonObject.get("id").getAsString();
-                return stringUUID == null ? null : PlayerUtil.uuidFromString(stringUUID);
-            } catch (Exception e) {
-                return null;
+            // Read response lines
+            while ((responseLine = responseBufferedReader.readLine()) != null) {
+                finalResponseBuilder.append(responseLine);
             }
+
+            // Parse JSON response and get as JsonObject
+            JsonElement responseJsonElement = new JsonParser().parse(finalResponseBuilder.toString());
+            JsonObject responseJsonObject = responseJsonElement.getAsJsonObject();
+
+            // Get the 'id' value and convert to UUID
+            String stringUUID = responseJsonObject.get("id").getAsString();
+            return stringUUID == null ? null : PlayerUtil.uuidFromString(stringUUID);
         }
     }
 
@@ -88,6 +83,7 @@ public final class PlayerUtil {
      * @throws IOException the IOException
      * @see <a href=https://wiki.vg/Mojang_API#Playernames_-.3E_UUIDs>Mojang_API#Playernames -> UUIDs</a>
      */
+    @SuppressWarnings("deprecation")
     public static HashMap<String, UUID> getMultipleMojangUUIDs(List<String> playerNames)
             throws IOException {
         if (playerNames.size() > 50) {
@@ -105,13 +101,14 @@ public final class PlayerUtil {
             // offline player.
             if (potentialUUID != PlayerUtil.getBukkitFormattedFakeOfflinePlayerUUID(playerName)) {
                 playerUUIDs.put(playerName, potentialUUID);
+                System.out.println("FOUND PLAYER UUID IN CACHE: " + playerName);
             } else {
                 namesToMojangFetch.add(playerName);
             }
         }
 
         // Now create request to the Mojang API
-        String uuidAPIURLString = "https://api.mojang.com/users/profiles/minecraft";
+        String uuidAPIURLString = "https://api.mojang.com/profiles/minecraft";
 
         String fetchNamesJsonArray = new Gson().toJson(namesToMojangFetch);
         byte[] outputData = fetchNamesJsonArray.getBytes(StandardCharsets.UTF_8);
@@ -172,10 +169,60 @@ public final class PlayerUtil {
         return playerUUIDs;
     }
 
-    public static String getPlayerName(UUID uuid) {
-        // TODO MAYBE USE OFFLINE PLAYER LIKE HERE:
-        // https://www.spigotmc.org/threads/player-name-uuid.248375/#post-2478270
-        return null;
+    /**
+     * Gets a player name from UUID via the Mojang API.
+     * {@link Bukkit#getOfflinePlayer(UUID)} doesn't check if the UUID is in the username cache, so this is the
+     * only way to get an offline player name with a UUID.
+     *
+     * @param uuid the uuid
+     * @return the current player name
+     * @throws IOException the IOException
+     */
+    public static String getMojangPlayerName(UUID uuid) throws IOException {
+        String nameHistoryAPIURLString = "https://api.mojang.com/user/profiles/" +
+                PlayerUtil.uuidToDashlessUUID(uuid) + "/names";
+
+        URL nameHistoryAPIURL = new URL(nameHistoryAPIURLString);
+        HttpURLConnection nameHistoryAPIConnection = (HttpURLConnection) nameHistoryAPIURL.openConnection();
+        nameHistoryAPIConnection.setRequestMethod("GET");
+
+        // Create input stream reading
+        BufferedReader responseBufferedReader = new BufferedReader(
+                new InputStreamReader(nameHistoryAPIConnection.getInputStream()));
+        String responseLine;
+        StringBuilder finalResponseBuilder = new StringBuilder();
+
+        // Read response lines
+        while ((responseLine = responseBufferedReader.readLine()) != null) {
+            finalResponseBuilder.append(responseLine);
+        }
+
+        // Parse JSON response and get as JsonObject
+        JsonElement responseJsonElement = new JsonParser().parse(finalResponseBuilder.toString());
+        JsonArray responseJsonArray = responseJsonElement.getAsJsonArray();
+
+        String changedToAtKey = "changedToAt";
+        String nameKey = "name";
+        long lastChangedToAt = 0;
+        String currentName = null;
+        for (JsonElement arrayElement : responseJsonArray) {
+            JsonObject nameObject = arrayElement.getAsJsonObject();
+
+            if (nameObject.has(changedToAtKey)) {
+                long changedToAt = nameObject.get(changedToAtKey).getAsLong();
+                if (changedToAt > lastChangedToAt) {
+                    currentName = nameObject.get(nameKey).getAsString();
+                }
+            } else {
+                currentName = nameObject.get(nameKey).getAsString();
+            }
+        }
+
+        if (currentName == null) {
+            throw new RuntimeException("Could not get current player name from API!");
+        } else {
+            return currentName;
+        }
     }
 
     /**
@@ -192,6 +239,16 @@ public final class PlayerUtil {
             String dashedUUID = UUID_DASH_PATTERN.matcher(stringUUID).replaceAll("$1-$2-$3-$4-$5");
             return UUID.fromString(dashedUUID);
         }
+    }
+
+    /**
+     * Converts UUID to String UUID without any dashes in it. (Mojang API requires this).
+     *
+     * @param uuid the uuid
+     * @return the string
+     */
+    public static String uuidToDashlessUUID(UUID uuid) {
+        return uuid.toString().replace("-", "");
     }
 
     /**
