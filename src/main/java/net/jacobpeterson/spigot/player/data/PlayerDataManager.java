@@ -6,6 +6,7 @@ import net.jacobpeterson.spigot.data.GsonManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
+import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -15,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class PlayerDataManager implements Initializers {
     private final GsonManager gsonManager;
     private final DatabaseManager databaseManager;
     private String databaseTableName;
-    private ArrayList<AbstractMap.SimpleEntry<String, String>> databaseColumnsList;
+    private HashMap<String, String> databaseColumnsMap;
 
     /**
      * Instantiates a new Player Data Manager which is used to read/write {@link PlayerData} via {@link DatabaseManager}.
@@ -50,26 +50,25 @@ public class PlayerDataManager implements Initializers {
     public void init() throws SQLException {
         this.databaseTableName = "player_data";
 
-        // Create list of table columns and their associated SQL characteristics
-        this.databaseColumnsList = new ArrayList<>();
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("uuid", "CHAR(36) NOT NULL"));
+        // Create map of table columns and their associated SQL characteristics
+        databaseColumnsMap.put("uuid", "CHAR(36) NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("elo", "INT NOT NULL"));
+        databaseColumnsMap.put("elo", "INT NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("arena_times_played", "TEXT NOT NULL"));
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("arena_inventory", "TEXT NOT NULL"));
+        databaseColumnsMap.put("arena_times_played", "TEXT NOT NULL");
+        databaseColumnsMap.put("arena_inventory", "TEXT NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("unranked_ffa_kills", "INT NOT NULL"));
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("unranked_ffa_deaths", "INT NOT NULL"));
+        databaseColumnsMap.put("unranked_ffa_kills", "INT NOT NULL");
+        databaseColumnsMap.put("unranked_ffa_deaths", "INT NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_kills", "INT NOT NULL"));
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_deaths", "INT NOT NULL"));
+        databaseColumnsMap.put("ranked_1v1_kills", "INT NOT NULL");
+        databaseColumnsMap.put("ranked_1v1_deaths", "INT NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_wins", "INT NOT NULL"));
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("ranked_1v1_losses", "INT NOT NULL"));
+        databaseColumnsMap.put("ranked_1v1_wins", "INT NOT NULL");
+        databaseColumnsMap.put("ranked_1v1_losses", "INT NOT NULL");
 
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_wins", "INT NOT NULL"));
-        databaseColumnsList.add(new AbstractMap.SimpleEntry<>("team_pvp_losses", "INT NOT NULL"));
+        databaseColumnsMap.put("team_pvp_wins", "INT NOT NULL");
+        databaseColumnsMap.put("team_pvp_losses", "INT NOT NULL");
 
         if (!this.doesPlayerDataTableExist()) { // If PlayerData table does NOT exists
 
@@ -134,9 +133,10 @@ public class PlayerDataManager implements Initializers {
 
         StringBuilder selectPlayerDataPreparedSQL = new StringBuilder("SELECT ");
         // Add columns in specific order so that code below doesn't get column index wrong
-        for (int i = 1; i < databaseColumnsList.size(); i++) { // Start at 1 b/c no need to get 'uuid'
-            selectPlayerDataPreparedSQL.append(databaseColumnsList.get(i).getKey());
-            if (i != databaseColumnsList.size() - 1) {
+        ArrayList<String> databaseColumnNames = new ArrayList<>(databaseColumnsMap.keySet());
+        for (int i = 1; i < databaseColumnsMap.size(); i++) { // Start at 1 b/c no need to get 'uuid'
+            selectPlayerDataPreparedSQL.append(databaseColumnNames.get(i));
+            if (i != databaseColumnsMap.size() - 1) {
                 selectPlayerDataPreparedSQL.append(",");
             }
         }
@@ -145,6 +145,7 @@ public class PlayerDataManager implements Initializers {
         selectPlayerDataPreparedSQL.append(" WHERE uuid=?");
 
         databaseManager.validateMySQLConnection();
+
         PreparedStatement selectPreparedStatement = databaseManager.getMySQLConnection().
                 prepareStatement(selectPlayerDataPreparedSQL.toString());
 
@@ -192,22 +193,23 @@ public class PlayerDataManager implements Initializers {
         PlayerData playerData = pvpPlayer.getPlayerData();
 
         StringBuilder updatePlayerDataPreparedSQL = new StringBuilder("UPDATE " + databaseTableName + " SET ");
-        for (int i = 1; i < databaseColumnsList.size(); i++) { // Start at 1 b/c no need to update 'uuid'
-            updatePlayerDataPreparedSQL.append(databaseColumnsList.get(i).getKey()); // key is column name
+        ArrayList<String> databaseColumnNames = new ArrayList<>(databaseColumnsMap.keySet());
+        for (int i = 1; i < databaseColumnsMap.size(); i++) { // Start at 1 b/c no need to update 'uuid'
+            updatePlayerDataPreparedSQL.append(databaseColumnNames.get(i)); // key is column name
             updatePlayerDataPreparedSQL.append("=? ");
-            if (i != databaseColumnsList.size() - 1) {
+            if (i != databaseColumnsMap.size() - 1) {
                 updatePlayerDataPreparedSQL.append(",");
             }
         }
-
         updatePlayerDataPreparedSQL.append("WHERE uuid=?");
 
         databaseManager.validateMySQLConnection();
+
         PreparedStatement updatePreparedStatement = databaseManager.getMySQLConnection()
                 .prepareStatement(updatePlayerDataPreparedSQL.toString());
 
         // Set UUID
-        updatePreparedStatement.setString(databaseColumnsList.size(),
+        updatePreparedStatement.setString(databaseColumnsMap.size(),
                 pvpPlayer.getPlayer().getUniqueId().toString());
 
         this.setPreparedStatementWithPlayerData(updatePreparedStatement, playerData, 1); // start at index 1
@@ -227,15 +229,16 @@ public class PlayerDataManager implements Initializers {
         // e.g. INSERT INTO player_data VALUES("<UUID>", 1000, "{}", 0, 0, 0, 0, 0, 0);
 
         StringBuilder insertPlayerDataPreparedSQL = new StringBuilder("INSERT INTO " + databaseTableName + " VALUES(");
-        for (int i = 0; i < databaseColumnsList.size(); i++) {
+        for (int i = 0; i < databaseColumnsMap.size(); i++) {
             insertPlayerDataPreparedSQL.append("?");
-            if (i != databaseColumnsList.size() - 1) {
+            if (i != databaseColumnsMap.size() - 1) {
                 insertPlayerDataPreparedSQL.append(",");
             }
         }
         insertPlayerDataPreparedSQL.append(")");
 
         databaseManager.validateMySQLConnection();
+
         PreparedStatement insertPreparedStatement = databaseManager.getMySQLConnection()
                 .prepareStatement(insertPlayerDataPreparedSQL.toString());
 
@@ -247,7 +250,7 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
-     * Sets player data values within prepared statement according to {@link #getDatabaseColumnsList()}
+     * Sets player data values within prepared statement according to {@link #getDatabaseColumnsMap()}
      * (excludes Primary Key aka UUID).
      *
      * @param preparedStatement      the prepared statement
@@ -282,15 +285,6 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
-     * Gets top 10 elo players.
-     *
-     * @return the top 10 elo player list
-     */
-    public synchronized ArrayList<String> getTop10ELOPlayerList() {
-        return null;
-    }
-
-    /**
      * Create player data table.
      *
      * @throws SQLException the sql exception
@@ -300,16 +294,18 @@ public class PlayerDataManager implements Initializers {
         // Table modeled after PlayerData object
         StringBuilder createTableSQL = new StringBuilder("CREATE TABLE " + databaseTableName + " (\n");
 
-        for (AbstractMap.SimpleEntry column : databaseColumnsList) {
-            createTableSQL.append(column.getKey())
+        ArrayList<String> databaseColumnNames = new ArrayList<>(databaseColumnsMap.keySet());
+        for (String columnName : databaseColumnNames) {
+            createTableSQL.append(columnName)
                     .append(" ")
-                    .append(column.getValue())
+                    .append(columnName)
                     .append(",");
         }
         createTableSQL.append("PRIMARY KEY (UUID)");
         createTableSQL.append(");");
 
         databaseManager.validateMySQLConnection();
+
         Statement createTableStatement = databaseManager.getMySQLConnection().createStatement();
         createTableStatement.execute(createTableSQL.toString());
     }
@@ -324,6 +320,7 @@ public class PlayerDataManager implements Initializers {
         String tableExistsSQL = "SHOW TABLES LIKE '" + databaseTableName + "';";
 
         databaseManager.validateMySQLConnection();
+
         Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(tableExistsSQL);
@@ -336,7 +333,7 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
-     * Checks if player data table is valid (comparing columns in DB to {@link #getDatabaseColumnsList()}).
+     * Checks if player data table is valid (comparing columns in DB to {@link #getDatabaseColumnsMap()}).
      *
      * @return the boolean
      * @throws SQLException the sql exception
@@ -345,40 +342,79 @@ public class PlayerDataManager implements Initializers {
         String describeTableSQL = "DESCRIBE " + databaseTableName + ";";
 
         databaseManager.validateMySQLConnection();
+
         Statement tableExistsStatement = databaseManager.getMySQLConnection().createStatement();
 
         ResultSet resultSet = tableExistsStatement.executeQuery(describeTableSQL);
 
         // Add table columns to temp list in order to compare properly to required table columns
-        ArrayList<AbstractMap.SimpleEntry<String, String>> realTableColumns = new ArrayList<>();
+        HashMap<String, String> realTableColumns = new HashMap<>();
         while (resultSet.next()) {
             String databaseColumnName = resultSet.getString(1); // 1st column is 'Field' which is column name
             String databaseColumnType = resultSet.getString(2); // 2nd column is 'type' which is column type
-            realTableColumns.add(new AbstractMap.SimpleEntry<>(databaseColumnName, databaseColumnType));
+            realTableColumns.put(databaseColumnName, databaseColumnType);
         }
 
         // Search required column list because description table from SQL might in different order than
         // databaseColumnsList
         databaseColumnsListSearch:
-        for (AbstractMap.SimpleEntry<String, String> requiredColumn : databaseColumnsList) {
-            String requiredColumnName = requiredColumn.getKey();
-            String requiredColumnsType = requiredColumn.getValue().split(" ")[0];
+        for (String requiredColumnName : databaseColumnsMap.keySet()) {
+            String requiredColumnType = databaseColumnsMap.get(requiredColumnName).split(" ")[0];
 
             // Search realTableColumns
-            for (AbstractMap.SimpleEntry<String, String> realTableColumn : realTableColumns) {
-                String realColumnName = realTableColumn.getKey();
-                String realColumnType = realTableColumn.getValue();
+            for (String realColumnName : realTableColumns.keySet()) {
+                String realColumnType = realTableColumns.get(realColumnName);
 
                 // If found exact column name that is required and
                 // if the columns types (e.g. INT, TEXT) are somewhat contained in the description table
                 if (requiredColumnName.equals(realColumnName) &&
-                        realColumnType.toLowerCase().contains(requiredColumnsType.toLowerCase())) {
+                        realColumnType.toLowerCase().contains(requiredColumnType.toLowerCase())) {
                     // Break out of database column list search and go on to next column from description table
                     continue databaseColumnsListSearch;
                 }
             }
+            return false;
         }
         return true;
+    }
+
+    /**
+     * Gets top elo rankings.
+     * NOTE: *MUST BE CALLED ASYNC* because this method queries DB and Mojang API
+     *
+     * @param numberOfRecords the number of records
+     * @return the top elo rankings where the position of each entry is the rank (0 is first/highest), the key is
+     * the player name, and the value is the elo value
+     */
+    public synchronized HashMap<String, Integer> getTopELORankings(int numberOfRecords)
+            throws SQLException {
+        HashMap<String, Integer> stringUUIDELORankings = new HashMap<>();
+
+        String getELORankingsSQL = "SELECT uuid, elo FROM " + databaseTableName +
+                " ORDER BY elo desc LIMIT " + numberOfRecords;
+
+        databaseManager.validateMySQLConnection();
+
+        Statement createTableStatement = databaseManager.getMySQLConnection().createStatement();
+        ResultSet eloRankingResults = createTableStatement.executeQuery(getELORankingsSQL);
+
+        // Go through result set and add names as String UUIDs for now
+        while (eloRankingResults.next()) {
+            String uuid = eloRankingResults.getString(1);
+            Integer elo = eloRankingResults.getInt(2);
+            stringUUIDELORankings.put(uuid, elo);
+        }
+
+        HashMap<String, Integer> eloRankings = new HashMap<>();
+        for (String uuidELORanking : stringUUIDELORankings.keySet()) {
+            // TODO get all
+        }
+
+        return eloRankings;
+    }
+
+    public synchronized int getPlayerELORank(UUID playerUUID) throws SQLException {
+        throw new UnsupportedOperationException("//TODO"); // TODO
     }
 
     /**
@@ -432,12 +468,12 @@ public class PlayerDataManager implements Initializers {
     }
 
     /**
-     * Gets database columns list.
+     * Gets database columns map.
      * The key is the column name and the value is the column type (e.g. INT NOT NULL)
      *
-     * @return the database columns list
+     * @return the database columns map
      */
-    public ArrayList<AbstractMap.SimpleEntry<String, String>> getDatabaseColumnsList() {
-        return databaseColumnsList;
+    public HashMap<String, String> getDatabaseColumnsMap() {
+        return databaseColumnsMap;
     }
 }

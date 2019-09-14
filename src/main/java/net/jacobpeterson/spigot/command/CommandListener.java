@@ -4,6 +4,7 @@ import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
+import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.util.ChatUtil;
 import net.jacobpeterson.spigot.util.PlayerUtil;
 import org.bukkit.Bukkit;
@@ -111,41 +112,70 @@ public class CommandListener implements CommandExecutor {
      * @param args      the args
      */
     public void handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
-        if (args.length > 0) { // show another player's stats
-            Player recordPlayer = Bukkit.getPlayer(args[0]);
+        // Do entire thing async because '/record' command needs ELO Rank which is fetched via Database
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PlayerManager playerManager = pvpPlugin.getPlayerManager();
+                PlayerDataManager playerDataManager = playerManager.getPlayerDataManager();
 
-            if (recordPlayer == null) { // No online player found so have to query DB
-                new BukkitRunnable() { // Run async b/c of database querying
-                    @Override
-                    public void run() {
+                if (args.length > 0) { // show another player's stats
+                    Player recordPlayer = Bukkit.getPlayer(args[0]);
+
+                    if (recordPlayer == null) { // No online player found so have to query DB
                         String recordPlayerName = args[0];
-                        // We need to fetch the UUID via Mojang API in order to query database b/c player is offline
-                        UUID recordPlayerUUID = PlayerUtil.getMojangUUID(recordPlayerName);
 
-                        if (recordPlayerUUID == null) {
-                            CommandListener.this.sendSyncRecordMessage(pvpPlayer, null, null);
+                        // We need to fetch the UUID via Mojang API in order to query database b/c player is offline
+                        UUID recordPlayerUUID = PlayerUtil.getSingleMojangUUID(recordPlayerName);
+
+                        if (recordPlayerUUID == null) { // Couldn't find offline player UUID
+                            CommandListener.this.sendSyncRecordMessage(pvpPlayer, null, null, 0);
                         } else {
-                            // Fetch playerdata
+                            // Fetch playerdata and ELO rank
                             PlayerData recordPlayerData = null;
+                            int eloRank = -1;
                             try {
-                                recordPlayerData = pvpPlugin.getPlayerManager().getPlayerDataManager()
-                                        .selectPlayerDataFromDatabase(recordPlayerUUID);
+                                recordPlayerData = playerDataManager.selectPlayerDataFromDatabase(recordPlayerUUID);
+                                eloRank = playerDataManager.getPlayerELORank(recordPlayerUUID);
                             } catch (SQLException exception) {
                                 exception.printStackTrace();
                             } finally {
                                 CommandListener.this.sendSyncRecordMessage(pvpPlayer,
-                                        recordPlayerName, recordPlayerData);
+                                        recordPlayerName, recordPlayerData, eloRank);
                             }
                         }
+                    } else {
+                        PvPPlayer recordPvPPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(recordPlayer);
+                        int eloRank = -1;
+                        try {
+                            // First update the DB
+                            playerDataManager.updatePlayerDataInDatabase(recordPvPPlayer);
+
+                            // Now fetch Rank
+                            eloRank = playerDataManager.getPlayerELORank(recordPlayer.getUniqueId());
+                        } catch (SQLException exception) {
+                            exception.printStackTrace();
+                        }
+
+                        CommandListener.this.sendSyncRecordMessage(pvpPlayer,
+                                recordPvPPlayer.getPlayer().getName(), recordPvPPlayer.getPlayerData(), eloRank);
                     }
-                }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
-            } else {
-                PvPPlayer recordPvPPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(recordPlayer);
-                this.sendRecordMessage(pvpPlayer, recordPlayer.getName(), recordPvPPlayer.getPlayerData());
+                } else { // show personal stats
+                    int eloRank = -1;
+                    try {
+                        // First update the DB
+                        playerDataManager.updatePlayerDataInDatabase(pvpPlayer);
+
+                        // Now fetch Rank
+                        eloRank = playerDataManager.getPlayerELORank(pvpPlayer.getPlayer().getUniqueId());
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                    }
+                    CommandListener.this.sendSyncRecordMessage(pvpPlayer,
+                            pvpPlayer.getPlayer().getName(), pvpPlayer.getPlayerData(), eloRank);
+                }
             }
-        } else { // show personal stats
-            this.sendRecordMessage(pvpPlayer, pvpPlayer.getPlayer().getName(), pvpPlayer.getPlayerData());
-        }
+        }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
     }
 
     /**
@@ -154,12 +184,14 @@ public class CommandListener implements CommandExecutor {
      * @param pvpPlayer        the pvp player that is receiving the record data
      * @param recordPlayerName the record player name
      * @param recordPlayerData the record player data (can be null for not found)
+     * @param eloRank          the elo rank
      */
-    private void sendSyncRecordMessage(PvPPlayer pvpPlayer, String recordPlayerName, PlayerData recordPlayerData) {
+    private void sendSyncRecordMessage(PvPPlayer pvpPlayer, String recordPlayerName, PlayerData recordPlayerData,
+                                       int eloRank) {
         new BukkitRunnable() { // Run sendRecordMessage on main bukkit thread
             @Override
             public void run() {
-                CommandListener.this.sendRecordMessage(pvpPlayer, recordPlayerName, recordPlayerData);
+                CommandListener.this.sendRecordMessage(pvpPlayer, recordPlayerName, recordPlayerData, eloRank);
             }
         }.runTask(pvpPlugin);
     }
@@ -170,8 +202,10 @@ public class CommandListener implements CommandExecutor {
      * @param pvpPlayer        the pvp player that is receiving the record data
      * @param recordPlayerName the record player name
      * @param recordPlayerData the record player data (can be null for not found)
+     * @param eloRank          the elo rank
      */
-    private void sendRecordMessage(PvPPlayer pvpPlayer, String recordPlayerName, PlayerData recordPlayerData) {
+    private void sendRecordMessage(PvPPlayer pvpPlayer, String recordPlayerName, PlayerData recordPlayerData,
+                                   int eloRank) {
         Player player = pvpPlayer.getPlayer();
         PlayerManager playerManager = pvpPlugin.getPlayerManager();
 
@@ -182,6 +216,8 @@ public class CommandListener implements CommandExecutor {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix) + recordPlayerName +
                     ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
             player.sendMessage(ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
+                    playerManager.getPlayerGroupName(recordPlayerName));
+            player.sendMessage(ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
                     playerManager.getPlayerGroupName(recordPlayerName));
             player.sendMessage(ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
                     recordPlayerData.getELO());
