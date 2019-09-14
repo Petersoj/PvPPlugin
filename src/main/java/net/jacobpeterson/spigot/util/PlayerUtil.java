@@ -1,9 +1,12 @@
 package net.jacobpeterson.spigot.util;
 
 import com.google.common.base.Charsets;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import org.bukkit.Bukkit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +15,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +29,7 @@ public final class PlayerUtil {
     private static final Pattern UUID_DASH_PATTERN = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
 
     /**
-     * Gets a player UUID from a player name.
-     * This first will check the server UUID cache and then will go to Mojang's servers.
+     * Gets a player UUID from a player name via Mojang's RestAPI.
      * Should be execute async!
      *
      * @param playerName the player name
@@ -36,50 +37,41 @@ public final class PlayerUtil {
      * @throws IOException the IOException
      * @see <a href=https://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time>Mojang_API#Username -> UUID at time</a>
      */
-    @SuppressWarnings("deprecation")
     public static UUID getSingleMojangUUID(String playerName) throws IOException {
-        UUID potentialUUID = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-        // Check if the playerName->UUID was cached by the MC server and Bukkit is not faking the UUID of an
-        // offline player.
-        if (potentialUUID != PlayerUtil.getBukkitFormattedFakeOfflinePlayerUUID(playerName)) {
-            return potentialUUID;
-        } else {
-            // Create GET request to API
-            String uuidAPIURLString = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
-            URL uuidAPIURL = new URL(uuidAPIURLString);
-            HttpURLConnection uuidAPIConnection = (HttpURLConnection) uuidAPIURL.openConnection();
-            uuidAPIConnection.setRequestMethod("GET");
+        // Create GET request to API
+        String uuidAPIURLString = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
+        URL uuidAPIURL = new URL(uuidAPIURLString);
+        HttpURLConnection uuidAPIConnection = (HttpURLConnection) uuidAPIURL.openConnection();
+        uuidAPIConnection.setRequestMethod("GET");
 
-            // Create input stream reading
-            BufferedReader responseBufferedReader = new BufferedReader(
-                    new InputStreamReader(uuidAPIConnection.getInputStream()));
-            String responseLine;
-            StringBuilder finalResponseBuilder = new StringBuilder();
+        // Create input stream reading
+        BufferedReader responseBufferedReader = new BufferedReader(
+                new InputStreamReader(uuidAPIConnection.getInputStream()));
+        String responseLine;
+        StringBuilder finalResponseBuilder = new StringBuilder();
 
-            // Read response lines
-            while ((responseLine = responseBufferedReader.readLine()) != null) {
-                finalResponseBuilder.append(responseLine);
-            }
-
-            // Parse JSON response and get as JsonObject
-            JsonElement responseJsonElement = new JsonParser().parse(finalResponseBuilder.toString());
-            JsonObject responseJsonObject = responseJsonElement.getAsJsonObject();
-
-            // Get the 'id' value and convert to UUID
-            String stringUUID = responseJsonObject.get("id").getAsString();
-            return stringUUID == null ? null : PlayerUtil.uuidFromString(stringUUID);
+        // Read response lines
+        while ((responseLine = responseBufferedReader.readLine()) != null) {
+            finalResponseBuilder.append(responseLine);
         }
+
+        // Parse JSON response and get as JsonObject
+        JsonElement responseJsonElement = new JsonParser().parse(finalResponseBuilder.toString());
+        JsonObject responseJsonObject = responseJsonElement.getAsJsonObject();
+
+        // Get the 'id' value and convert to UUID
+        String stringUUID = responseJsonObject.get("id").getAsString();
+        return stringUUID == null ? null : PlayerUtil.uuidFromString(stringUUID);
     }
 
     /**
-     * Gets multiple Mojang UUIDs.
-     * This first will check the server UUID cache and then will go to Mojang's servers.
+     * Gets multiple Mojang UUIDs via Mojang's RestAPI.
      * DO NOT USE {@link #getSingleMojangUUID(String)} for a lot of player names. Use this
      * method as it ensures that you don't exceed the rate limit of Mojang's API.
      * Should be execute async!
      *
      * @param playerNames the player names arrayList (MUST NOT EXCEED 50 NAMES (use batching if necessary))
-     * @return the multiple mojang uuids map (key = name, value = UUID)
+     * @return the multiple Mojang UUIDs map (key = name, value = UUID)
      * @throws IOException the IOException
      * @see <a href=https://wiki.vg/Mojang_API#Playernames_-.3E_UUIDs>Mojang_API#Playernames -> UUIDs</a>
      */
@@ -91,26 +83,11 @@ public final class PlayerUtil {
         }
 
         HashMap<String, UUID> playerUUIDs = new HashMap<>();
-        ArrayList<String> namesToMojangFetch = new ArrayList<>();
-
-        // Go through player names and check if they're cached
-        for (String playerName : playerNames) {
-            UUID potentialUUID = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-
-            // Check if the playerName->UUID was cached by the MC server and Bukkit is not faking the UUID of an
-            // offline player.
-            if (potentialUUID != PlayerUtil.getBukkitFormattedFakeOfflinePlayerUUID(playerName)) {
-                playerUUIDs.put(playerName, potentialUUID);
-                System.out.println("FOUND PLAYER UUID IN CACHE: " + playerName);
-            } else {
-                namesToMojangFetch.add(playerName);
-            }
-        }
 
         // Now create request to the Mojang API
         String uuidAPIURLString = "https://api.mojang.com/profiles/minecraft";
 
-        String fetchNamesJsonArray = new Gson().toJson(namesToMojangFetch);
+        String fetchNamesJsonArray = new Gson().toJson(playerNames);
         byte[] outputData = fetchNamesJsonArray.getBytes(StandardCharsets.UTF_8);
         int outputDataLength = outputData.length;
 
@@ -148,20 +125,20 @@ public final class PlayerUtil {
             UUID uuid = null;
 
             while (jsonArrayReader.hasNext()) { // Iterate through all key/values in ID Object
-                String key = jsonArrayReader.nextName();
+                String key = jsonArrayReader.nextName(); // Get key
                 if (key.equals("name")) { // Get the name so that we can map the UUID properly
                     name = jsonArrayReader.nextString();
-                } else if (key.equals("uuid")) { // Get the UUID
+                } else if (key.equals("id")) { // Get the UUID value
                     uuid = uuidFromString(jsonArrayReader.nextString());
+                } else {
+                    jsonArrayReader.skipValue(); //
                 }
             }
+            jsonArrayReader.endObject(); // End ID Object
 
-            if (name == null || uuid == null) { // Don't add if name or id (UUID) wasn't found in the JSON response
-                continue;
-            } else {
+            if (name != null && uuid != null) { // Add name or id (UUID) if it was found in the JSON response
                 playerUUIDs.put(name, uuid);
             }
-            jsonArrayReader.endObject(); // End ID Object
         }
         jsonArrayReader.endArray(); // End off the array JSON response
         jsonArrayReader.close();
@@ -171,8 +148,8 @@ public final class PlayerUtil {
 
     /**
      * Gets a player name from UUID via the Mojang API.
-     * {@link Bukkit#getOfflinePlayer(UUID)} doesn't check if the UUID is in the username cache, so this is the
-     * only way to get an offline player name with a UUID.
+     * The number of calls to this method cannot exceed 1 per second.
+     * Implement a timed repeating task if you need to call this method many times in a short duration.
      *
      * @param uuid the uuid
      * @return the current player name
