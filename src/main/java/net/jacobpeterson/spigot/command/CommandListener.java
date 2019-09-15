@@ -1,6 +1,8 @@
 package net.jacobpeterson.spigot.command;
 
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
@@ -18,11 +20,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 public class CommandListener implements CommandExecutor {
 
+    private final Logger LOGGER;
     private PvPPlugin pvpPlugin;
 
     /**
@@ -31,6 +36,7 @@ public class CommandListener implements CommandExecutor {
      * @param pvpPlugin the pvp plugin
      */
     public CommandListener(PvPPlugin pvpPlugin) {
+        this.LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlugin = pvpPlugin;
     }
 
@@ -58,9 +64,9 @@ public class CommandListener implements CommandExecutor {
                 case "scoreboard":
                     return this.handleScoreboardCommand(pvpPlayer, args);
                 case "accept":
-                    return this.handleAcceptCommand(pvpPlayer, args);
+                    return this.handleAcceptCommand(pvpPlayer);
                 case "leave":
-                    return this.handleLeaveCommand(pvpPlayer, args);
+                    return this.handleLeaveCommand(pvpPlayer);
                 case "challenge":
 
                 case "ffa":
@@ -307,10 +313,9 @@ public class CommandListener implements CommandExecutor {
      * Handle accept command.
      *
      * @param pvpPlayer the pvp player
-     * @param args      the args
      * @return if the command was successful
      */
-    public boolean handleAcceptCommand(PvPPlayer pvpPlayer, String[] args) {
+    public boolean handleAcceptCommand(PvPPlayer pvpPlayer) {
         return false;
     }
 
@@ -318,11 +323,17 @@ public class CommandListener implements CommandExecutor {
      * Handle leave command boolean.
      *
      * @param pvpPlayer the pvp player
-     * @param args      the args
      * @return the boolean
      */
-    public boolean handleLeaveCommand(PvPPlayer pvpPlayer, String[] args) {
-        return false;
+    public boolean handleLeaveCommand(PvPPlayer pvpPlayer) {
+        Arena playerCurrentArena = pvpPlayer.getPlayerArenaManager().getCurrentArena();
+        if (playerCurrentArena != null) {
+            playerCurrentArena.leave(pvpPlayer);
+        } else {
+            pvpPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You're not currently " +
+                    "in an arena.");
+        }
+        return true;
     }
 
     /**
@@ -334,17 +345,14 @@ public class CommandListener implements CommandExecutor {
      */
     public boolean handleFFACommand(PvPPlayer pvpPlayer, String[] args) {
         Player player = pvpPlayer.getPlayer();
+        ArenaManager arenaManager = pvpPlugin.getArenaManager();
         FFAArena currentFFAArena = pvpPlugin.getArenaManager().getFFAArena();
 
         if (args.length == 0) { // Join FFA Arena
             if (currentFFAArena == null) {
-                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena not created!");
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena does not exist!");
             } else {
-                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully joined the " +
-                        "FFA Arena");
-                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Type " + ChatColor.AQUA +
-                        "/leave " + ChatColor.GOLD + "to get back to the lobby.");
-                player.teleport(currentFFAArena.getSpawnLocation());
+                currentFFAArena.join(pvpPlayer);
             }
         } else {
             String ffaCommand = args[0];
@@ -357,20 +365,32 @@ public class CommandListener implements CommandExecutor {
                 } else {
                     currentFFAArena.setInventory(player.getInventory().getContents());
                     player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
-                            "set the Inventory for the FFA Arena: " + ChatColor.WHITE + currentFFAArena.getName() +
-                            ".");
+                            "set the Inventory for the " + ChatColor.WHITE + currentFFAArena.getName() +
+                            " arena.");
                 }
 
             } else if (ffaCommand.equalsIgnoreCase("setSpawn")) {
 
                 if (currentFFAArena == null) { // Create the Arena
-                    currentFFAArena = new FFAArena("FFA Arena");
-                    currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
-
-                    pvpPlugin.getArenaManager().setFFAArena(currentFFAArena);
+                    currentFFAArena = new FFAArena(arenaManager, "FFA Arena");
+                    arenaManager.setFFAArena(currentFFAArena);
                 }
 
-                currentFFAArena.setSpawnLocation(player.getLocation());
+                currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
+
+                // Now save arenas async
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            arenaManager.getArenaDataManager().saveArenas();
+                        } catch (IOException exception) {
+                            exception.printStackTrace();
+                        }
+                        LOGGER.info("Saved arenas.");
+                    }
+                }.runTaskAsynchronously(pvpPlugin);
+
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
                         "set the spawn for FFA Arena.");
 

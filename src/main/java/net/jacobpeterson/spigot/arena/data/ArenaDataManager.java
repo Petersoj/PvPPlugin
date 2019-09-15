@@ -111,7 +111,7 @@ public class ArenaDataManager implements Initializers {
 
         JsonObject arenasObject = (JsonObject) arenasElement;
 
-        FFAArena ffaArena = gson.fromJson(arenasObject.getAsJsonArray(FFA_ARENA_KEY), FFAArena.class);
+        FFAArena ffaArena = gson.fromJson(arenasObject.getAsJsonObject(FFA_ARENA_KEY), FFAArena.class);
         ArrayList ranked1v1Arenas = gson.fromJson(arenasObject.getAsJsonArray(RANKED_1V1_ARENAS_KEY),
                 arenaManager.getRanked1v1Arenas().getClass());
         ArrayList team2v2Arenas = gson.fromJson(arenasObject.getAsJsonArray(TEAM_2V2_ARENAS),

@@ -10,6 +10,9 @@ import com.google.gson.JsonSerializer;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.ArenaManager;
+import net.jacobpeterson.spigot.player.PvPPlayer;
+import net.jacobpeterson.spigot.util.ChatUtil;
+import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
 
@@ -32,36 +35,44 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
 
     @Override
     public JsonElement serialize(Arena arena, Type type, JsonSerializationContext jsonSerializationContext) {
+
         if (!referenceSerialization) {
             return jsonSerializationContext.serialize(arena, type);
+        } else {
+            JsonObject arenaNameObject = new JsonObject();
+            arenaNameObject.addProperty("name", arena.getName());
+            return arenaNameObject;
         }
-        JsonObject arenaNameObject = new JsonObject();
-        arenaNameObject.addProperty("name", arena.getName());
-        return arenaNameObject;
     }
 
     @Override
     public Arena deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
+
         if (!referenceDeserialization) {
+
             Arena arena = jsonDeserializationContext.deserialize(jsonElement, type);
+            arena.setArenaManager(pvpPlugin.getArenaManager());
             arena.getArenaItemStack().setArena(arena); // Set the reference in ArenaItemStack
             return arena;
-        }
-        if (!(jsonElement instanceof JsonObject)) {
-            throw new JsonParseException("Arena must be JSON Object!");
-        }
 
-        ArenaManager arenaManager = pvpPlugin.getArenaManager();
+        } else {
 
-        String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
-
-        for (Arena arena : arenaManager.getAllArenas()) {
-            if (arena.getName().equals(arenaName)) {
-                return arena;
+            if (!(jsonElement instanceof JsonObject)) {
+                throw new JsonParseException("Arena must be JSON Object!");
             }
+
+            ArenaManager arenaManager = pvpPlugin.getArenaManager();
+
+            String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
+
+            for (Arena arena : arenaManager.getAllArenas()) {
+                if (arena.getName().equals(arenaName)) {
+                    return arena;
+                }
+            }
+            return new Arena(null, arenaName){};
         }
-        return null;
     }
 
     /**

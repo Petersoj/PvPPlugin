@@ -1,6 +1,8 @@
 package net.jacobpeterson.spigot.arena.arenas;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.Location;
 
 public class Ranked1v1Arena extends Arena {
@@ -12,10 +14,21 @@ public class Ranked1v1Arena extends Arena {
     /**
      * Instantiates a new Ranked 1v1 arena.
      *
-     * @param name the name
+     * @param arenaManager the arena manager
+     * @param name         the name
      */
-    public Ranked1v1Arena(String name) {
-        super(name);
+    public Ranked1v1Arena(ArenaManager arenaManager, String name) {
+        super(arenaManager, name);
+    }
+
+    @Override
+    public void join(PvPPlayer pvpPlayer) {
+
+    }
+
+    @Override
+    public void leave(PvPPlayer pvpPlayer) {
+
     }
 
     /**

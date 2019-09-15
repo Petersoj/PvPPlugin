@@ -1,6 +1,8 @@
 package net.jacobpeterson.spigot.arena.arenas;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.arena.ArenaManager;
+import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.Location;
 
 public class FFAArena extends Arena {
@@ -11,10 +13,27 @@ public class FFAArena extends Arena {
     /**
      * Instantiates a new FFA arena.
      *
-     * @param name the name
+     * @param arenaManager the arena manager
+     * @param name         the name
      */
-    public FFAArena(String name) {
-        super(name);
+    public FFAArena(ArenaManager arenaManager, String name) {
+        super(arenaManager, name);
+    }
+
+    @Override
+    public void join(PvPPlayer pvpPlayer) {
+        super.join(pvpPlayer);
+
+        pvpPlayer.getPlayer().teleport(spawnLocation);
+        pvpPlayer.getPlayerArenaManager().setCurrentArena(this);
+    }
+
+    @Override
+    public void leave(PvPPlayer pvpPlayer) {
+        super.leave(pvpPlayer);
+
+        pvpPlayer.getPlayer().teleport(leaveLocation);
+        pvpPlayer.getPlayerArenaManager().setCurrentArena(null);
     }
 
     /**

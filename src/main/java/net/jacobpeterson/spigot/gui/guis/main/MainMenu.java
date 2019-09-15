@@ -86,8 +86,6 @@ public class MainMenu extends AbstractInventoryGUI {
 
         if (currentItem.equals(ranked1v1Item)) {
 
-//            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
-
         } else if (currentItem.equals(unrankedFFAItem)) {
 
             FFAArena currentFFAArena = arenaManager.getFFAArena();
@@ -96,13 +94,12 @@ public class MainMenu extends AbstractInventoryGUI {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena does not exist!");
                 player.closeInventory();
             } else {
-                player.teleport(currentFFAArena.getSpawnLocation());
+                currentFFAArena.join(pvpPlayer);
             }
 
         } else if (currentItem.equals(teamPvPItem)) {
 
             // TODO Check if player has already created team, if so, open the craft team menu.
-//            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeam2v2Menu().getInventory());
 
         }
     }

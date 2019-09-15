@@ -2,13 +2,19 @@ package net.jacobpeterson.spigot.arena;
 
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.spigot.game.Game;
+import net.jacobpeterson.spigot.player.PvPPlayer;
+import net.jacobpeterson.spigot.player.item.PlayerItemManager;
+import net.jacobpeterson.spigot.util.ChatUtil;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 
 public abstract class Arena implements Initializers {
 
+    protected transient ArenaManager arenaManager;
     protected String name;
     protected ArenaItemStack arenaItemStack;
     protected ItemStack[] inventory; // Should be in the same format as PlayerInventory#getContents()
@@ -23,7 +29,8 @@ public abstract class Arena implements Initializers {
      *
      * @param name the name of the Arena
      */
-    public Arena(String name) {
+    public Arena(ArenaManager arenaManager, String name) {
+        this.arenaManager = arenaManager;
         this.name = name;
         this.arenaItemStack = new ArenaItemStack(this, null);
         this.disabled = false;
@@ -42,6 +49,56 @@ public abstract class Arena implements Initializers {
 
     @Override
     public void deinit() {
+    }
+
+
+    /**
+     * Have a player join the arena.
+     * Sets the inventory of the player to {@link Arena#getInventory()} and sends a join message.
+     *
+     * @param pvpPlayer the pvp player
+     */
+    public void join(PvPPlayer pvpPlayer) {
+        Player player = pvpPlayer.getPlayer();
+
+        player.getInventory().setContents(inventory);
+
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully joined " + name);
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Type " + ChatColor.AQUA +
+                "/leave " + ChatColor.GOLD + "to get back to the lobby.");
+    }
+
+    /**
+     * Have a player leave the arena.
+     * Sets the inventory of the player to {@link PlayerItemManager#loadSpawnInventory()} and sends a leave message.
+     *
+     * @param pvpPlayer the pvp player
+     */
+    public void leave(PvPPlayer pvpPlayer) {
+        Player player = pvpPlayer.getPlayer();
+
+        pvpPlayer.getPlayerItemManager().loadSpawnInventory();
+
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully left the " +
+                "FFA Arena");
+    }
+
+    /**
+     * Gets arena manager.
+     *
+     * @return the arena manager
+     */
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
+    /**
+     * Sets arena manager.
+     *
+     * @param arenaManager the arena manager
+     */
+    public void setArenaManager(ArenaManager arenaManager) {
+        this.arenaManager = arenaManager;
     }
 
     /**

@@ -9,13 +9,16 @@ import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
 import net.jacobpeterson.spigot.player.item.PlayerItemManager;
 import net.jacobpeterson.spigot.util.Initializers;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.util.logging.Logger;
 
@@ -92,6 +95,33 @@ public class PlayerEventHandlers implements Initializers {
     }
 
     /**
+     * Handle player spawn location event.
+     *
+     * @param event the event
+     */
+    public void handlePlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
+        // Ensure that the player spawns in the default world at the exact spawn location
+        event.setSpawnLocation(Bukkit.getWorlds().get(0).getSpawnLocation().add(0.5, 0, 0.5));
+    }
+
+    /**
+     * Handle player death event.
+     *
+     * @param event the event
+     */
+    public void handlePlayerDeathEvent(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        player.spigot().respawn();
+        // TODO should ArenaEventHandlers do this?
+    }
+
+    /**
      * Handle player interact event.
      *
      * @param event the event
@@ -155,7 +185,7 @@ public class PlayerEventHandlers implements Initializers {
 
         PlayerItemManager playerItemManager = pvpPlayer.getPlayerItemManager();
 
-        if (playerItemManager.getPlayNowCompassItem().equals(event.getCurrentItem())) {
+        if (playerItemManager.getPlayNowCompassItem().equals(event.getCurrentItem()) && !player.isOp()) {
             event.setCancelled(true);
         }
     }

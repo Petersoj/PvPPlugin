@@ -1,18 +1,18 @@
 package net.jacobpeterson.spigot;
 
 import net.jacobpeterson.spigot.gui.listener.InventoryGUIEventHandlers;
-import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.listener.PlayerEventHandlers;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 public class PluginListeners implements Listener, Initializers {
 
@@ -49,6 +49,15 @@ public class PluginListeners implements Listener, Initializers {
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
         this.playerEventHandlers.handlePlayerQuitEvent(event);
+    }
+
+    @EventHandler
+    public void onPlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
+        this.playerEventHandlers.handlePlayerSpawnLocationEvent(event);
+    }
+    @EventHandler
+    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+
     }
 
     @EventHandler

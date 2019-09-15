@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.player;
 
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.player.arena.PlayerArenaManager;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.gamemode.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
@@ -12,6 +13,7 @@ public class PvPPlayer implements Initializers {
 
     private final PlayerManager playerManager;
     private final Player player;
+    private PlayerArenaManager playerArenaManager;
     private PlayerGameManager playerGameManager;
     private PlayerGUIManager playerGUIManager;
     private PlayerItemManager playerItemManager;
@@ -27,6 +29,7 @@ public class PvPPlayer implements Initializers {
     PvPPlayer(PlayerManager playerManager, Player player) {
         this.playerManager = playerManager;
         this.player = player;
+        this.playerArenaManager = new PlayerArenaManager(this);
         this.playerGameManager = new PlayerGameManager(this);
         this.playerGUIManager = new PlayerGUIManager(this);
         this.playerItemManager = new PlayerItemManager(this);
@@ -80,6 +83,24 @@ public class PvPPlayer implements Initializers {
      */
     public Player getPlayer() {
         return player;
+    }
+
+    /**
+     * Gets player arena manager.
+     *
+     * @return the player arena manager
+     */
+    public PlayerArenaManager getPlayerArenaManager() {
+        return playerArenaManager;
+    }
+
+    /**
+     * Sets player arena manager.
+     *
+     * @param playerArenaManager the player arena manager
+     */
+    public void setPlayerArenaManager(PlayerArenaManager playerArenaManager) {
+        this.playerArenaManager = playerArenaManager;
     }
 
     /**

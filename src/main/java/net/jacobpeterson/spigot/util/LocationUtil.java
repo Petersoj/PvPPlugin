@@ -12,9 +12,11 @@ public class LocationUtil {
      */
     public static Location centerBlockLocation(Location location) {
         double pitch = location.getPitch();
-        double yaw = location.getY();
+        double yaw = location.getYaw();
 
-        Location centeredLocation = location.getBlock().getLocation().add(0.5d, 0d, 0.5d);
+        Location centeredLocation = new Location(location.getWorld(),
+                location.getBlockX(), location.getBlockY(), location.getBlockZ())
+                .add(0.5d, 0d, 0.5d);
 
         // Set the pitch and yaw again because they get reset in .getBlock().getLocation()
         centeredLocation.setPitch((float) pitch);
