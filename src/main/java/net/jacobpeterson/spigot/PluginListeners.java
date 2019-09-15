@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -55,9 +56,10 @@ public class PluginListeners implements Listener, Initializers {
     public void onPlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
         this.playerEventHandlers.handlePlayerSpawnLocationEvent(event);
     }
+
     @EventHandler
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
-
+        this.playerEventHandlers.handlePlayerDeathEvent(event);
     }
 
     @EventHandler
@@ -68,6 +70,11 @@ public class PluginListeners implements Listener, Initializers {
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
         this.playerEventHandlers.handlePlayerDropItemEvent(event);
+    }
+
+    @EventHandler
+    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+        this.playerEventHandlers.handleAsyncPlayerChatEvent(event);
     }
 
     @EventHandler

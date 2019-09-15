@@ -10,10 +10,12 @@ import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
 import net.jacobpeterson.spigot.player.item.PlayerItemManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -164,6 +166,27 @@ public class PlayerEventHandlers implements Initializers {
         if (playerItemManager.getPlayNowCompassItem().equals(event.getItemDrop().getItemStack()) && !player.isOp()) {
             event.setCancelled(true);
         }
+    }
+
+    /**
+     * Handle async player chat event.
+     *
+     * @param event the event
+     */
+    public void handleAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        // Format for normal Bukkit Minecraft message: <%1$s> %2$s
+        // Format for PvPPlugin: &8:&3<elo>&8:<displayname>&8: %2$s
+
+        event.setFormat(ChatColor.DARK_GRAY + ":" + ChatColor.DARK_AQUA + pvpPlayer.getPlayerData().getELO() +
+                ChatColor.DARK_GRAY + ":" + pvpPlayer.getPrefixedName() + ChatColor.DARK_GRAY + ":" +
+                ChatColor.WHITE + " %2$s");
     }
 
     /**

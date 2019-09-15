@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.game.games.team2v2;
+package net.jacobpeterson.spigot.arena.game.team2v2;
 
 import net.jacobpeterson.spigot.player.PvPPlayer;
 

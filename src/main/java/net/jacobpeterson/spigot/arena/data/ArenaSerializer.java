@@ -10,9 +10,6 @@ import com.google.gson.JsonSerializer;
 import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.ArenaManager;
-import net.jacobpeterson.spigot.player.PvPPlayer;
-import net.jacobpeterson.spigot.util.ChatUtil;
-import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
 
@@ -71,7 +68,9 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
                     return arena;
                 }
             }
-            return new Arena(null, arenaName){};
+            return new Arena(null, arenaName) {
+            }; // Create a new arena that doesn't exist just so there is record of a player playing that arena for
+            // player "arena times played"
         }
     }
 

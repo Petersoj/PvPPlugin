@@ -364,9 +364,10 @@ public class CommandListener implements CommandExecutor {
                             "doesn't exist! Set the spawn before setting the inventory for it!");
                 } else {
                     currentFFAArena.setInventory(player.getInventory().getContents());
+                    currentFFAArena.setArmorInventory(player.getInventory().getArmorContents());
                     player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
                             "set the Inventory for the " + ChatColor.WHITE + currentFFAArena.getName() +
-                            " arena.");
+                            ChatColor.GREEN + " arena.");
                 }
 
             } else if (ffaCommand.equalsIgnoreCase("setSpawn")) {

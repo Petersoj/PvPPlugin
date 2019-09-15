@@ -1,7 +1,7 @@
 package net.jacobpeterson.spigot.arena;
 
+import net.jacobpeterson.spigot.arena.game.Game;
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
-import net.jacobpeterson.spigot.game.Game;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.item.PlayerItemManager;
 import net.jacobpeterson.spigot.util.ChatUtil;
@@ -17,7 +17,8 @@ public abstract class Arena implements Initializers {
     protected transient ArenaManager arenaManager;
     protected String name;
     protected ArenaItemStack arenaItemStack;
-    protected ItemStack[] inventory; // Should be in the same format as PlayerInventory#getContents()
+    protected ItemStack[] inventory; // Use PlayerInventory#getContents()
+    protected ItemStack[] armorInventory;
     protected boolean disabled;
     protected boolean premium;
     protected String builtByName;
@@ -153,6 +154,24 @@ public abstract class Arena implements Initializers {
      */
     public void setInventory(ItemStack[] inventory) {
         this.inventory = inventory;
+    }
+
+    /**
+     * Get armor inventory item stack [].
+     *
+     * @return the item stack []
+     */
+    public ItemStack[] getArmorInventory() {
+        return armorInventory;
+    }
+
+    /**
+     * Sets armor inventory.
+     *
+     * @param armorInventory the armor inventory
+     */
+    public void setArmorInventory(ItemStack[] armorInventory) {
+        this.armorInventory = armorInventory;
     }
 
     /**

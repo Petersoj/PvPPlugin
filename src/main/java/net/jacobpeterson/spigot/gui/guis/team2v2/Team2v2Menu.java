@@ -1,7 +1,7 @@
 package net.jacobpeterson.spigot.gui.guis.team2v2;
 
-import net.jacobpeterson.spigot.game.games.team2v2.Team2v2;
-import net.jacobpeterson.spigot.game.games.team2v2.itemstack.Team2v2ItemStack;
+import net.jacobpeterson.spigot.arena.game.team2v2.Team2v2;
+import net.jacobpeterson.spigot.arena.game.team2v2.itemstack.Team2v2ItemStack;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;

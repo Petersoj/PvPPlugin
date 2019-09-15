@@ -5,7 +5,6 @@ import net.jacobpeterson.spigot.command.CommandListener;
 import net.jacobpeterson.spigot.data.DatabaseConfig;
 import net.jacobpeterson.spigot.data.DatabaseManager;
 import net.jacobpeterson.spigot.data.GsonManager;
-import net.jacobpeterson.spigot.game.GameManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import org.bukkit.Bukkit;
@@ -31,7 +30,6 @@ public class PvPPlugin extends JavaPlugin {
     private DatabaseManager databaseManager;
     private ArenaManager arenaManager;
     private PlayerManager playerManager;
-    private GameManager gameManager;
     private GUIManager guiManager;
 
     public PvPPlugin() {
@@ -48,7 +46,6 @@ public class PvPPlugin extends JavaPlugin {
         this.databaseManager = new DatabaseManager(this);
         this.arenaManager = new ArenaManager(this);
         this.playerManager = new PlayerManager(this);
-        this.gameManager = new GameManager(this);
         this.guiManager = new GUIManager(this);
     }
 
@@ -74,7 +71,6 @@ public class PvPPlugin extends JavaPlugin {
             databaseManager.init();
             arenaManager.init();
             playerManager.init();
-            gameManager.init();
             guiManager.init();
         } catch (Exception exception) {
             LOGGER.log(Level.SEVERE, "Cannot enable " + this.getName(), exception);
@@ -99,7 +95,6 @@ public class PvPPlugin extends JavaPlugin {
         // Call all .deinit() methods in reverse order as some deinit() might use previous managers
         try {
             guiManager.deinit();
-            gameManager.deinit();
             playerManager.deinit();
             arenaManager.deinit();
             databaseManager.deinit();
