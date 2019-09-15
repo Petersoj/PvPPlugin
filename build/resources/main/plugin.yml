@@ -21,15 +21,15 @@ commands:
     description: Accepts a duel challenge/team invite
   leave:
     description: Leaves the arena
+  challenge:
+    aliases: [duel]
+    description: Sends a 1v1 duel to a player
 
   ffa:
     description: Joins the ffa arena
 
   1v1:
     description: Opens the 1v1 menu
-  challenge:
-    aliases: [duel]
-    description: Sends a 1v1 duel to a player
 
   2v2:
     description: Opens the 2v2 menu

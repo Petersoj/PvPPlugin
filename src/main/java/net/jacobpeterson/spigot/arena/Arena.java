@@ -2,20 +2,21 @@ package net.jacobpeterson.spigot.arena;
 
 import net.jacobpeterson.spigot.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.spigot.game.Game;
+import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 
-public abstract class Arena {
+public abstract class Arena implements Initializers {
 
     protected String name;
     protected ArenaItemStack arenaItemStack;
-    protected ItemStack[] inventory;
+    protected ItemStack[] inventory; // Should be in the same format as PlayerInventory#getContents()
     protected boolean disabled;
     protected boolean premium;
     protected String builtByName;
     protected String description;
-    protected transient LinkedList<Game> gameQueue;
+    protected transient LinkedList<Game> gameQueue; // Transient as there is no need for this to persist
 
     /**
      * Instantiates a new Arena.
@@ -30,6 +31,17 @@ public abstract class Arena {
         this.builtByName = "";
         this.description = "";
         this.gameQueue = new LinkedList<>();
+    }
+
+    @Override
+    public void init() {
+        if (gameQueue == null) {
+            this.gameQueue = new LinkedList<>();
+        }
+    }
+
+    @Override
+    public void deinit() {
     }
 
     /**

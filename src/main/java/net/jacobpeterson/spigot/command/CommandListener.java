@@ -1,11 +1,13 @@
 package net.jacobpeterson.spigot.command;
 
 import net.jacobpeterson.spigot.PvPPlugin;
+import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.util.ChatUtil;
+import net.jacobpeterson.spigot.util.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -48,27 +50,33 @@ public class CommandListener implements CommandExecutor {
                 case "setlobby":
                     return handleSetLobbyCommand(pvpPlayer);
                 case "lobby":
-                    this.handleLobbyCommand(pvpPlayer);
-                    break;
+                    return this.handleLobbyCommand(pvpPlayer);
                 case "record":
-                    this.handleRecordCommand(pvpPlayer, args);
-                    break;
+                    return this.handleRecordCommand(pvpPlayer, args);
                 case "save":
-
-                    break;
+                    return this.handleSaveCommand(pvpPlayer, args);
                 case "scoreboard":
-                    this.handleScoreboardCommand(pvpPlayer, args);
-                    break;
+                    return this.handleScoreboardCommand(pvpPlayer, args);
                 case "accept":
-                    break;
+                    return this.handleAcceptCommand(pvpPlayer, args);
+                case "leave":
+                    return this.handleLeaveCommand(pvpPlayer, args);
+                case "challenge":
 
                 case "ffa":
-                    this.handleFFACommand(pvpPlayer, args);
-                    break;
-            }
+                    return this.handleFFACommand(pvpPlayer, args);
 
-            return true;
+
+                case "1v1":
+
+
+                case "2v2":
+
+                default:
+                    return false;
+            }
         } else {
+            commandSender.sendMessage("You must be a player to execute PvPPlugin commands.");
             return false;
         }
     }
@@ -112,9 +120,9 @@ public class CommandListener implements CommandExecutor {
      *
      * @param pvpPlayer the pvp player
      * @param args      the args
+     * @return if the command was successful
      */
-    @SuppressWarnings("deprecation")
-    public void handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
+    public boolean handleRecordCommand(PvPPlayer pvpPlayer, String[] args) {
         // Do entire thing async because '/record' command needs ELO Rank which is fetched via Database
         new BukkitRunnable() {
             @Override
@@ -171,6 +179,7 @@ public class CommandListener implements CommandExecutor {
                 }
             }
         }.runTaskAsynchronously(pvpPlugin); // Will run async on next tick
+        return true;
     }
 
     /**
@@ -212,10 +221,9 @@ public class CommandListener implements CommandExecutor {
                     recordPlayerName + ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " +
                     ChatColor.AQUA + playerManager.getPlayerGroupName(recordPlayerName));
-            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "ELO Rank" + ChatColor.DARK_GRAY + ": " +
-                    ChatColor.AQUA + eloRank);
-            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 ELO" + ChatColor.DARK_GRAY +
-                    ": " + ChatColor.AQUA + recordPlayerData.getELO());
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 ELO and ELO Rank" +
+                    ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + recordPlayerData.getELO() + ChatColor.DARK_GRAY +
+                    " - #" + ChatColor.AQUA + eloRank);
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Ranked 1v1 Wins" + ChatColor.DARK_GRAY +
                     "/" + ChatColor.GOLD + "Losses" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA +
                     recordPlayerData.getRanked1v1Wins() + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA +
@@ -236,12 +244,24 @@ public class CommandListener implements CommandExecutor {
     }
 
     /**
+     * Handle save command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return if the command was successful
+     */
+    public boolean handleSaveCommand(PvPPlayer pvpPlayer, String[] args) {
+        return false;
+    }
+
+    /**
      * Handle scoreboard command.
      *
      * @param pvpPlayer the pvp player
      * @param args      the args
+     * @return if the command was successful
      */
-    public void handleScoreboardCommand(PvPPlayer pvpPlayer, String[] args) {
+    public boolean handleScoreboardCommand(PvPPlayer pvpPlayer, String[] args) {
         // Execute ordered query to DB async
         new BukkitRunnable() {
             @Override
@@ -265,8 +285,8 @@ public class CommandListener implements CommandExecutor {
                             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not get " +
                                     "ELO Scoreboard. Check console for errors.");
                         } else {
-                            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatUtil.boldColor(ChatColor.GOLD) +
-                                    "Scoreboard (top 10 players):");
+                            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD +
+                                    "Top Players of Siege" + ChatColor.DARK_GRAY + ":");
 
                             int rankIndex = 1;
                             for (String name : topELORankingsMapReference.keySet()) {
@@ -280,16 +300,29 @@ public class CommandListener implements CommandExecutor {
                 }.runTask(pvpPlugin);
             }
         }.runTaskAsynchronously(pvpPlugin);
+        return true;
     }
 
     /**
-     * Handle arena add command.
+     * Handle accept command.
      *
      * @param pvpPlayer the pvp player
      * @param args      the args
+     * @return if the command was successful
      */
-    public void handleArenaAddCommand(PvPPlayer pvpPlayer, String[] args) {
-        // TODO make sure info that \n should be used for multiple lines
+    public boolean handleAcceptCommand(PvPPlayer pvpPlayer, String[] args) {
+        return false;
+    }
+
+    /**
+     * Handle leave command boolean.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return the boolean
+     */
+    public boolean handleLeaveCommand(PvPPlayer pvpPlayer, String[] args) {
+        return false;
     }
 
     /**
@@ -300,13 +333,88 @@ public class CommandListener implements CommandExecutor {
      * @return if the command was successful
      */
     public boolean handleFFACommand(PvPPlayer pvpPlayer, String[] args) {
-        if (args.length <= 0) {
-            return false;
+        Player player = pvpPlayer.getPlayer();
+        FFAArena currentFFAArena = pvpPlugin.getArenaManager().getFFAArena();
+
+        if (args.length == 0) { // Join FFA Arena
+            if (currentFFAArena == null) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena not created!");
+            } else {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully joined the " +
+                        "FFA Arena");
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Type " + ChatColor.AQUA +
+                        "/leave " + ChatColor.GOLD + "to get back to the lobby.");
+                player.teleport(currentFFAArena.getSpawnLocation());
+            }
+        } else {
+            String ffaCommand = args[0];
+
+            if (ffaCommand.equalsIgnoreCase("setInv")) {
+
+                if (currentFFAArena == null) {
+                    player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena " +
+                            "doesn't exist! Set the spawn before setting the inventory for it!");
+                } else {
+                    currentFFAArena.setInventory(player.getInventory().getContents());
+                    player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
+                            "set the Inventory for the FFA Arena: " + ChatColor.WHITE + currentFFAArena.getName() +
+                            ".");
+                }
+
+            } else if (ffaCommand.equalsIgnoreCase("setSpawn")) {
+
+                if (currentFFAArena == null) { // Create the Arena
+                    currentFFAArena = new FFAArena("FFA Arena");
+                    currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
+
+                    pvpPlugin.getArenaManager().setFFAArena(currentFFAArena);
+                }
+
+                currentFFAArena.setSpawnLocation(player.getLocation());
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
+                        "set the spawn for FFA Arena.");
+
+            } else if (ffaCommand.equalsIgnoreCase("setLeave")) {
+
+                if (currentFFAArena == null) {
+                    player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena " +
+                            "doesn't exist! Set the spawn before setting the leave location for it!");
+                } else {
+                    currentFFAArena.setLeaveLocation(LocationUtil.centerBlockLocation(player.getLocation()));
+                }
+            }
         }
-        String ffaCommand = args[0];
-//        if () {
-//
-//        }
-        return true;
+        return true; // We use our own custom usage messages so don't make Bukkit output them
+    }
+
+    /**
+     * Handle arena add command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return if the command was successful
+     */
+    public boolean handleArenaAddCommand(PvPPlayer pvpPlayer, String[] args) {
+        // TODO make sure info that \n should be used for multiple lines
+
+        /*
+        ItemStack playerItemStack = player.getInventory().getItemInHand();
+
+                    if (args.length < 5) {
+                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Incorrect number of " +
+                                "arguments! Usage: " + ChatColor.WHITE + "/ffa setSpawn <name> <premium?> " +
+                                "<built by> <description>");
+                        return true;
+                    }
+                    if (playerItemStack == null || playerItemStack.getType() == Material.AIR) {
+                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must be holding " +
+                                "an Item to resemble this Arena in the GUI!");
+                        return true;
+                    }
+
+                    currentFFAArena = new FFAArena("FFA Arena");
+                    currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
+         */
+        return false;
     }
 }

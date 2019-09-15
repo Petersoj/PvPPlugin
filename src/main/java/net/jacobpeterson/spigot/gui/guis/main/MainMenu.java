@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.gui.guis.main;
 
 import net.jacobpeterson.spigot.arena.ArenaManager;
+import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
@@ -11,6 +12,7 @@ import net.jacobpeterson.spigot.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -56,9 +58,7 @@ public class MainMenu extends AbstractInventoryGUI {
         ItemStackUtil.formatLore(teamPvPItem, true,
                 ChatUtil.boldColor(ChatColor.YELLOW) + "Play Team PvP",
                 ChatColor.GOLD + "Here you can play 2v2s and soon 3v3s!",
-                ChatColor.GOLD + "Join a team or craft your own!",
-                ChatColor.GOLD + "For more information, please visit",
-                ChatColor.AQUA + "mcsiege.namelesshosting.com/teampvp");
+                ChatColor.GOLD + "Join a team or craft your own!");
 
         this.createInventory();
     }
@@ -77,19 +77,33 @@ public class MainMenu extends AbstractInventoryGUI {
     public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
         event.setCancelled(true);
 
+        Player player = pvpPlayer.getPlayer();
         ItemStack currentItem = event.getCurrentItem();
 
-        if (pvpPlayer == null || currentItem == null) {
+        if (currentItem == null || currentItem.getType() == Material.AIR) {
             return;
         }
 
         if (currentItem.equals(ranked1v1Item)) {
-            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
+
+//            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
+
         } else if (currentItem.equals(unrankedFFAItem)) {
-            // TODO send player to Unranked FFA
+
+            FFAArena currentFFAArena = arenaManager.getFFAArena();
+
+            if (currentFFAArena == null) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena does not exist!");
+                player.closeInventory();
+            } else {
+                player.teleport(currentFFAArena.getSpawnLocation());
+            }
+
         } else if (currentItem.equals(teamPvPItem)) {
+
             // TODO Check if player has already created team, if so, open the craft team menu.
-            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeam2v2Menu().getInventory());
+//            pvpPlayer.getPlayer().openInventory(pvpPlayer.getPlayerGUIManager().getTeam2v2Menu().getInventory());
+
         }
     }
 
