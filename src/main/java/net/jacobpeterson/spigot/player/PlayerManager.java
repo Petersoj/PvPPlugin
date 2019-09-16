@@ -100,14 +100,14 @@ public class PlayerManager implements Initializers {
     }
 
     /**
-     * Checks if a player is premium (aka if the player has the 'premium' permission which can be
+     * Checks if a player is premium (aka if the player has the 'game.save.premium' permission which can be
      * granted via PermissionsEx in a given group).
      *
      * @param player the player
      * @return the premium boolean
      */
     public boolean isPlayerPremium(Player player) {
-        return player.hasPermission("premium");
+        return player.hasPermission("game.save.premium");
     }
 
     /**

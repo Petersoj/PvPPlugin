@@ -99,17 +99,18 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      * @param createAllNewItemStacks whether or not to update previously created {@link ArenaItemStack} or create new ones
      */
     public void updateArenaItemStacks(PvPPlayer pvpPlayer, ArrayList<Arena> arenas, boolean createAllNewItemStacks) {
-        if (createAllNewItemStacks) {
-            for (Arena arena : arenas) {
-                ArenaItemStack arenaItemStack = new ArenaItemStack(arena.getArenaItemStack()); // Copies ArenaItemStack
-                arenaItemStack.updateItemStack(pvpPlayer);
-                arenaItemStacks.add(arenaItemStack);
-            }
-        } else {
-            for (ArenaItemStack arenaItemStack : arenaItemStacks) {
-                arenaItemStack.updateItemStack(pvpPlayer);
-            }
-        }
+        // TODO
+//        if (createAllNewItemStacks) {
+//            for (Arena arena : arenas) {
+//                ArenaItemStack arenaItemStack = new ArenaItemStack(arena.getArenaItemStack()); // Copies ArenaItemStack
+//                arenaItemStack.updateItemStack(pvpPlayer);
+//                arenaItemStacks.add(arenaItemStack);
+//            }
+//        } else {
+//            for (ArenaItemStack arenaItemStack : arenaItemStacks) {
+//                arenaItemStack.updateItemStack(pvpPlayer);
+//            }
+//        }
     }
 
     /**

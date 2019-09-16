@@ -1,11 +1,10 @@
 package net.jacobpeterson.spigot.player;
 
 import net.jacobpeterson.spigot.PvPPlugin;
-import net.jacobpeterson.spigot.player.arena.PlayerArenaManager;
 import net.jacobpeterson.spigot.player.data.PlayerData;
-import net.jacobpeterson.spigot.player.gamemode.PlayerGameManager;
+import net.jacobpeterson.spigot.player.game.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
-import net.jacobpeterson.spigot.player.item.PlayerItemManager;
+import net.jacobpeterson.spigot.player.inventory.PlayerInventoryManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.entity.Player;
 
@@ -13,10 +12,9 @@ public class PvPPlayer implements Initializers {
 
     private final PlayerManager playerManager;
     private final Player player;
-    private PlayerArenaManager playerArenaManager;
     private PlayerGameManager playerGameManager;
     private PlayerGUIManager playerGUIManager;
-    private PlayerItemManager playerItemManager;
+    private PlayerInventoryManager playerInventoryManager;
     private PlayerData playerData;
 
     /**
@@ -29,24 +27,23 @@ public class PvPPlayer implements Initializers {
     PvPPlayer(PlayerManager playerManager, Player player) {
         this.playerManager = playerManager;
         this.player = player;
-        this.playerArenaManager = new PlayerArenaManager(this);
         this.playerGameManager = new PlayerGameManager(this);
         this.playerGUIManager = new PlayerGUIManager(this);
-        this.playerItemManager = new PlayerItemManager(this);
+        this.playerInventoryManager = new PlayerInventoryManager(this);
     }
 
     @Override
     public void init() {
         playerGameManager.init();
         playerGUIManager.init();
-        playerItemManager.init();
+        playerInventoryManager.init();
     }
 
     @Override
     public void deinit() {
         playerGameManager.deinit();
         playerGUIManager.deinit();
-        playerItemManager.deinit();
+        playerInventoryManager.deinit();
     }
 
     /**
@@ -86,24 +83,6 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Gets player arena manager.
-     *
-     * @return the player arena manager
-     */
-    public PlayerArenaManager getPlayerArenaManager() {
-        return playerArenaManager;
-    }
-
-    /**
-     * Sets player arena manager.
-     *
-     * @param playerArenaManager the player arena manager
-     */
-    public void setPlayerArenaManager(PlayerArenaManager playerArenaManager) {
-        this.playerArenaManager = playerArenaManager;
-    }
-
-    /**
      * Gets player game manager.
      *
      * @return the player game manager
@@ -113,9 +92,9 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Sets player gamemode manager.
+     * Sets player game manager.
      *
-     * @param playerGameManager the player gamemode manager
+     * @param playerGameManager the player game manager
      */
     public void setPlayerGameManager(PlayerGameManager playerGameManager) {
         this.playerGameManager = playerGameManager;
@@ -140,21 +119,21 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Gets player item manager.
+     * Gets player inventory manager.
      *
-     * @return the player item manager
+     * @return the player inventory manager
      */
-    public PlayerItemManager getPlayerItemManager() {
-        return playerItemManager;
+    public PlayerInventoryManager getPlayerInventoryManager() {
+        return playerInventoryManager;
     }
 
     /**
-     * Sets player item manager.
+     * Sets player inventory manager.
      *
-     * @param playerItemManager the player item manager
+     * @param playerInventoryManager the player inventory manager
      */
-    public void setPlayerItemManager(PlayerItemManager playerItemManager) {
-        this.playerItemManager = playerItemManager;
+    public void setPlayerInventoryManager(PlayerInventoryManager playerInventoryManager) {
+        this.playerInventoryManager = playerInventoryManager;
     }
 
     /**

@@ -7,7 +7,7 @@ import net.jacobpeterson.spigot.player.data.PlayerBukkitDataRemoveRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataManager;
 import net.jacobpeterson.spigot.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.spigot.player.data.PlayerDataUpdateRunnable;
-import net.jacobpeterson.spigot.player.item.PlayerItemManager;
+import net.jacobpeterson.spigot.player.inventory.PlayerInventoryManager;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -64,7 +64,7 @@ public class PlayerEventHandlers implements Initializers {
         PlayerDataManager playerDataManager = playerManager.getPlayerDataManager();
 
         PvPPlayer pvpPlayer = playerManager.createNewPvPPlayer(player);
-        pvpPlayer.getPlayerItemManager().loadSpawnInventory();
+        pvpPlayer.getPlayerInventoryManager().loadSpawnInventory();
 
         PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(pvpPlayer, playerDataManager);
         playerDataSelectRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
@@ -141,10 +141,11 @@ public class PlayerEventHandlers implements Initializers {
             return;
         }
 
-        PlayerItemManager playerItemManager = pvpPlayer.getPlayerItemManager();
+        PlayerInventoryManager playerInventoryManager = pvpPlayer.getPlayerInventoryManager();
 
-        if (playerItemManager.getPlayNowCompassItem().equals(event.getItem())) {
-            pvpPlayer.getPlayer().openInventory(playerManager.getPvPPlugin().getGUIManager().getMainMenu().getInventory());
+        if (playerInventoryManager.getPlayNowCompassItem().equals(event.getItem())) {
+            pvpPlayer.getPlayer().openInventory(
+                    playerManager.getPvPPlugin().getGUIManager().getMainMenu().getInventory());
         }
     }
 
@@ -161,9 +162,35 @@ public class PlayerEventHandlers implements Initializers {
             return;
         }
 
-        PlayerItemManager playerItemManager = pvpPlayer.getPlayerItemManager();
+        PlayerInventoryManager playerInventoryManager = pvpPlayer.getPlayerInventoryManager();
 
-        if (playerItemManager.getPlayNowCompassItem().equals(event.getItemDrop().getItemStack()) && !player.isOp()) {
+        if (playerInventoryManager.getPlayNowCompassItem().equals(event.getItemDrop().getItemStack()) &&
+                !playerInventoryManager.canManipulateInventory()) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Handle inventory click event.
+     *
+     * @param event the event
+     */
+    public void handleInventoryClickEvent(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) { // If who clicked is not a player
+            return;
+        }
+
+        Player player = (Player) event.getWhoClicked();
+        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        PlayerInventoryManager playerInventoryManager = pvpPlayer.getPlayerInventoryManager();
+
+        if (playerInventoryManager.getPlayNowCompassItem().equals(event.getCurrentItem()) &&
+                !playerInventoryManager.canManipulateInventory()) {
             event.setCancelled(true);
         }
     }
@@ -187,29 +214,5 @@ public class PlayerEventHandlers implements Initializers {
         event.setFormat(ChatColor.DARK_GRAY + ":" + ChatColor.DARK_AQUA + pvpPlayer.getPlayerData().getELO() +
                 ChatColor.DARK_GRAY + ":" + pvpPlayer.getPrefixedName() + ChatColor.DARK_GRAY + ":" +
                 ChatColor.WHITE + " %2$s");
-    }
-
-    /**
-     * Handle inventory click event.
-     *
-     * @param event the event
-     */
-    public void handleInventoryClickEvent(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) { // If who clicked is not a player
-            return;
-        }
-
-        Player player = (Player) event.getWhoClicked();
-        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
-
-        if (pvpPlayer == null) {
-            return;
-        }
-
-        PlayerItemManager playerItemManager = pvpPlayer.getPlayerItemManager();
-
-        if (playerItemManager.getPlayNowCompassItem().equals(event.getCurrentItem()) && !player.isOp()) {
-            event.setCancelled(true);
-        }
     }
 }

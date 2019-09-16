@@ -1,7 +1,7 @@
 package net.jacobpeterson.spigot.gui.guis.main;
 
-import net.jacobpeterson.spigot.arena.ArenaManager;
-import net.jacobpeterson.spigot.arena.arenas.FFAArena;
+import net.jacobpeterson.spigot.game.GameManager;
+import net.jacobpeterson.spigot.game.ffa.FFAGame;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
@@ -20,7 +20,7 @@ public class MainMenu extends AbstractInventoryGUI {
 
     private GUIManager guiManager;
     private PlayerManager playerManager;
-    private ArenaManager arenaManager;
+    private GameManager gameManager;
     private String currentlyPlayingLine;
     private ItemStack ranked1v1Item;
     private ItemStack unrankedFFAItem;
@@ -31,10 +31,10 @@ public class MainMenu extends AbstractInventoryGUI {
      *
      * @param guiManager the gui manager
      */
-    public MainMenu(GUIManager guiManager, PlayerManager playerManager, ArenaManager arenaManager) {
+    public MainMenu(GUIManager guiManager, PlayerManager playerManager, GameManager gameManager) {
         this.guiManager = guiManager;
         this.playerManager = playerManager;
-        this.arenaManager = arenaManager;
+        this.gameManager = gameManager;
         this.currentlyPlayingLine = ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": ";
     }
 
@@ -88,13 +88,13 @@ public class MainMenu extends AbstractInventoryGUI {
 
         } else if (currentItem.equals(unrankedFFAItem)) {
 
-            FFAArena currentFFAArena = arenaManager.getFFAArena();
+            FFAGame currentFFAGame = gameManager.getFFAGame();
 
-            if (currentFFAArena == null) {
-                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena does not exist!");
+            if (currentFFAGame == null) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Game does not exist!");
                 player.closeInventory();
             } else {
-                currentFFAArena.join(pvpPlayer);
+                currentFFAGame.join(pvpPlayer);
             }
 
         } else if (currentItem.equals(teamPvPItem)) {

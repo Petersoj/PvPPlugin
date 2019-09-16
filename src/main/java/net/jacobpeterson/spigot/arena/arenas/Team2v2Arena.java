@@ -2,7 +2,6 @@ package net.jacobpeterson.spigot.arena.arenas;
 
 import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.ArenaManager;
-import net.jacobpeterson.spigot.player.PvPPlayer;
 import org.bukkit.Location;
 
 public class Team2v2Arena extends Arena {
@@ -20,16 +19,6 @@ public class Team2v2Arena extends Arena {
      */
     public Team2v2Arena(ArenaManager arenaManager, String name) {
         super(arenaManager, name);
-    }
-
-    @Override
-    public void join(PvPPlayer pvpPlayer) {
-
-    }
-
-    @Override
-    public void leave(PvPPlayer pvpPlayer) {
-
     }
 
     /**

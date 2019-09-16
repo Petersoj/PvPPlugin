@@ -5,6 +5,7 @@ import net.jacobpeterson.spigot.command.CommandListener;
 import net.jacobpeterson.spigot.data.DatabaseConfig;
 import net.jacobpeterson.spigot.data.DatabaseManager;
 import net.jacobpeterson.spigot.data.GsonManager;
+import net.jacobpeterson.spigot.game.GameManager;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ public class PvPPlugin extends JavaPlugin {
     private CommandListener commandListener;
     private DatabaseManager databaseManager;
     private ArenaManager arenaManager;
+    private GameManager gameManager;
     private PlayerManager playerManager;
     private GUIManager guiManager;
 
@@ -45,6 +47,7 @@ public class PvPPlugin extends JavaPlugin {
         this.commandListener = new CommandListener(this);
         this.databaseManager = new DatabaseManager(this);
         this.arenaManager = new ArenaManager(this);
+        this.gameManager = new GameManager(this);
         this.playerManager = new PlayerManager(this);
         this.guiManager = new GUIManager(this);
     }
@@ -70,6 +73,7 @@ public class PvPPlugin extends JavaPlugin {
             pluginListeners.init();
             databaseManager.init();
             arenaManager.init();
+            gameManager.init();
             playerManager.init();
             guiManager.init();
         } catch (Exception exception) {
@@ -175,6 +179,15 @@ public class PvPPlugin extends JavaPlugin {
      */
     public ArenaManager getArenaManager() {
         return arenaManager;
+    }
+
+    /**
+     * Gets game manager.
+     *
+     * @return the game manager
+     */
+    public GameManager getGameManager() {
+        return gameManager;
     }
 
     /**

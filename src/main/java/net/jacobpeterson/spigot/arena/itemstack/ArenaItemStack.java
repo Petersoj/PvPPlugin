@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.arena.itemstack;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.game.Game;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.ChatUtil;
@@ -20,29 +21,21 @@ public class ArenaItemStack {
      * Instantiates a new ArenaItemStack which is used as a wrapper for the {@link ItemStack} representing the Arena.
      * Note: this is meant to be instantiated on a per-player basis because of the unique, per-player lores.
      *
-     * @param arena     the arena
-     * @param itemStack the item stack
+     * @param arena    the arena
+     * @param material the material
      */
-    public ArenaItemStack(Arena arena, ItemStack itemStack) {
+    public ArenaItemStack(Arena arena, Material material) {
         this.arena = arena;
-        this.itemStack = itemStack;
-    }
-
-    /**
-     * Copy Constructor.
-     *
-     * @param arenaItemStack the arena item stack
-     */
-    public ArenaItemStack(ArenaItemStack arenaItemStack) {
-        this(arenaItemStack.getArena(), arenaItemStack.getItemStack().clone());
+        this.material = material;
     }
 
     /**
      * Updates the ItemStack lore.
      *
+     * @param game      the game instance associated with this
      * @param pvpPlayer the pvp player who is viewing this ArenaItemStack
      */
-    public void updateItemStack(PvPPlayer pvpPlayer) {
+    public void updateItemStack(Game game, PvPPlayer pvpPlayer) {
         if (itemStack == null) {
             this.itemStack = new ItemStack(material, 1);
         }
@@ -53,7 +46,7 @@ public class ArenaItemStack {
             lore.add(ChatColor.GOLD + "For premium, visit " + ChatColor.AQUA + "shop.mcsiege.com");
         }
         lore.add(ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": " +
-                ChatColor.AQUA + arena.getGameQueue().size());
+                ChatColor.AQUA + game.getPvPPlayers().size());
         lore.add(ChatColor.GOLD + "Total times played" + ChatColor.GRAY + ": " +
                 ChatColor.AQUA + pvpPlayer.getPlayerData().getArenaTimesPlayedMap().get(arena));
         lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +

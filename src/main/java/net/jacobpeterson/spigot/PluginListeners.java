@@ -73,13 +73,13 @@ public class PluginListeners implements Listener, Initializers {
     }
 
     @EventHandler
-    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-        this.playerEventHandlers.handleAsyncPlayerChatEvent(event);
-    }
-
-    @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent event) {
         this.playerEventHandlers.handleInventoryClickEvent(event);
         this.inventoryGUIEventHandlers.handleOnInventoryClickEvent(event);
+    }
+
+    @EventHandler
+    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+        this.playerEventHandlers.handleAsyncPlayerChatEvent(event);
     }
 }

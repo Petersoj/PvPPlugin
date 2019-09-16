@@ -22,6 +22,7 @@ public class GsonManager implements Initializers {
     private ItemStackArraySerializer itemStackArraySerializer;
     private ArenaSerializer arenaSerializer;
     private Gson gson;
+    private Gson prettyGson;
 
     /**
      * Instantiates a new Gson manager which is used to (de)serialize various objects for this PvPPlugin.
@@ -47,6 +48,7 @@ public class GsonManager implements Initializers {
         gsonBuilder.registerTypeAdapter(Arena.class, arenaSerializer);
 
         this.gson = gsonBuilder.create();
+        this.prettyGson = gsonBuilder.setPrettyPrinting().create();
     }
 
     @Override
@@ -63,12 +65,12 @@ public class GsonManager implements Initializers {
     }
 
     /**
-     * Gets gson with the type adapters.
+     * Gets location serializer.
      *
-     * @return the gson
+     * @return the location serializer
      */
-    public Gson getGson() {
-        return gson;
+    public LocationSerializer getLocationSerializer() {
+        return locationSerializer;
     }
 
     /**
@@ -96,5 +98,23 @@ public class GsonManager implements Initializers {
      */
     public ArenaSerializer getArenaSerializer() {
         return arenaSerializer;
+    }
+
+    /**
+     * Gets gson with the type adapters.
+     *
+     * @return the gson
+     */
+    public Gson getGson() {
+        return gson;
+    }
+
+    /**
+     * Gets pretty gson.
+     *
+     * @return the pretty gson
+     */
+    public Gson getPrettyGson() {
+        return prettyGson;
     }
 }

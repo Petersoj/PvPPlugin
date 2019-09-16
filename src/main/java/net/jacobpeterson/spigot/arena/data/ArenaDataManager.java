@@ -69,21 +69,21 @@ public class ArenaDataManager implements Initializers {
      * @throws IOException the io exception
      */
     public void saveArenas() throws IOException {
-        Gson gson = gsonManager.getGson();
+        Gson prettyGson = gsonManager.getPrettyGson();
 
         ArenaSerializer arenaSerializer = gsonManager.getArenaSerializer();
         arenaSerializer.setReferenceSerialization(false); // This will serialize the entire object via Gson
 
         JsonObject arenasObject = new JsonObject();
-        JsonElement ffaArenaJson = gson.toJsonTree(arenaManager.getFFAArena());
-        JsonElement ranked1v1ArenasJsonArray = gson.toJsonTree(arenaManager.getRanked1v1Arenas());
-        JsonElement team2v2ArenasJsonArray = gson.toJsonTree(arenaManager.getTeam2v2Arenas());
+        JsonElement ffaArenaJson = prettyGson.toJsonTree(arenaManager.getFFAArena());
+        JsonElement ranked1v1ArenasJsonArray = prettyGson.toJsonTree(arenaManager.getRanked1v1Arenas());
+        JsonElement team2v2ArenasJsonArray = prettyGson.toJsonTree(arenaManager.getTeam2v2Arenas());
 
         arenasObject.add(FFA_ARENA_KEY, ffaArenaJson);
         arenasObject.add(RANKED_1V1_ARENAS_KEY, ranked1v1ArenasJsonArray);
         arenasObject.add(TEAM_2V2_ARENAS, team2v2ArenasJsonArray);
 
-        byte[] jsonBytes = gson.toJson(arenasObject).getBytes(StandardCharsets.UTF_8);
+        byte[] jsonBytes = prettyGson.toJson(arenasObject).getBytes(StandardCharsets.UTF_8);
 
         Files.write(arenaDataFile.toPath(), jsonBytes); // Default OpenOptions are fine here
     }

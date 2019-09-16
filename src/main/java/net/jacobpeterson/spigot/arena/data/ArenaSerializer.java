@@ -68,9 +68,11 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
                     return arena;
                 }
             }
-            return new Arena(null, arenaName) {
-            }; // Create a new arena that doesn't exist just so there is record of a player playing that arena for
+
+            // Create a new arena that doesn't exist just so there is record of a player playing that arena for
             // player "arena times played"
+            return new Arena(arenaManager, arenaName) {
+            };
         }
     }
 

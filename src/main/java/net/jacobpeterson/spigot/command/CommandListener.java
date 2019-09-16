@@ -1,9 +1,10 @@
 package net.jacobpeterson.spigot.command;
 
 import net.jacobpeterson.spigot.PvPPlugin;
-import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.arena.arenas.FFAArena;
+import net.jacobpeterson.spigot.game.Game;
+import net.jacobpeterson.spigot.game.GameManager;
 import net.jacobpeterson.spigot.player.PlayerManager;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.data.PlayerData;
@@ -60,26 +61,28 @@ public class CommandListener implements CommandExecutor {
                 case "record":
                     return this.handleRecordCommand(pvpPlayer, args);
                 case "save":
-                    return this.handleSaveCommand(pvpPlayer, args);
+                    return this.handleSaveCommand(pvpPlayer);
                 case "scoreboard":
-                    return this.handleScoreboardCommand(pvpPlayer, args);
+                    return this.handleScoreboardCommand(pvpPlayer);
+                case "challenge":
+                    return this.handleChallengeCommand(pvpPlayer, args);
                 case "accept":
                     return this.handleAcceptCommand(pvpPlayer);
                 case "leave":
                     return this.handleLeaveCommand(pvpPlayer);
-                case "challenge":
 
                 case "ffa":
                     return this.handleFFACommand(pvpPlayer, args);
 
-
                 case "1v1":
-
+                    return this.handle1v1Command(pvpPlayer, args);
 
                 case "2v2":
+                    return this.handle2v2Command(pvpPlayer, args);
 
                 default:
-                    return false;
+                    player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Unhandled PvPPlugin command!");
+                    return true;
             }
         } else {
             commandSender.sendMessage("You must be a player to execute PvPPlugin commands.");
@@ -253,10 +256,9 @@ public class CommandListener implements CommandExecutor {
      * Handle save command.
      *
      * @param pvpPlayer the pvp player
-     * @param args      the args
      * @return if the command was successful
      */
-    public boolean handleSaveCommand(PvPPlayer pvpPlayer, String[] args) {
+    public boolean handleSaveCommand(PvPPlayer pvpPlayer) {
         return false;
     }
 
@@ -264,10 +266,9 @@ public class CommandListener implements CommandExecutor {
      * Handle scoreboard command.
      *
      * @param pvpPlayer the pvp player
-     * @param args      the args
      * @return if the command was successful
      */
-    public boolean handleScoreboardCommand(PvPPlayer pvpPlayer, String[] args) {
+    public boolean handleScoreboardCommand(PvPPlayer pvpPlayer) {
         // Execute ordered query to DB async
         new BukkitRunnable() {
             @Override
@@ -310,6 +311,17 @@ public class CommandListener implements CommandExecutor {
     }
 
     /**
+     * Handle accept command boolean.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return if the command was successful
+     */
+    public boolean handleChallengeCommand(PvPPlayer pvpPlayer, String[] args) {
+        return false;
+    }
+
+    /**
      * Handle accept command.
      *
      * @param pvpPlayer the pvp player
@@ -323,12 +335,12 @@ public class CommandListener implements CommandExecutor {
      * Handle leave command boolean.
      *
      * @param pvpPlayer the pvp player
-     * @return the boolean
+     * @return if the command was successful
      */
     public boolean handleLeaveCommand(PvPPlayer pvpPlayer) {
-        Arena playerCurrentArena = pvpPlayer.getPlayerArenaManager().getCurrentArena();
-        if (playerCurrentArena != null) {
-            playerCurrentArena.leave(pvpPlayer);
+        Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
+        if (playerCurrentGame != null) {
+            playerCurrentGame.leave(pvpPlayer);
         } else {
             pvpPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You're not currently " +
                     "in an arena.");
@@ -346,13 +358,16 @@ public class CommandListener implements CommandExecutor {
     public boolean handleFFACommand(PvPPlayer pvpPlayer, String[] args) {
         Player player = pvpPlayer.getPlayer();
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
+        GameManager gameManager = pvpPlugin.getGameManager();
+
         FFAArena currentFFAArena = pvpPlugin.getArenaManager().getFFAArena();
+
 
         if (args.length == 0) { // Join FFA Arena
             if (currentFFAArena == null) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Arena does not exist!");
             } else {
-                currentFFAArena.join(pvpPlayer);
+                gameManager.getFFAGame().join(pvpPlayer);
             }
         } else {
             String ffaCommand = args[0];
@@ -375,25 +390,14 @@ public class CommandListener implements CommandExecutor {
                 if (currentFFAArena == null) { // Create the Arena
                     currentFFAArena = new FFAArena(arenaManager, "FFA Arena");
                     arenaManager.setFFAArena(currentFFAArena);
+
+                    gameManager.updateArenaReferences(arenaManager); // Creates the FFAGame instance
                 }
 
                 currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
 
-                // Now save arenas async
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            arenaManager.getArenaDataManager().saveArenas();
-                        } catch (IOException exception) {
-                            exception.printStackTrace();
-                        }
-                        LOGGER.info("Saved arenas.");
-                    }
-                }.runTaskAsynchronously(pvpPlugin);
-
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
-                        "set the spawn for FFA Arena.");
+                        "set the spawn location for FFA Arena.");
 
             } else if (ffaCommand.equalsIgnoreCase("setLeave")) {
 
@@ -403,39 +407,77 @@ public class CommandListener implements CommandExecutor {
                 } else {
                     currentFFAArena.setLeaveLocation(LocationUtil.centerBlockLocation(player.getLocation()));
                 }
+
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
+                        "set the leave location for FFA Arena.");
             }
+
+            // Now save arenas async
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    try {
+                        arenaManager.getArenaDataManager().saveArenas();
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
+                    }
+                    LOGGER.info("Saved arenas.");
+                }
+            }.runTaskAsynchronously(pvpPlugin);
         }
         return true; // We use our own custom usage messages so don't make Bukkit output them
     }
 
     /**
-     * Handle arena add command.
+     * Handle 1v1 command.
      *
      * @param pvpPlayer the pvp player
      * @param args      the args
      * @return if the command was successful
      */
-    public boolean handleArenaAddCommand(PvPPlayer pvpPlayer, String[] args) {
-        // TODO make sure info that \n should be used for multiple lines
-
-        /*
-        ItemStack playerItemStack = player.getInventory().getItemInHand();
-
-                    if (args.length < 5) {
-                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Incorrect number of " +
-                                "arguments! Usage: " + ChatColor.WHITE + "/ffa setSpawn <name> <premium?> " +
-                                "<built by> <description>");
-                        return true;
-                    }
-                    if (playerItemStack == null || playerItemStack.getType() == Material.AIR) {
-                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must be holding " +
-                                "an Item to resemble this Arena in the GUI!");
-                        return true;
-                    }
-
-                    currentFFAArena = new FFAArena("FFA Arena");
-                    currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
-         */
+    public boolean handle1v1Command(PvPPlayer pvpPlayer, String[] args) {
         return false;
     }
+
+    /**
+     * Handle 2v2 command.
+     *
+     * @param pvpPlayer the pvp player
+     * @param args      the args
+     * @return if the command was successful
+     */
+    public boolean handle2v2Command(PvPPlayer pvpPlayer, String[] args) {
+        return false;
+    }
+
+//    /**
+//     * Handle arena add command.
+//     *
+//     * @param pvpPlayer the pvp player
+//     * @param args      the args
+//     * @return if the command was successful
+//     */
+//    public boolean handleArenaAddCommand(PvPPlayer pvpPlayer, String[] args) {
+//        // make sure info that \n should be used for multiple lines
+//
+//        /*
+//        ItemStack playerItemStack = player.getInventory().getItemInHand();
+//
+//                    if (args.length < 5) {
+//                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Incorrect number of " +
+//                                "arguments! Usage: " + ChatColor.WHITE + "/ffa setSpawn <name> <premium?> " +
+//                                "<built by> <description>");
+//                        return true;
+//                    }
+//                    if (playerItemStack == null || playerItemStack.getType() == Material.AIR) {
+//                        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must be holding " +
+//                                "an Item to resemble this Arena in the GUI!");
+//                        return true;
+//                    }
+//
+//                    currentFFAArena = new FFAArena("FFA Arena");
+//                    currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
+//         */
+//        return false;
+//    }
 }

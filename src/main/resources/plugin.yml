@@ -35,8 +35,6 @@ commands:
     description: Opens the 2v2 menu
 
 permissions:
-  premium:
-    description: Gives a player the Premium permission
   game.*:
     description: All the game permissions
   game.setlobby:
@@ -53,6 +51,8 @@ permissions:
     description: When having this permission your inventory will be saved the whole time
   game.scoreboard:
     description: Allowed to see top 10 players
+  game.inventory:
+    description: Allow player to modify their inventory in the lobby
 
   ffa.join:
     description: Can join the ffa arena
