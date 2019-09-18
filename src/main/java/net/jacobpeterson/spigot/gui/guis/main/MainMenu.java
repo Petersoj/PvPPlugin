@@ -1,7 +1,7 @@
 package net.jacobpeterson.spigot.gui.guis.main;
 
 import net.jacobpeterson.spigot.game.GameManager;
-import net.jacobpeterson.spigot.game.ffa.FFAGame;
+import net.jacobpeterson.spigot.game.game.ffa.FFAGame;
 import net.jacobpeterson.spigot.gui.AbstractInventoryGUI;
 import net.jacobpeterson.spigot.gui.GUIManager;
 import net.jacobpeterson.spigot.itemstack.ItemStackUtil;

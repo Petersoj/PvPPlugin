@@ -5,9 +5,9 @@ import net.jacobpeterson.spigot.arena.ArenaManager;
 import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.arena.arenas.Ranked1v1Arena;
 import net.jacobpeterson.spigot.arena.arenas.Team2v2Arena;
-import net.jacobpeterson.spigot.game.ffa.FFAGame;
-import net.jacobpeterson.spigot.game.ranked1v1.Ranked1v1Game;
-import net.jacobpeterson.spigot.game.team2v2.Team2v2Game;
+import net.jacobpeterson.spigot.game.game.ffa.FFAGame;
+import net.jacobpeterson.spigot.game.game.ranked1v1.Ranked1v1Game;
+import net.jacobpeterson.spigot.game.game.team2v2.Team2v2Game;
 import net.jacobpeterson.spigot.util.Initializers;
 
 import java.util.HashMap;
@@ -70,9 +70,8 @@ public class GameManager implements Initializers {
     public void updateArenaReferences(ArenaManager arenaManager) {
         FFAArena ffaArena = arenaManager.getFFAArena();
 
-        // Check if FFAGame needs to be created
-        if (ffaArena != null && ffaGame == null) {
-            this.ffaGame = new FFAGame(ffaArena);
+        if (ffaArena != null && ffaGame == null) { // Check if FFAGame needs to be created
+            this.ffaGame = new FFAGame(this, ffaArena);
         } else if (ffaGame != null) { // Destroy FFAGame instance because the arena no longer exists
             this.ffaGame.stop();
             this.ffaGame.deinit();

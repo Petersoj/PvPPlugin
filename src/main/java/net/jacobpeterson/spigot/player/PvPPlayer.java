@@ -1,6 +1,5 @@
 package net.jacobpeterson.spigot.player;
 
-import net.jacobpeterson.spigot.PvPPlugin;
 import net.jacobpeterson.spigot.player.data.PlayerData;
 import net.jacobpeterson.spigot.player.game.PlayerGameManager;
 import net.jacobpeterson.spigot.player.gui.PlayerGUIManager;
@@ -47,7 +46,7 @@ public class PvPPlayer implements Initializers {
     }
 
     /**
-     * Gets {@link PvPPlugin#getPermissionsEx()} prefixed name.
+     * Gets {@link ru.tehkode.permissions.bukkit.PermissionsEx} prefixed name.
      *
      * @return the prefixed name
      */

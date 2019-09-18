@@ -12,15 +12,18 @@ import java.util.ArrayList;
 
 public abstract class Game implements Initializers {
 
+    protected GameManager gameManager;
     protected Arena arena;
     protected ArrayList<PvPPlayer> pvpPlayers;
 
     /**
      * Instantiates a new Game which represents an instance of a game in an Arena.
      *
-     * @param arena the arena
+     * @param gameManager the game manager
+     * @param arena       the arena
      */
-    public Game(Arena arena) {
+    public Game(GameManager gameManager, Arena arena) {
+        this.gameManager = gameManager;
         this.arena = arena;
         this.pvpPlayers = new ArrayList<>();
     }
@@ -45,6 +48,8 @@ public abstract class Game implements Initializers {
     public void join(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
 
+        pvpPlayers.add(pvpPlayer);
+
         player.getInventory().setContents(arena.getInventory());
         player.getInventory().setArmorContents(arena.getArmorInventory());
 
@@ -62,6 +67,12 @@ public abstract class Game implements Initializers {
      */
     public void leave(PvPPlayer pvpPlayer) {
         Player player = pvpPlayer.getPlayer();
+
+        if (pvpPlayers.contains(pvpPlayer)) {
+            pvpPlayers.remove(pvpPlayer);
+        } else {
+            return;
+        }
 
         pvpPlayer.getPlayerInventoryManager().loadSpawnInventory();
 

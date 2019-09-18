@@ -1,6 +1,6 @@
-package net.jacobpeterson.spigot.game.team2v2.itemstack;
+package net.jacobpeterson.spigot.game.game.team2v2.itemstack;
 
-import net.jacobpeterson.spigot.game.team2v2.Team2v2;
+import net.jacobpeterson.spigot.game.game.team2v2.Team2v2;
 import net.jacobpeterson.spigot.gui.guis.team2v2.Team2v2Menu;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.DyeColor;

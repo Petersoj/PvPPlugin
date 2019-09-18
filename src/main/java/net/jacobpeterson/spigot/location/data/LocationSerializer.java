@@ -1,4 +1,4 @@
-package net.jacobpeterson.spigot.location;
+package net.jacobpeterson.spigot.location.data;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -8,7 +8,7 @@ import net.jacobpeterson.spigot.arena.Arena;
 import net.jacobpeterson.spigot.arena.data.ArenaSerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackArraySerializer;
 import net.jacobpeterson.spigot.itemstack.data.ItemStackSerializer;
-import net.jacobpeterson.spigot.location.LocationSerializer;
+import net.jacobpeterson.spigot.location.data.LocationSerializer;
 import net.jacobpeterson.spigot.util.Initializers;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
