@@ -1,6 +1,7 @@
 package net.jacobpeterson.spigot.game;
 
 import net.jacobpeterson.spigot.arena.Arena;
+import net.jacobpeterson.spigot.game.listener.AbstractGameEventHandlers;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.player.inventory.PlayerInventoryManager;
 import net.jacobpeterson.spigot.util.ChatUtil;
@@ -14,6 +15,7 @@ public abstract class Game implements Initializers {
 
     protected GameManager gameManager;
     protected Arena arena;
+    protected AbstractGameEventHandlers gameEventHandler;
     protected ArrayList<PvPPlayer> pvpPlayers;
 
     /**
@@ -81,13 +83,20 @@ public abstract class Game implements Initializers {
     }
 
     /**
+     * Gets game manager.
+     *
+     * @return the game manager
+     */
+    public GameManager getGameManager() {
+        return gameManager;
+    }
+
+    /**
      * Gets arena.
      *
      * @return the arena
      */
-    public Arena getArena() {
-        return arena;
-    }
+    public abstract Arena getArena();
 
     /**
      * Sets arena.
@@ -96,6 +105,15 @@ public abstract class Game implements Initializers {
      */
     public void setArena(Arena arena) {
         this.arena = arena;
+    }
+
+    /**
+     * Gets game event handler.
+     *
+     * @return the game event handler
+     */
+    public AbstractGameEventHandlers getGameEventHandler() {
+        return gameEventHandler;
     }
 
     /**

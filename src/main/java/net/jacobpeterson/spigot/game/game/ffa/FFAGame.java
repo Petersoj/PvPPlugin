@@ -3,6 +3,7 @@ package net.jacobpeterson.spigot.game.game.ffa;
 import net.jacobpeterson.spigot.arena.arenas.FFAArena;
 import net.jacobpeterson.spigot.game.Game;
 import net.jacobpeterson.spigot.game.GameManager;
+import net.jacobpeterson.spigot.game.game.ffa.listener.FFAGameEventHandlers;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 
 public class FFAGame extends Game {
@@ -15,6 +16,8 @@ public class FFAGame extends Game {
      */
     public FFAGame(GameManager gameManager, FFAArena ffaArena) {
         super(gameManager, ffaArena);
+
+        this.gameEventHandler = new FFAGameEventHandlers(this);
     }
 
     @Override
@@ -66,6 +69,6 @@ public class FFAGame extends Game {
 
     @Override
     public FFAArena getArena() {
-        return (FFAArena) super.getArena();
+        return (FFAArena) arena;
     }
 }

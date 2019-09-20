@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -102,25 +101,9 @@ public class PlayerEventHandlers implements Initializers {
      * @param event the event
      */
     public void handlePlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
-        // Ensure that the player spawns in the default world at the exact spawn location
+        // Ensure that the player spawns in the default world at the exact spawn location when
+        // they first join the server.
         event.setSpawnLocation(Bukkit.getWorlds().get(0).getSpawnLocation().add(0.5, 0, 0.5));
-    }
-
-    /**
-     * Handle player death event.
-     *
-     * @param event the event
-     */
-    public void handlePlayerDeathEvent(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
-
-        if (pvpPlayer == null) {
-            return;
-        }
-
-        player.spigot().respawn();
-        // TODO should ArenaEventHandlers do this?
     }
 
     /**

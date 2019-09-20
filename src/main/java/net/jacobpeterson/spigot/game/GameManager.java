@@ -8,6 +8,7 @@ import net.jacobpeterson.spigot.arena.arenas.Team2v2Arena;
 import net.jacobpeterson.spigot.game.game.ffa.FFAGame;
 import net.jacobpeterson.spigot.game.game.ranked1v1.Ranked1v1Game;
 import net.jacobpeterson.spigot.game.game.team2v2.Team2v2Game;
+import net.jacobpeterson.spigot.game.listener.GameEventHandlersDistributor;
 import net.jacobpeterson.spigot.util.Initializers;
 
 import java.util.HashMap;
@@ -16,13 +17,14 @@ import java.util.LinkedList;
 public class GameManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
+    private GameEventHandlersDistributor gameEventHandlersDistributor;
     private FFAGame ffaGame;
     private HashMap<Ranked1v1Arena, LinkedList<Ranked1v1Game>> ranked1v1GameQueueMap;
     private HashMap<Team2v2Arena, LinkedList<Team2v2Game>> team2v2GameQueueMap;
 
     public GameManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
-
+        this.gameEventHandlersDistributor = new GameEventHandlersDistributor(this);
         this.ranked1v1GameQueueMap = new HashMap<>();
         this.team2v2GameQueueMap = new HashMap<>();
     }
@@ -30,6 +32,8 @@ public class GameManager implements Initializers {
     @Override
     public void init() {
         this.updateArenaReferences(pvpPlugin.getArenaManager());
+
+        this.gameEventHandlersDistributor.init();
     }
 
     @Override
@@ -57,6 +61,8 @@ public class GameManager implements Initializers {
                 team2v2Game.deinit();
             }
         }
+
+        this.gameEventHandlersDistributor.deinit();
     }
 
     /**
@@ -116,6 +122,15 @@ public class GameManager implements Initializers {
      */
     public PvPPlugin getPvPPlugin() {
         return pvpPlugin;
+    }
+
+    /**
+     * Gets game event handlers distributor.
+     *
+     * @return the game event handlers distributor
+     */
+    public GameEventHandlersDistributor getGameEventHandlersDistributor() {
+        return gameEventHandlersDistributor;
     }
 
     /**

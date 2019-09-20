@@ -51,6 +51,6 @@ public class Ranked1v1Game extends Game implements Initializers {
 
     @Override
     public Ranked1v1Arena getArena() {
-        return (Ranked1v1Arena) super.getArena();
+        return (Ranked1v1Arena) arena;
     }
 }

@@ -53,6 +53,6 @@ public class Team2v2Game extends Game implements Initializers {
 
     @Override
     public Team2v2Arena getArena() {
-        return (Team2v2Arena) super.getArena();
+        return (Team2v2Arena) arena;
     }
 }

@@ -26,11 +26,11 @@ public class InventoryGUIEventHandlers {
     }
 
     /**
-     * Handle on inventory click event.
+     * Handle inventory click event.
      *
      * @param event the event
      */
-    public void handleOnInventoryClickEvent(InventoryClickEvent event) {
+    public void handleInventoryClickEvent(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }

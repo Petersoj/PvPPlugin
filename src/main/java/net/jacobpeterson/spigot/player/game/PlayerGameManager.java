@@ -4,10 +4,13 @@ import net.jacobpeterson.spigot.game.Game;
 import net.jacobpeterson.spigot.player.PvPPlayer;
 import net.jacobpeterson.spigot.util.Initializers;
 
+import java.util.AbstractMap;
+
 public class PlayerGameManager implements Initializers {
 
     private PvPPlayer pvpPlayer;
     private Game currentGame;
+    private AbstractMap.SimpleEntry<PvPPlayer, Object> lastDamager;
 
     /**
      * Instantiates a new PlayerGameManager which is used to manage Game instances that the player is involved in.
@@ -51,5 +54,24 @@ public class PlayerGameManager implements Initializers {
      */
     public void setCurrentGame(Game currentGame) {
         this.currentGame = currentGame;
+    }
+
+    /**
+     * Gets last damager.
+     *
+     * @return the last damager
+     */
+    public AbstractMap.SimpleEntry<PvPPlayer, Object> getLastDamager() {
+        return lastDamager;
+    }
+
+    /**
+     * Sets last damager.
+     *
+     * @param pvpPlayer      the pvp player
+     * @param damagingObject the damaging object
+     */
+    public void setLastDamager(PvPPlayer pvpPlayer, Object damagingObject) {
+        this.lastDamager = new AbstractMap.SimpleEntry<>(pvpPlayer, damagingObject);
     }
 }
