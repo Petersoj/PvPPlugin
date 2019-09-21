@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0' // Used for shading dependencies
 }
 
-group 'net.jacobpeterson.spigot'
+group 'net.jacobpeterson.pvpplugin'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -28,7 +28,7 @@ dependencies {
 
 shadowJar {
     dependencies {
-        include(dependency('net.jacobpeterson.spigot:PvPPlugin:1.0-SNAPSHOT'))
+        include(dependency('net.jacobpeterson.pvpplugin:PvPPlugin:1.0-SNAPSHOT'))
         include(dependency('mysql:mysql-connector-java:5.1.6'))
     }
 }

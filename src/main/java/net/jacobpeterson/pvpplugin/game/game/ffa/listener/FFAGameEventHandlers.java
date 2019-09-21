@@ -1,0 +1,66 @@
+package net.jacobpeterson.pvpplugin.game.game.ffa.listener;
+
+import net.jacobpeterson.pvpplugin.game.game.ffa.FFAGame;
+import net.jacobpeterson.pvpplugin.game.event.AbstractGameEventHandlers;
+import net.jacobpeterson.pvpplugin.player.PvPPlayer;
+import net.jacobpeterson.pvpplugin.player.data.PlayerData;
+import net.jacobpeterson.pvpplugin.player.game.DamageTracker;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+
+public class FFAGameEventHandlers extends AbstractGameEventHandlers {
+
+    public FFAGameEventHandlers(FFAGame game) {
+        super(game);
+    }
+
+    @Override
+    public void handlePlayerQuitEvent(PlayerQuitEvent event, PvPPlayer pvpPlayer) {
+        this.getGame().leave(pvpPlayer);
+    }
+
+    @Override
+    public void handlePlayerDeathEvent(PlayerDeathEvent event, PvPPlayer pvpPlayer) {
+        Player player = pvpPlayer.getPlayer();
+
+        event.setDeathMessage(null); // Cancels death message
+        event.setKeepInventory(true); // Don't drop anything
+        // Zero out all level/xp
+        event.setKeepLevel(true);
+        event.setNewExp(0);
+        event.setNewLevel(0);
+        event.setDroppedExp(0);
+
+        // Update death stats
+        PlayerData playerData = pvpPlayer.getPlayerData();
+        playerData.setUnrankedFFADeaths(playerData.getUnrankedFFADeaths() + 1);
+
+        // Update killer stats
+        DamageTracker damageTracker = pvpPlayer.getPlayerGameManager().getDamageTracker();
+        PvPPlayer lastDamagingPvPPlayer = damageTracker.getLastDamagingPvPPlayer();
+        if (lastDamagingPvPPlayer != null) { // Check if last damaging PvPPlayer exists
+            PlayerData lastDamagerPlayerData = lastDamagingPvPPlayer.getPlayerData();
+            lastDamagerPlayerData.setUnrankedFFAKills(lastDamagerPlayerData.getUnrankedFFAKills() + 1);
+        }
+
+        // Set inventory to FFAGame Inventory
+        player.getInventory().setContents(getGame().getArena().getInventory());
+        player.getInventory().setArmorContents(getGame().getArena().getArmorInventory());
+
+        // Force a respawn
+        pvpPlayer.getPlayer().spigot().respawn();
+    }
+
+    @Override
+    public void handlePlayerRespawnEvent(PlayerRespawnEvent event, PvPPlayer pvpPlayer) {
+        // Teleport player back to spawn location for FFA
+        event.setRespawnLocation(getGame().getArena().getSpawnLocation());
+    }
+
+    @Override
+    public FFAGame getGame() {
+        return (FFAGame) game;
+    }
+}
