@@ -1,7 +1,7 @@
 package net.jacobpeterson.pvpplugin.game.game.ffa.listener;
 
-import net.jacobpeterson.pvpplugin.game.game.ffa.FFAGame;
 import net.jacobpeterson.pvpplugin.game.event.AbstractGameEventHandlers;
+import net.jacobpeterson.pvpplugin.game.game.ffa.FFAGame;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.player.data.PlayerData;
 import net.jacobpeterson.pvpplugin.player.game.DamageTracker;
@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.util.Vector;
 
 public class FFAGameEventHandlers extends AbstractGameEventHandlers {
 
@@ -39,18 +40,27 @@ public class FFAGameEventHandlers extends AbstractGameEventHandlers {
 
         // Update killer stats
         DamageTracker damageTracker = pvpPlayer.getPlayerGameManager().getDamageTracker();
-        PvPPlayer lastDamagingPvPPlayer = damageTracker.getLastDamagingPvPPlayer();
-        if (lastDamagingPvPPlayer != null) { // Check if last damaging PvPPlayer exists
-            PlayerData lastDamagerPlayerData = lastDamagingPvPPlayer.getPlayerData();
+        PvPPlayer lastDamagerPvPPlayer = damageTracker.getLastDamagerPvPPlayer(); // Damager = killer
+        if (lastDamagerPvPPlayer != null) { // Check if last damaging PvPPlayer exists
+
+            // Update the killers's stats
+            PlayerData lastDamagerPlayerData = lastDamagerPvPPlayer.getPlayerData();
             lastDamagerPlayerData.setUnrankedFFAKills(lastDamagerPlayerData.getUnrankedFFAKills() + 1);
+
+            // Send the killer a kill message
+            this.sendKillMessage(lastDamagerPvPPlayer);
         }
+
+        // Send the dead player a death message
+        this.sendDeathMessage(pvpPlayer);
 
         // Set inventory to FFAGame Inventory
         player.getInventory().setContents(getGame().getArena().getInventory());
         player.getInventory().setArmorContents(getGame().getArena().getArmorInventory());
 
-        // Force a respawn
-        pvpPlayer.getPlayer().spigot().respawn();
+        // Force a respawn and set velocity to 0
+        player.setVelocity(new Vector(0, 0, 0));
+        player.spigot().respawn();
     }
 
     @Override

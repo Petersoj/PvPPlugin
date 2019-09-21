@@ -27,4 +27,15 @@ public final class ChatUtil {
         return ChatColor.RESET + color.toString();
     }
 
+    /**
+     * Format player health string.
+     * e.g. "3.5 ❤"
+     *
+     * @param health the health
+     * @return the string
+     */
+    public static String formatPlayerHealth(float health) {
+        return String.format("%.1f ", health) + ChatColor.RED + CharUtil.HEART;
+    }
+
 }

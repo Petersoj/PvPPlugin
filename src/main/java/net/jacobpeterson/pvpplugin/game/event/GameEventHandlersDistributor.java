@@ -5,6 +5,7 @@ import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.player.PlayerManager;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.util.Initializers;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -80,24 +81,31 @@ public class GameEventHandlersDistributor implements Initializers {
 
     /**
      * Handle entity damage by entity event.
+     * NOTE: This event is called ONLY when an entity gets damaged, NOT when an entity damages another entity.
+     * So it is only called once, say, if one player damages another player.
      *
      * @param event the event
      */
     public void handleEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
-            return;
+
+        Entity damager = event.getDamager();
+        Entity damagee = event.getEntity();
+
+        PvPPlayer damagerPvPPlayer = (damager instanceof Player ? playerManager.getPvPPlayer((Player) damager) : null);
+        PvPPlayer damageePvPPlayer = (damagee instanceof Player ? playerManager.getPvPPlayer((Player) damagee) : null);
+
+        // Set the playerCurrentGame equal to the damagee's game, but if the damageePvPPlayer is null
+        // (aka the damagerPvPPlayer damaged a non-PvPPlayer Entity), then use the damager's game.
+        Game playerCurrentGame = null;
+        if (damageePvPPlayer != null) {
+            playerCurrentGame = damageePvPPlayer.getPlayerGameManager().getCurrentGame();
+        } else if (damagerPvPPlayer != null) {
+            playerCurrentGame = damagerPvPPlayer.getPlayerGameManager().getCurrentGame();
         }
 
-        Player player = (Player) event.getEntity();
-        PvPPlayer pvpPlayer = playerManager.getPvPPlayer(player);
-
-        if (pvpPlayer == null) {
-            return;
-        }
-
-        Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handleEntityDamageByEntityEvent(event, pvpPlayer);
+            playerCurrentGame.getGameEventHandler().handleEntityDamageByEntityEvent(
+                    event, damageePvPPlayer, damagerPvPPlayer);
         }
     }
 
