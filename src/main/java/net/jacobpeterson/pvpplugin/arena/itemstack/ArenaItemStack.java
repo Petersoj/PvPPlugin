@@ -2,20 +2,23 @@ package net.jacobpeterson.pvpplugin.arena.itemstack;
 
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.game.Game;
-import net.jacobpeterson.pvpplugin.itemstack.ItemStackUtil;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
-import net.jacobpeterson.pvpplugin.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class ArenaItemStack {
+/**
+ * The type Arena item stack.
+ */
+public abstract class ArenaItemStack implements Serializable {
 
-    private transient Arena arena; // Used strictly for reference
-    private transient ItemStack itemStack; // No need to serialize because methods below can create it new
-    private Material material;
+    protected transient Arena arena; // Used strictly for reference
+    protected transient ItemStack itemStack; // No need to serialize because methods below can create it new
+    protected Material material;
 
     /**
      * Instantiates a new ArenaItemStack which is used as a wrapper for the {@link ItemStack} representing the Arena.
@@ -30,33 +33,49 @@ public class ArenaItemStack {
     }
 
     /**
-     * Updates the ItemStack lore.
+     * Updates the lore for this Arena representation ItemStack.
      *
-     * @param game      the game instance associated with this
-     * @param pvpPlayer the pvp player who is viewing this ArenaItemStack
+     * @param currentGame the game instance that is currently being played on this Arena (can be null)
+     * @param pvpPlayer   the pvp player who is viewing this ArenaItemStack
      */
-    public void updateItemStack(Game game, PvPPlayer pvpPlayer) {
-        if (itemStack == null) {
+    public void updateItemStack(Game currentGame, PvPPlayer pvpPlayer) {
+        if (itemStack == null) { // Check if a new ItemStack needs to be created
             this.itemStack = new ItemStack(material, 1);
         }
+    }
 
+    /**
+     * Gets the standard lore format of an ArenaItemStack.
+     *
+     * @param pvpPlayer           the pvp player
+     * @param currentPlayingLines the current playing lines
+     * @return the standard lore format
+     */
+    public ArrayList<String> getStandardLoreFormat(PvPPlayer pvpPlayer,
+                                                   String... currentPlayingLines) {
         ArrayList<String> lore = new ArrayList<>();
+
         if (!pvpPlayer.isPremium()) {
             lore.add(ChatColor.GOLD + "You need premium to choose this 1v1 arena.");
             lore.add(ChatColor.GOLD + "For premium, visit " + ChatColor.AQUA + "shop.mcsiege.com");
         }
-        lore.add(ChatColor.GOLD + "Currently Playing" + ChatColor.GRAY + ": " +
-                ChatColor.AQUA + game.getPvPPlayers().size());
+
+        if (currentPlayingLines != null) {
+            lore.addAll(Arrays.asList(currentPlayingLines));
+        }
+
         lore.add(ChatColor.GOLD + "Total times played" + ChatColor.GRAY + ": " +
                 ChatColor.AQUA + pvpPlayer.getPlayerData().getArenaTimesPlayedMap().get(arena));
+
         lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +
                 ChatColor.GREEN + arena.getBuiltByName());
+
+        // Append arena description lines
         for (String descriptionLine : arena.getDescription().split("\n")) {
             lore.add(ChatColor.GOLD + descriptionLine);
         }
 
-        ItemStackUtil.formatLore(itemStack, true, ChatUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
-                (String[]) lore.toArray());
+        return lore;
     }
 
     /**
@@ -64,18 +83,14 @@ public class ArenaItemStack {
      *
      * @return the arena
      */
-    public Arena getArena() {
-        return arena;
-    }
+    public abstract Arena getArena();
 
     /**
      * Sets arena.
      *
      * @param arena the arena
      */
-    public void setArena(Arena arena) {
-        this.arena = arena;
-    }
+    public abstract void setArena(Arena arena);
 
     /**
      * Gets item stack.

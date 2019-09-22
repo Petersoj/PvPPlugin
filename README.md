@@ -146,7 +146,7 @@ Player win broadcast: <displayname> &6just won against <displayname>&6!
 You won game: &6You won the game and gained &b15 &6points.
 You lost game: &6You lost the game and lost &b10 &6points.
 
-Game teleprot: If you can do this, the countdown will be in the exp bar, so when it's 3 seconds until you teleport to the arena it says 3 then 2 then 1
+Game teleport: If you can do this, the countdown will be in the exp bar, so when it's 3 seconds until you teleport to the arena it says 3 then 2 then 1
 Game starting: Same here, but now the counter starts at 5 seconds then 4 and so on...
 
 You won round: &6You have won the round!

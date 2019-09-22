@@ -1,10 +1,13 @@
-package net.jacobpeterson.pvpplugin.arena.arenas;
+package net.jacobpeterson.pvpplugin.arena.arenas.ffa;
 
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
+import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import org.bukkit.Location;
 
-public class FFAArena extends Arena {
+import java.io.Serializable;
+
+public class FFAArena extends Arena implements Serializable {
 
     private Location spawnLocation;
     private Location leaveLocation;
@@ -17,6 +20,11 @@ public class FFAArena extends Arena {
      */
     public FFAArena(ArenaManager arenaManager, String name) {
         super(arenaManager, name);
+    }
+
+    @Override
+    public ArenaItemStack getArenaItemStack() {
+        return arenaItemStack;
     }
 
     /**

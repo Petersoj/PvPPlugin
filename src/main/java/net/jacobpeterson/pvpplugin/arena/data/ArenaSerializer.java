@@ -10,6 +10,7 @@ import com.google.gson.JsonSerializer;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
+import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 
 import java.lang.reflect.Type;
 
@@ -32,11 +33,11 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
 
     @Override
     public JsonElement serialize(Arena arena, Type type, JsonSerializationContext jsonSerializationContext) {
-
         if (!referenceSerialization) {
-            return jsonSerializationContext.serialize(arena, type);
+            return pvpPlugin.getGsonManager().getNoArenaSerializerGson().toJsonTree(arena, type);
         } else {
             JsonObject arenaNameObject = new JsonObject();
+            // Set the name in the Json Object which is used as the reference to the Arena Object
             arenaNameObject.addProperty("name", arena.getName());
             return arenaNameObject;
         }
@@ -45,22 +46,21 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
     @Override
     public Arena deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
-
         if (!referenceDeserialization) {
-
-            Arena arena = jsonDeserializationContext.deserialize(jsonElement, type);
+            Arena arena = pvpPlugin.getGsonManager().getNoArenaSerializerGson().fromJson(jsonElement, type);
             arena.setArenaManager(pvpPlugin.getArenaManager());
-            arena.getArenaItemStack().setArena(arena); // Set the reference in ArenaItemStack
+            if (arena.getArenaItemStack() != null) {
+                arena.getArenaItemStack().setArena(arena); // Set the reference in ArenaItemStack
+            }
             return arena;
-
         } else {
-
             if (!(jsonElement instanceof JsonObject)) {
                 throw new JsonParseException("Arena must be JSON Object!");
             }
 
             ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
+            // Get the name from the Json Object which is used as the reference to the Arena Object
             String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
 
             for (Arena arena : arenaManager.getAllArenas()) {
@@ -72,6 +72,10 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
             // Create a new arena that doesn't exist just so there is record of a player playing that arena for
             // player "arena times played"
             return new Arena(arenaManager, arenaName) {
+                @Override
+                public ArenaItemStack getArenaItemStack() {
+                    return null;
+                }
             };
         }
     }

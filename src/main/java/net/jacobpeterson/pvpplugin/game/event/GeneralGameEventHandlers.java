@@ -13,18 +13,18 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-public class GameEventHandlersDistributor implements Initializers {
+public class GeneralGameEventHandlers implements Initializers {
 
     private GameManager gameManager;
     private PlayerManager playerManager;
 
     /**
-     * Instantiates a new DistributingGameEventHandler which is used to distribute events related to pvp/games
-     * to the proper game instances.
+     * Instantiates a new GeneralGameEventHandlers which is used to distribute events related to pvp/games
+     * to the proper game instances and handle general events.
      *
      * @param gameManager the game manager
      */
-    public GameEventHandlersDistributor(GameManager gameManager) {
+    public GeneralGameEventHandlers(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 

@@ -40,10 +40,15 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
 
             if (playerData == null) { // If no exception occurs and player data is null
                 insertNewPlayer = true;
-                pvpPlayer.setPlayerData(new PlayerData()); // Create a fresh PlayerData for the player
-            } else {
+                playerData = new PlayerData(); // Create a fresh PlayerData for the player
                 pvpPlayer.setPlayerData(playerData);
             }
+
+            // Set the player data
+            pvpPlayer.setPlayerData(playerData);
+
+            // Update the Player Data in accordance with current Arenas
+            playerDataManager.updatePlayerDataArenas(playerData);
         } catch (SQLException exception) {
             LOGGER.log(Level.SEVERE, "Could not select player data for: " + pvpPlayer.getPlayer().getName(), exception);
             playerDataManager.getPlayerManager().kickPlayerSync(pvpPlayer,

@@ -44,11 +44,21 @@ public abstract class AbstractInventoryGUI implements Initializers {
     public abstract void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event);
 
     /**
+     * Open this inventory for a player.
+     *
+     * @param pvpPlayer the pvp player
+     */
+    public void open(PvPPlayer pvpPlayer) {
+        pvpPlayer.getPlayer().openInventory(inventory);
+    }
+
+    /**
      * Will close the inventory for all current viewers.
      */
     public void closeViewers() {
         if (inventory != null) {
-            ArrayList<HumanEntity> viewers = new ArrayList<>(inventory.getViewers()); // Must copy references to prevent CME
+            // Must copy references to prevent CME
+            ArrayList<HumanEntity> viewers = new ArrayList<>(inventory.getViewers());
             viewers.forEach(HumanEntity::closeInventory);
         }
     }

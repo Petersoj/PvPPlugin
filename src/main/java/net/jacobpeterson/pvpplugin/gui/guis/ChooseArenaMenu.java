@@ -2,8 +2,8 @@ package net.jacobpeterson.pvpplugin.gui.guis;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
-import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
+import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.gui.AbstractInventoryGUI;
 import net.jacobpeterson.pvpplugin.itemstack.ItemStackUtil;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
@@ -15,6 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
@@ -25,12 +27,12 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     protected final Logger LOGGER;
 
     protected final PlayerGUIManager playerGUIManager;
-    protected ArenaManager arenaManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
 
     /**
-     * Instantiates a new 'Choose Arena' menu. This is meant to be extended by other GUI/menus as this is a general viewer.
+     * Instantiates a new 'Choose Arena' menu. This is meant to be extended by other GUI/menus
+     * as this is a general viewer.
      *
      * @param playerGUIManager the player gui manager
      * @param title            the title
@@ -94,23 +96,29 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      * Update arena item stacks lore.
      * Used for updating the player-specific 'times played' for an arena
      *
-     * @param pvpPlayer              the pvp player
-     * @param arenas                 the arenas
-     * @param createAllNewItemStacks whether or not to update previously created {@link ArenaItemStack} or create new ones
+     * @param <A>          the type parameter for the Arena
+     * @param <G>          the type parameter for the Game
+     * @param gameQueueMap the game queue map
+     * @param pvpPlayer    the pvp player
      */
-    public void updateArenaItemStacks(PvPPlayer pvpPlayer, ArrayList<Arena> arenas, boolean createAllNewItemStacks) {
-        // TODO
-//        if (createAllNewItemStacks) {
-//            for (Arena arena : arenas) {
-//                ArenaItemStack arenaItemStack = new ArenaItemStack(arena.getArenaItemStack()); // Copies ArenaItemStack
-//                arenaItemStack.updateItemStack(pvpPlayer);
-//                arenaItemStacks.add(arenaItemStack);
-//            }
-//        } else {
-//            for (ArenaItemStack arenaItemStack : arenaItemStacks) {
-//                arenaItemStack.updateItemStack(pvpPlayer);
-//            }
-//        }
+    // Generics required here because polymorphism with generics don't work I guess
+    @SuppressWarnings("SuspiciousMethodCalls") // Suppress this warning because we know that value exists in Map
+    public <A extends Arena, G extends Game> void updateArenaItemStacks(HashMap<A, LinkedList<G>> gameQueueMap,
+                                                                        PvPPlayer pvpPlayer) {
+        arenaItemStacks.clear();
+
+        // Loop through all games add update the itemstacks of the games' arenas
+        for (Arena arena : gameQueueMap.keySet()) {
+            ArenaItemStack arenaItemStack = arena.getArenaItemStack();
+            Game currentGame = gameQueueMap.get(arena).peek();
+
+            // Update the ArenaItemStack and add it to the local list
+            arenaItemStack.updateItemStack(currentGame, pvpPlayer);
+            arenaItemStacks.add(arenaItemStack);
+        }
+
+        // Create Inventory with updated ArenaItemStacks
+        this.createInventory();
     }
 
     /**

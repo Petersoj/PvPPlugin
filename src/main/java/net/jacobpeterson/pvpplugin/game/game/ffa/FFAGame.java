@@ -1,6 +1,7 @@
 package net.jacobpeterson.pvpplugin.game.game.ffa;
 
-import net.jacobpeterson.pvpplugin.arena.arenas.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.game.game.ffa.listener.FFAGameEventHandlers;
@@ -32,12 +33,12 @@ public class FFAGame extends Game {
 
     @Override
     public void start() {
-
+        super.inProgress = true;
     }
 
     @Override
     public void stop() {
-
+        super.inProgress = false;
     }
 
     @Override
@@ -70,5 +71,13 @@ public class FFAGame extends Game {
     @Override
     public FFAArena getArena() {
         return (FFAArena) arena;
+    }
+
+    @Override
+    public void setArena(Arena arena) {
+        if (arena != null && !(arena instanceof FFAArena)) {
+            throw new IllegalArgumentException("Arena must be a FFAArena!");
+        }
+        this.arena = arena;
     }
 }

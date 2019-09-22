@@ -1,6 +1,7 @@
 package net.jacobpeterson.pvpplugin.game.game.team2v2;
 
-import net.jacobpeterson.pvpplugin.arena.arenas.Team2v2Arena;
+import net.jacobpeterson.pvpplugin.arena.Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
@@ -54,5 +55,13 @@ public class Team2v2Game extends Game implements Initializers {
     @Override
     public Team2v2Arena getArena() {
         return (Team2v2Arena) arena;
+    }
+
+    @Override
+    public void setArena(Arena arena) {
+        if (arena != null && !(arena instanceof Team2v2Arena)) {
+            throw new IllegalArgumentException("Arena must be a Team2v2Arena!");
+        }
+        this.arena = arena;
     }
 }

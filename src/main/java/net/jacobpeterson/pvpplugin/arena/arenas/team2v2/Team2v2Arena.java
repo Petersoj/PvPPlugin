@@ -1,10 +1,13 @@
-package net.jacobpeterson.pvpplugin.arena.arenas;
+package net.jacobpeterson.pvpplugin.arena.arenas.team2v2;
 
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.itemstack.Team2v2ArenaItemStack;
 import org.bukkit.Location;
 
-public class Team2v2Arena extends Arena {
+import java.io.Serializable;
+
+public class Team2v2Arena extends Arena implements Serializable {
 
     private Location teamRedSpawnLocation;
     private Location teamBlueSpawnLocation;
@@ -19,6 +22,11 @@ public class Team2v2Arena extends Arena {
      */
     public Team2v2Arena(ArenaManager arenaManager, String name) {
         super(arenaManager, name);
+    }
+
+    @Override
+    public Team2v2ArenaItemStack getArenaItemStack() {
+        return (Team2v2ArenaItemStack) arenaItemStack;
     }
 
     /**

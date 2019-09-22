@@ -15,6 +15,7 @@ public abstract class Game implements Initializers {
 
     protected GameManager gameManager;
     protected Arena arena;
+    protected boolean inProgress;
     protected AbstractGameEventHandlers gameEventHandler;
     protected ArrayList<PvPPlayer> pvpPlayers;
 
@@ -103,8 +104,15 @@ public abstract class Game implements Initializers {
      *
      * @param arena the arena
      */
-    public void setArena(Arena arena) {
-        this.arena = arena;
+    public abstract void setArena(Arena arena);
+
+    /**
+     * Is in progress boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isInProgress() {
+        return inProgress;
     }
 
     /**

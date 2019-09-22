@@ -2,13 +2,13 @@ package net.jacobpeterson.pvpplugin.game;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
-import net.jacobpeterson.pvpplugin.arena.arenas.FFAArena;
-import net.jacobpeterson.pvpplugin.arena.arenas.Ranked1v1Arena;
-import net.jacobpeterson.pvpplugin.arena.arenas.Team2v2Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
+import net.jacobpeterson.pvpplugin.game.event.GeneralGameEventHandlers;
 import net.jacobpeterson.pvpplugin.game.game.ffa.FFAGame;
 import net.jacobpeterson.pvpplugin.game.game.ranked1v1.Ranked1v1Game;
 import net.jacobpeterson.pvpplugin.game.game.team2v2.Team2v2Game;
-import net.jacobpeterson.pvpplugin.game.event.GameEventHandlersDistributor;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 
 import java.util.HashMap;
@@ -17,14 +17,19 @@ import java.util.LinkedList;
 public class GameManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
-    private GameEventHandlersDistributor gameEventHandlersDistributor;
+    private GeneralGameEventHandlers generalGameEventHandlers;
     private FFAGame ffaGame;
     private HashMap<Ranked1v1Arena, LinkedList<Ranked1v1Game>> ranked1v1GameQueueMap;
     private HashMap<Team2v2Arena, LinkedList<Team2v2Game>> team2v2GameQueueMap;
 
+    /**
+     * Instantiates a new GameManager which is used to manage game instances/queues.
+     *
+     * @param pvpPlugin the pvp plugin
+     */
     public GameManager(PvPPlugin pvpPlugin) {
         this.pvpPlugin = pvpPlugin;
-        this.gameEventHandlersDistributor = new GameEventHandlersDistributor(this);
+        this.generalGameEventHandlers = new GeneralGameEventHandlers(this);
         this.ranked1v1GameQueueMap = new HashMap<>();
         this.team2v2GameQueueMap = new HashMap<>();
     }
@@ -33,7 +38,7 @@ public class GameManager implements Initializers {
     public void init() {
         this.updateArenaReferences(pvpPlugin.getArenaManager());
 
-        this.gameEventHandlersDistributor.init();
+        this.generalGameEventHandlers.init();
     }
 
     @Override
@@ -62,7 +67,7 @@ public class GameManager implements Initializers {
             }
         }
 
-        this.gameEventHandlersDistributor.deinit();
+        this.generalGameEventHandlers.deinit();
     }
 
     /**
@@ -125,12 +130,12 @@ public class GameManager implements Initializers {
     }
 
     /**
-     * Gets game event handlers distributor.
+     * Gets general game event handlers.
      *
-     * @return the game event handlers distributor
+     * @return the general game event handlers
      */
-    public GameEventHandlersDistributor getGameEventHandlersDistributor() {
-        return gameEventHandlersDistributor;
+    public GeneralGameEventHandlers getGeneralGameEventHandlers() {
+        return generalGameEventHandlers;
     }
 
     /**

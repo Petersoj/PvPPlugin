@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonReader;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
-import net.jacobpeterson.pvpplugin.arena.arenas.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
 import net.jacobpeterson.pvpplugin.data.GsonManager;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 

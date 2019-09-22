@@ -3,7 +3,9 @@ package net.jacobpeterson.pvpplugin.arena;
 import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class Arena {
+import java.io.Serializable;
+
+public abstract class Arena implements Serializable {
 
     protected transient ArenaManager arenaManager;
     protected String name;
@@ -23,7 +25,6 @@ public abstract class Arena {
     public Arena(ArenaManager arenaManager, String name) {
         this.arenaManager = arenaManager;
         this.name = name;
-        this.arenaItemStack = new ArenaItemStack(this, null);
         this.disabled = false;
         this.premium = false;
         this.builtByName = "";
@@ -71,18 +72,7 @@ public abstract class Arena {
      *
      * @return the arena item stack
      */
-    public ArenaItemStack getArenaItemStack() {
-        return arenaItemStack;
-    }
-
-    /**
-     * Sets arena item stack.
-     *
-     * @param arenaItemStack the arena item stack
-     */
-    public void setArenaItemStack(ArenaItemStack arenaItemStack) {
-        this.arenaItemStack = arenaItemStack;
-    }
+    public abstract ArenaItemStack getArenaItemStack();
 
     /**
      * Get inventory item stack [].

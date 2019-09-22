@@ -1,6 +1,6 @@
 package net.jacobpeterson.pvpplugin;
 
-import net.jacobpeterson.pvpplugin.game.event.GameEventHandlersDistributor;
+import net.jacobpeterson.pvpplugin.game.event.GeneralGameEventHandlers;
 import net.jacobpeterson.pvpplugin.gui.event.InventoryGUIEventHandlers;
 import net.jacobpeterson.pvpplugin.player.event.PlayerEventHandlers;
 import net.jacobpeterson.pvpplugin.util.Initializers;
@@ -24,7 +24,7 @@ public class PluginListeners implements Listener, Initializers {
     private PvPPlugin pvpPlugin;
     private PlayerEventHandlers playerEventHandlers;
     private InventoryGUIEventHandlers inventoryGUIEventHandlers;
-    private GameEventHandlersDistributor gameEventHandlersDistributor;
+    private GeneralGameEventHandlers generalGameEventHandlers;
 
     /**
      * Instantiates a new Plugin Listeners class which calls various event handler classes.
@@ -41,7 +41,7 @@ public class PluginListeners implements Listener, Initializers {
 
         this.playerEventHandlers = pvpPlugin.getPlayerManager().getPlayerEventHandlers();
         this.inventoryGUIEventHandlers = pvpPlugin.getGUIManager().getInventoryGUIEventHandlers();
-        this.gameEventHandlersDistributor = pvpPlugin.getGameManager().getGameEventHandlersDistributor();
+        this.generalGameEventHandlers = pvpPlugin.getGameManager().getGeneralGameEventHandlers();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class PluginListeners implements Listener, Initializers {
      */
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        this.gameEventHandlersDistributor.handlePlayerQuitEvent(event);
+        this.generalGameEventHandlers.handlePlayerQuitEvent(event);
         this.playerEventHandlers.handlePlayerQuitEvent(event);
     }
 
@@ -86,7 +86,7 @@ public class PluginListeners implements Listener, Initializers {
      */
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
-        this.gameEventHandlersDistributor.handlePlayerRespawnEvent(event);
+        this.generalGameEventHandlers.handlePlayerRespawnEvent(event);
     }
 
     /**
@@ -96,7 +96,7 @@ public class PluginListeners implements Listener, Initializers {
      */
     @EventHandler
     public void onEntityDamageByBlockEvent(EntityDamageByBlockEvent event) {
-        this.gameEventHandlersDistributor.handleEntityDamageByBlockEvent(event);
+        this.generalGameEventHandlers.handleEntityDamageByBlockEvent(event);
     }
 
     /**
@@ -106,7 +106,7 @@ public class PluginListeners implements Listener, Initializers {
      */
     @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        this.gameEventHandlersDistributor.handleEntityDamageByEntityEvent(event);
+        this.generalGameEventHandlers.handleEntityDamageByEntityEvent(event);
     }
 
     /**
@@ -116,7 +116,7 @@ public class PluginListeners implements Listener, Initializers {
      */
     @EventHandler
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        this.gameEventHandlersDistributor.handlePlayerDeathEvent(event);
+        this.generalGameEventHandlers.handlePlayerDeathEvent(event);
     }
 
     /**

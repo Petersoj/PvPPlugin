@@ -3,16 +3,17 @@ package net.jacobpeterson.pvpplugin.player.data;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * A POJO for data on a PvPPlayer.
  */
-public class PlayerData {
+public class PlayerData implements Serializable {
 
     private int elo;
-    private HashMap<Arena, Integer> arenaTimesPlayed;
-    private HashMap<Arena, ItemStack[]> arenaInventory;
+    private HashMap<Arena, Integer> arenaTimesPlayedMap;
+    private HashMap<Arena, ItemStack[]> arenaInventoryMap;
     private int unrankedFFAKills;
     private int unrankedFFADeaths;
     private int ranked1v1Kills;
@@ -27,9 +28,8 @@ public class PlayerData {
      */
     public PlayerData() {
         this.elo = 1000; // For first-timers
-        // Instantiate so that getClass() of these objects for Gson is not null
-        this.arenaTimesPlayed = new HashMap<>();
-        this.arenaInventory = new HashMap<>();
+        this.arenaTimesPlayedMap = new HashMap<>();
+        this.arenaInventoryMap = new HashMap<>();
     }
 
     /**
@@ -56,7 +56,7 @@ public class PlayerData {
      * @return the arena times played map
      */
     public HashMap<Arena, Integer> getArenaTimesPlayedMap() {
-        return arenaTimesPlayed;
+        return arenaTimesPlayedMap;
     }
 
     /**
@@ -65,25 +65,25 @@ public class PlayerData {
      * @param arenaTimesPlayed the arena times played map
      */
     public void setArenaTimesPlayedMap(HashMap<Arena, Integer> arenaTimesPlayed) {
-        this.arenaTimesPlayed = arenaTimesPlayed;
+        this.arenaTimesPlayedMap = arenaTimesPlayed;
     }
 
     /**
-     * Gets arena inventory.
+     * Gets arena inventory map.
      *
-     * @return the arena inventory
+     * @return the arena inventory map
      */
-    public HashMap<Arena, ItemStack[]> getArenaInventory() {
-        return arenaInventory;
+    public HashMap<Arena, ItemStack[]> getArenaInventoryMap() {
+        return arenaInventoryMap;
     }
 
     /**
-     * Sets arena inventory.
+     * Sets arena inventory map.
      *
-     * @param arenaInventory the arena inventory
+     * @param arenaInventoryMap the arena inventory map
      */
-    public void setArenaInventory(HashMap<Arena, ItemStack[]> arenaInventory) {
-        this.arenaInventory = arenaInventory;
+    public void setArenaInventoryMap(HashMap<Arena, ItemStack[]> arenaInventoryMap) {
+        this.arenaInventoryMap = arenaInventoryMap;
     }
 
     /**

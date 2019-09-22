@@ -31,6 +31,10 @@ public class PlayerDataUpdateRunnable extends BukkitRunnable {
     @Override
     public void run() {
         try {
+            // Update the Player Data in accordance with current Arenas
+            playerDataManager.updatePlayerDataArenas(pvpPlayer.getPlayerData());
+
+            // Update the PlayerData in the database
             playerDataManager.updatePlayerDataInDatabase(pvpPlayer);
         } catch (SQLException exception) {
             LOGGER.log(Level.SEVERE, "Error pushing player data for: " + pvpPlayer.getPlayer().getName(), exception);

@@ -1,7 +1,7 @@
 package net.jacobpeterson.pvpplugin.player.gui;
 
+import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.gui.AbstractInventoryGUI;
-import net.jacobpeterson.pvpplugin.gui.GUIManager;
 import net.jacobpeterson.pvpplugin.gui.InventoryReferenceMatcher;
 import net.jacobpeterson.pvpplugin.gui.guis.ranked1v1.Ranked1v1Menu;
 import net.jacobpeterson.pvpplugin.gui.guis.team2v2.Team2v2ArenaMenu;
@@ -14,7 +14,6 @@ import org.bukkit.inventory.Inventory;
 public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher {
 
     private final PvPPlayer pvpPlayer;
-    private GUIManager guiManager;
     private Ranked1v1Menu ranked1v1Menu;
     private Team2v2Menu team2v2Menu;
     private Team2v2ArenaMenu team2v2ArenaMenu;
@@ -35,12 +34,12 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
 
     @Override
     public void init() {
-        this.guiManager = pvpPlayer.getPlayerManager().getPvPPlugin().getGUIManager();
-
         ranked1v1Menu.init();
         team2v2Menu.init();
         team2v2ArenaMenu.init();
         team2v2CraftTeamMenu.init();
+
+        this.updateArenaItemStackInventories(pvpPlayer.getPlayerManager().getPvPPlugin().getGameManager());
     }
 
     @Override
@@ -51,6 +50,16 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
         team2v2CraftTeamMenu.deinit();
     }
 
+    /**
+     * Updates inventories containing {@link net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack}.
+     *
+     * @param gameManager the game manager
+     */
+    public void updateArenaItemStackInventories(GameManager gameManager) {
+        ranked1v1Menu.updateArenaItemStacks(gameManager.getRanked1v1GameQueueMap(), pvpPlayer);
+        team2v2ArenaMenu.updateArenaItemStacks(gameManager.getTeam2v2GameQueueMap(), pvpPlayer);
+    }
+
     @Override
     public AbstractInventoryGUI getInventoryGUI(Inventory inventory) {
         if (ranked1v1Menu.getInventory().equals(inventory)) return ranked1v1Menu;
@@ -58,15 +67,6 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
         if (team2v2ArenaMenu.getInventory().equals(inventory)) return team2v2ArenaMenu;
         if (team2v2CraftTeamMenu.getInventory().equals(inventory)) return team2v2ArenaMenu;
         return null;
-    }
-
-    /**
-     * Gets GUI manager.
-     *
-     * @return the GUI manager
-     */
-    public GUIManager getGUIManager() {
-        return guiManager;
     }
 
     /**

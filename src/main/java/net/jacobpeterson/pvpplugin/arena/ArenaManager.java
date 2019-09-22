@@ -1,9 +1,9 @@
 package net.jacobpeterson.pvpplugin.arena;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
-import net.jacobpeterson.pvpplugin.arena.arenas.FFAArena;
-import net.jacobpeterson.pvpplugin.arena.arenas.Ranked1v1Arena;
-import net.jacobpeterson.pvpplugin.arena.arenas.Team2v2Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.arena.data.ArenaDataManager;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 

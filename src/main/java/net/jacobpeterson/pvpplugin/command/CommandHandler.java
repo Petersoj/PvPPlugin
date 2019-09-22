@@ -2,7 +2,7 @@ package net.jacobpeterson.pvpplugin.command;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
-import net.jacobpeterson.pvpplugin.arena.arenas.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.player.PlayerManager;
@@ -298,8 +298,7 @@ public class CommandHandler implements CommandExecutor {
                             int rankIndex = 1;
                             for (String name : topELORankingsMapReference.keySet()) {
                                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + rankIndex + ". " +
-                                        ChatColor.AQUA + topELORankingsMapReference.get(name) +
-                                        playerManager.getPlayerGroupPrefix(name) + " " + name);
+                                        ChatColor.AQUA + topELORankingsMapReference.get(name) + name);
                                 rankIndex++;
                             }
                         }
@@ -436,6 +435,26 @@ public class CommandHandler implements CommandExecutor {
      * @return if the command was successful
      */
     public boolean handle1v1Command(PvPPlayer pvpPlayer, String[] args) {
+        if (args.length == 0) { // /1v1 command
+
+        } else {
+            if (args[0].equalsIgnoreCase("arena")) {
+
+            }
+        }
+
+/*
+/1v1 -> Opens the 1v1 menu (Screenshot: )
+/challenge <player> or /duel <player> -> Sends a 1v1 duel to a player
+/1v1 arena add <arena> -> Creates a 1v1 arena
+/1v1 arena remove <arena> -> Removes a 1v1 arena
+/1v1 arena setSpawn1 <arena> -> Sets the first spawn when joining the arena
+/1v1 arena setSpawn2 <arena> -> Sets the second spawn when joining the arena
+/1v1 arena setFinish <arena> -> Sets the position where the losser and winner teleports after the game
+/1v1 setInv <arena> -> Sets the inventory + armor for the arena
+/1v1 enable/disable <arena> -> Enabled or disabled a arena. Enabled = Can play Disabled = Cannot play
+ */
+
         return false;
     }
 

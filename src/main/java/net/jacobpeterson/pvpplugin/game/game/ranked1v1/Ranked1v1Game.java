@@ -1,7 +1,8 @@
 package net.jacobpeterson.pvpplugin.game.game.ranked1v1;
 
-import net.jacobpeterson.pvpplugin.arena.arenas.Ranked1v1Arena;
-import net.jacobpeterson.pvpplugin.arena.arenas.Team2v2Arena;
+import net.jacobpeterson.pvpplugin.arena.Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
@@ -52,5 +53,13 @@ public class Ranked1v1Game extends Game implements Initializers {
     @Override
     public Ranked1v1Arena getArena() {
         return (Ranked1v1Arena) arena;
+    }
+
+    @Override
+    public void setArena(Arena arena) {
+        if (arena != null && !(arena instanceof Ranked1v1Arena)) {
+            throw new IllegalArgumentException("Arena must be a Ranked1v1Arena!");
+        }
+        this.arena = arena;
     }
 }

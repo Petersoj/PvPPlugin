@@ -1,6 +1,8 @@
 package net.jacobpeterson.pvpplugin.player.data;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
+import net.jacobpeterson.pvpplugin.arena.Arena;
+import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.data.DatabaseManager;
 import net.jacobpeterson.pvpplugin.data.GsonManager;
 import net.jacobpeterson.pvpplugin.player.PlayerManager;
@@ -8,6 +10,7 @@ import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,16 +183,18 @@ public class PlayerDataManager implements Initializers {
             return null;
         }
 
+        // Turn on referencing to already-created Arenas
+        gsonManager.getArenaSerializer().setReferenceDeserialization(true);
+
         // Arenas times played parsing from DB logic
-        gsonManager.getArenaSerializer().setReferenceDeserialization(true); // Turn on referencing to already-created Arenas
         HashMap arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
                 playerData.getArenaTimesPlayedMap().getClass());
         playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
 
         // Arena Inventory parsing from DB logic
         HashMap arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
-                playerData.getArenaInventory().getClass());
-        playerData.setArenaInventory(arenaInventory);
+                playerData.getArenaInventoryMap().getClass());
+        playerData.setArenaInventoryMap(arenaInventory);
 
         // Set other primitives
         playerData.setELO(resultSet.getInt(1));
@@ -203,6 +208,42 @@ public class PlayerDataManager implements Initializers {
         playerData.setTeamPvPLosses(resultSet.getInt(11));
 
         return playerData;
+    }
+
+    /**
+     * Update player data arenas aka {@link PlayerData#getArenaInventoryMap()} and
+     * {@link PlayerData#getArenaTimesPlayedMap()}
+     *
+     * @param playerData the player data
+     */
+    public void updatePlayerDataArenas(PlayerData playerData) {
+        ArenaManager arenaManager = playerManager.getPvPPlugin().getArenaManager();
+        ArrayList<Arena> allArenas = arenaManager.getAllArenas();
+        HashMap<Arena, ItemStack[]> playerArenaInventoryMap = playerData.getArenaInventoryMap();
+        HashMap<Arena, Integer> playerArenaTimesPlayedMap = playerData.getArenaTimesPlayedMap();
+
+        if (playerArenaInventoryMap == null) {
+            playerArenaInventoryMap = new HashMap<>();
+            playerData.setArenaInventoryMap(playerArenaInventoryMap);
+        }
+        if (playerArenaTimesPlayedMap == null) {
+            playerArenaTimesPlayedMap = new HashMap<>();
+            playerData.setArenaTimesPlayedMap(playerArenaTimesPlayedMap);
+        }
+
+        // Remove all arenas that don't exist anymore from player data arena maps
+        playerArenaInventoryMap.keySet().removeIf(arena -> !allArenas.contains(arena));
+        playerArenaTimesPlayedMap.keySet().removeIf(arena -> !allArenas.contains(arena));
+
+        // Add all arenas that aren't added to player data arena maps
+        for (Arena arena : allArenas) {
+            if (!playerArenaInventoryMap.containsKey(arena)) {
+                playerArenaInventoryMap.put(arena, null);
+            }
+            if (!playerArenaTimesPlayedMap.containsKey(arena)) {
+                playerArenaTimesPlayedMap.put(arena, 0);
+            }
+        }
     }
 
     /**
@@ -284,17 +325,17 @@ public class PlayerDataManager implements Initializers {
      * @throws SQLException the sql exception
      */
     private void setPreparedStatementWithPlayerData(PreparedStatement preparedStatement, String playerName,
-                                                    PlayerData playerData, int questionMarkStartIndex) throws SQLException {
-        gsonManager.getArenaSerializer().setReferenceSerialization(true); // Turn on referencing to already-created Arenas
+                                                    PlayerData playerData, int questionMarkStartIndex)
+            throws SQLException {
+        // Turn on referencing to already-created Arenas
+        gsonManager.getArenaSerializer().setReferenceSerialization(true);
 
         // Arena times played parsing logic
-        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap(),
-                playerData.getArenaTimesPlayedMap().getClass());
+        String arenaTimesPlayedMapJson = gsonManager.getGson().toJson(playerData.getArenaTimesPlayedMap());
         preparedStatement.setString(questionMarkStartIndex + 2, arenaTimesPlayedMapJson);
 
         // Arena Inventory parsing logic
-        String arenaInventoryMapJson = gsonManager.getGson().toJson(playerData.getArenaInventory(),
-                playerData.getArenaInventory().getClass());
+        String arenaInventoryMapJson = gsonManager.getGson().toJson(playerData.getArenaInventoryMap());
         preparedStatement.setString(questionMarkStartIndex + 3, arenaInventoryMapJson);
 
         // Set other primitives
@@ -427,7 +468,10 @@ public class PlayerDataManager implements Initializers {
         while (eloRankingResults.next()) {
             String name = eloRankingResults.getString(1);
             Integer elo = eloRankingResults.getInt(2);
-            topELORankingsMap.put(name, elo);
+
+            // Get Player Group prefix while async already because Pex will have to read from disk
+            String prefixedName = playerManager.getPlayerGroupPrefix(name) + name;
+            topELORankingsMap.put(prefixedName, elo);
         }
 
         return topELORankingsMap;

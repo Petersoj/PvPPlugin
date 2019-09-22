@@ -1,10 +1,13 @@
-package net.jacobpeterson.pvpplugin.arena.arenas;
+package net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1;
 
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
+import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.itemstack.Ranked1v1ArenaItemStack;
 import org.bukkit.Location;
 
-public class Ranked1v1Arena extends Arena {
+import java.io.Serializable;
+
+public class Ranked1v1Arena extends Arena implements Serializable {
 
     private Location spawnLocation1;
     private Location spawnLocation2;
@@ -18,6 +21,11 @@ public class Ranked1v1Arena extends Arena {
      */
     public Ranked1v1Arena(ArenaManager arenaManager, String name) {
         super(arenaManager, name);
+    }
+
+    @Override
+    public Ranked1v1ArenaItemStack getArenaItemStack() {
+        return (Ranked1v1ArenaItemStack) arenaItemStack;
     }
 
     /**
