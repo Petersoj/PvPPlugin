@@ -122,7 +122,7 @@ Game Rank (the leaderboard position/rank)
 Commands:
 /1v1 -> Opens the 1v1 menu (Screenshot: )
 /challenge <player> or /duel <player> -> Sends a 1v1 duel to a player
-/1v1 arena add <name> <premium?> <built by> <description> -> Creates a 1v1 arena (use \n for multi-line description)
+/1v1 arena add <name> <premium?> <built by> <description> -> Creates a 1v1 arena (use /n for multi-line description)
 /1v1 arena remove <arena> -> Removes a 1v1 arena
 /1v1 arena setSpawn1 <arena> -> Sets the first spawn when joining the arena
 /1v1 arena setSpawn2 <arena> -> Sets the second spawn when joining the arena

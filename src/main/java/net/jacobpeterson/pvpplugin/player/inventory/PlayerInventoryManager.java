@@ -26,11 +26,7 @@ public class PlayerInventoryManager implements Initializers {
 
     @Override
     public void init() {
-        if (PLAY_NOW_COMPASS_ITEM == null) {
-            PLAY_NOW_COMPASS_ITEM = new ItemStack(Material.COMPASS);
-            ItemStackUtil.formatLore(PLAY_NOW_COMPASS_ITEM, true,
-                    ChatUtil.boldColor(ChatColor.YELLOW) + "Play Now!", (String[]) null);
-        }
+
     }
 
     @Override
@@ -51,6 +47,12 @@ public class PlayerInventoryManager implements Initializers {
      * Loads the spawn inventory into the current player's inventory.
      */
     public void loadSpawnInventory() {
+        if (PLAY_NOW_COMPASS_ITEM == null) {
+            PLAY_NOW_COMPASS_ITEM = new ItemStack(Material.COMPASS);
+            ItemStackUtil.formatLore(PLAY_NOW_COMPASS_ITEM, true,
+                    ChatUtil.boldColor(ChatColor.YELLOW) + "Play Now!", (String[]) null);
+        }
+
         PlayerInventory playerInventory = pvpPlayer.getPlayer().getInventory();
         playerInventory.clear();
         playerInventory.setArmorContents(null);

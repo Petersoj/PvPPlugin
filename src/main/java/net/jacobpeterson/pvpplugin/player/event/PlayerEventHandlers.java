@@ -65,7 +65,13 @@ public class PlayerEventHandlers implements Initializers {
         PvPPlayer pvpPlayer = playerManager.createNewPvPPlayer(player);
         pvpPlayer.getPlayerInventoryManager().loadSpawnInventory();
 
-        PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(pvpPlayer, playerDataManager);
+        PlayerDataSelectRunnable playerDataSelectRunnable = new PlayerDataSelectRunnable(playerManager.getPvPPlugin(),
+                pvpPlayer, playerDataManager, () -> {
+            // Update the Player Data in accordance with current Arenas
+            playerDataManager.updatePlayerDataArenas(pvpPlayer.getPlayerData());
+
+            pvpPlayer.init();
+        });
         playerDataSelectRunnable.runTaskAsynchronously(playerManager.getPvPPlugin());
     }
 
@@ -170,7 +176,6 @@ public class PlayerEventHandlers implements Initializers {
             return;
         }
         PlayerInventoryManager playerInventoryManager = pvpPlayer.getPlayerInventoryManager();
-
 
         if (playerInventoryManager.getPlayNowCompassItem().equals(event.getCurrentItem()) &&
                 !playerInventoryManager.canManipulateInventory()) {

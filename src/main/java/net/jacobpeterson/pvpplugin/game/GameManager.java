@@ -11,7 +11,9 @@ import net.jacobpeterson.pvpplugin.game.game.ranked1v1.Ranked1v1Game;
 import net.jacobpeterson.pvpplugin.game.game.team2v2.Team2v2Game;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class GameManager implements Initializers {
@@ -36,7 +38,7 @@ public class GameManager implements Initializers {
 
     @Override
     public void init() {
-        this.updateArenaReferences(pvpPlugin.getArenaManager());
+        this.updateArenaReferences();
 
         this.generalGameEventHandlers.init();
     }
@@ -73,12 +75,13 @@ public class GameManager implements Initializers {
     /**
      * Update arena references. Will basically check if an arena exists and there isn't a game instance or queue for
      * it. If there isn't, create a game instance or queue.
-     * Should be called whenever there is an addition/removal of arenas
-     *
-     * @param arenaManager the arena manager
+     * Should be called whenever there is an addition/removal of arenas.
+     * Will also stop/deinit games as necessary.
      */
     @SuppressWarnings("SuspiciousMethodCalls") // Suppress this warning because we know that value exists in Map
-    public void updateArenaReferences(ArenaManager arenaManager) {
+    public void updateArenaReferences() {
+        ArenaManager arenaManager = pvpPlugin.getArenaManager();
+
         FFAArena ffaArena = arenaManager.getFFAArena();
 
         if (ffaArena != null && ffaGame == null) { // Check if FFAGame needs to be created
@@ -89,33 +92,64 @@ public class GameManager implements Initializers {
             this.ffaGame = null;
         }
 
-        for (Ranked1v1Arena ranked1v1Arena : arenaManager.getRanked1v1Arenas()) { // Loop through all current Arenas
-            LinkedList<Ranked1v1Game> ranked1v1GameQueue = ranked1v1GameQueueMap.get(ranked1v1Arena);
 
-            if (ranked1v1GameQueue == null) { // Check if Ranked1v1Game queue needs to be created
-                ranked1v1GameQueueMap.put(ranked1v1Arena, new LinkedList<>());
-            } else {
+        //
+        // Update game queue map for Ranked1v1Arenas
+        //
+        ArrayList<Ranked1v1Arena> realRanked1v1Arenas = arenaManager.getRanked1v1Arenas();
+        // Loop through all current Arena references to check if removal/stopping is needed
+        Iterator<Ranked1v1Arena> ranked1v1ArenaIterator = ranked1v1GameQueueMap.keySet().iterator();
+        while (ranked1v1ArenaIterator.hasNext()) {
+            Ranked1v1Arena ranked1v1Arena = ranked1v1ArenaIterator.next();
+
+            // Check if Arena reference in game queue no longer exists in realRanked1v1Arenas
+            if (!realRanked1v1Arenas.contains(ranked1v1Arena)) {
+                LinkedList<Ranked1v1Game> ranked1v1GameQueue = ranked1v1GameQueueMap.get(ranked1v1Arena);
+
                 // Destroy all Ranked1v1Game instances because the arena no longer exists
                 for (Ranked1v1Game ranked1v1Game : ranked1v1GameQueue) {
                     ranked1v1Game.stop();
                     ranked1v1Game.deinit();
                 }
-                ranked1v1GameQueueMap.remove(ranked1v1GameQueue);
+
+                // Remove from game queue map
+                ranked1v1ArenaIterator.remove();
+            }
+        }
+        // Create game queue for arenas that don't exist in ranked1v1GameQueueMap
+        for (Ranked1v1Arena realRanked1v1Arena : realRanked1v1Arenas) {
+            if (!ranked1v1GameQueueMap.containsKey(realRanked1v1Arena)) {
+                ranked1v1GameQueueMap.put(realRanked1v1Arena, new LinkedList<>());
             }
         }
 
-        for (Team2v2Arena team2v2Arena : arenaManager.getTeam2v2Arenas()) { // Loop through all current Arenas
-            LinkedList<Team2v2Game> team2v2GameQueue = team2v2GameQueueMap.get(team2v2Arena);
+        //
+        // Update game queue map for team2v2GameQueueMap
+        //
+        ArrayList<Team2v2Arena> realTeam2v2Arenas = arenaManager.getTeam2v2Arenas();
+        // Loop through all current Arena references to check if removal/stopping is needed
+        Iterator<Team2v2Arena> team2v2ArenaIterator = team2v2GameQueueMap.keySet().iterator();
+        while (ranked1v1ArenaIterator.hasNext()) {
+            Team2v2Arena team2v2Arena = team2v2ArenaIterator.next();
 
-            if (team2v2GameQueue == null) { // Check if Team2v2Game queue needs to be created
-                team2v2GameQueueMap.put(team2v2Arena, new LinkedList<>());
-            } else {
+            // Check if Arena reference in game queue no longer exists in realTeam2v2Arenas
+            if (!realTeam2v2Arenas.contains(team2v2Arena)) {
+                LinkedList<Team2v2Game> team2v2Games = team2v2GameQueueMap.get(team2v2Arena);
+
                 // Destroy all Team2v2Game instances because the arena no longer exists
-                for (Team2v2Game team2v2Game : team2v2GameQueue) {
+                for (Team2v2Game team2v2Game : team2v2Games) {
                     team2v2Game.stop();
                     team2v2Game.deinit();
                 }
-                ranked1v1GameQueueMap.remove(team2v2GameQueue);
+
+                // Remove from game queue map
+                team2v2ArenaIterator.remove();
+            }
+        }
+        // Create game queue for arenas that don't exist in team2v2GameQueueMap
+        for (Team2v2Arena realTeam2v2Arena : realTeam2v2Arenas) {
+            if (!team2v2GameQueueMap.containsKey(realTeam2v2Arena)) {
+                team2v2GameQueueMap.put(realTeam2v2Arena, new LinkedList<>());
             }
         }
     }

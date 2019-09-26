@@ -48,14 +48,14 @@ public class PlayerManager implements Initializers {
     }
 
     /**
-     * Create new PvPPlayer from a Player object, initializes it, and adds it to {@link PlayerManager#getPvPPlayers()}.
+     * Create new PvPPlayer from a Player object, does NOT initialize it,
+     * and adds it to {@link PlayerManager#getPvPPlayers()}.
      *
      * @param player the player
      * @return the pvp player
      */
     public PvPPlayer createNewPvPPlayer(Player player) {
         PvPPlayer pvpPlayer = new PvPPlayer(this, player);
-        pvpPlayer.init();
 
         pvpPlayers.add(pvpPlayer);
         return pvpPlayer;

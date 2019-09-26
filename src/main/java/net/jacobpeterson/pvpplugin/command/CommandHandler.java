@@ -394,7 +394,7 @@ public class CommandHandler implements CommandExecutor {
                     currentFFAArena = new FFAArena(arenaManager, "FFA Arena");
                     arenaManager.setFFAArena(currentFFAArena);
 
-                    gameManager.updateArenaReferences(arenaManager); // Creates the FFAGame instance
+                    gameManager.updateArenaReferences(); // Creates the FFAGame instance
                 }
 
                 currentFFAArena.setSpawnLocation(LocationUtil.centerBlockLocation(player.getLocation()));
@@ -456,7 +456,7 @@ public class CommandHandler implements CommandExecutor {
                                     "Unknown arena command.");
                             return true;
                     }
-                case "setInv":
+                case "setinv":
                     return this.handle1v1ArenaSetInvCommand(pvpPlayer, args);
                 case "enable":
                     return this.handle1v1ArenaEnableDisableCommand(pvpPlayer, args, false);
@@ -482,6 +482,9 @@ public class CommandHandler implements CommandExecutor {
         Player player = pvpPlayer.getPlayer();
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
         PlayerDataManager playerDataManager = pvpPlugin.getPlayerManager().getPlayerDataManager();
+
+        // Allows for quoted sequences of args to be one arg
+        args = ChatUtil.getArgsQuoted(args);
 
         if (args.length < 5) { // Check if <5 and not =5 because description is more than 1 word
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Incorrect number of " +
@@ -513,6 +516,7 @@ public class CommandHandler implements CommandExecutor {
         // Check if arena already exists
         if (arenaManager.getArenaByName(arena1v1Name) != null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Arena already exists!");
+            return true;
         }
 
         // Create the arena
@@ -524,6 +528,9 @@ public class CommandHandler implements CommandExecutor {
 
         // Add the arena
         arenaManager.getRanked1v1Arenas().add(ranked1v1Arena);
+
+        // Update the GameManager arena references
+        pvpPlugin.getGameManager().updateArenaReferences();
 
         // Save the arenas async
         this.saveArenasAsync();
@@ -570,6 +577,9 @@ public class CommandHandler implements CommandExecutor {
 
         // Remove the arena
         arenaManager.getRanked1v1Arenas().remove((Ranked1v1Arena) arena);
+
+        // Update the GameManager arena references
+        pvpPlugin.getGameManager().updateArenaReferences();
 
         this.saveArenasAsync();
 
@@ -699,8 +709,10 @@ public class CommandHandler implements CommandExecutor {
      */
     public boolean handle1v1ArenaEnableDisableCommand(PvPPlayer pvpPlayer, String[] args, boolean arenaDisabled) {
         Player player = pvpPlayer.getPlayer();
-        String arena1v1Name = args[1];
+        PlayerDataManager playerDataManager = pvpPlugin.getPlayerManager().getPlayerDataManager();
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
+
+        String arena1v1Name = args[1];
 
         // Get the arena
         Arena arena = arenaManager.getArenaByName(arena1v1Name);
@@ -717,6 +729,12 @@ public class CommandHandler implements CommandExecutor {
         ranked1v1Arena.setDisabled(arenaDisabled);
 
         this.saveArenasAsync();
+
+        // Loop through all online Players, update their inventories that display arenas and their player data
+        for (PvPPlayer aPvPPlayer : pvpPlugin.getPlayerManager().getPvPPlayers()) {
+            playerDataManager.updatePlayerDataArenas(aPvPPlayer.getPlayerData());
+            aPvPPlayer.getPlayerGUIManager().updateArenaItemStackInventories(pvpPlugin.getGameManager());
+        }
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully set the 1v1 Arena to be " +
                 (arenaDisabled ? "disabled" : "enabled") + ".");

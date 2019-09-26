@@ -6,6 +6,8 @@ import com.google.gson.JsonParser;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.data.ArenaSerializer;
+import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
+import net.jacobpeterson.pvpplugin.arena.itemstack.data.ArenaItemStackInstanceCreator;
 import net.jacobpeterson.pvpplugin.itemstack.data.ItemStackArraySerializer;
 import net.jacobpeterson.pvpplugin.itemstack.data.ItemStackSerializer;
 import net.jacobpeterson.pvpplugin.location.data.LocationSerializer;
@@ -21,6 +23,7 @@ public class GsonManager implements Initializers {
     private ItemStackSerializer itemStackSerializer;
     private ItemStackArraySerializer itemStackArraySerializer;
     private ArenaSerializer arenaSerializer;
+    private ArenaItemStackInstanceCreator arenaItemStackInstanceCreator;
     private Gson gson;
     private Gson prettyGson;
     private Gson noArenaSerializerGson;
@@ -36,17 +39,18 @@ public class GsonManager implements Initializers {
         this.itemStackSerializer = new ItemStackSerializer();
         this.itemStackArraySerializer = new ItemStackArraySerializer();
         this.arenaSerializer = new ArenaSerializer(pvpPlugin);
+        this.arenaItemStackInstanceCreator = new ArenaItemStackInstanceCreator();
     }
 
     @Override
     public void init() {
+        this.arenaSerializer.init();
+
         this.jsonParser = new JsonParser();
 
         // Create GsonBuilder and register mandatory type adapters
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.enableComplexMapKeySerialization(); // Will allow keys in Maps to be serialized as Objects
-        // Fields with @ExcludeDeserialization annotations will not be deserialized
-        gsonBuilder.addDeserializationExclusionStrategy(new GsonAnnotationExclusionStrategy());
         gsonBuilder.registerTypeAdapter(Location.class, locationSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack.class, itemStackSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack[].class, itemStackArraySerializer);
@@ -54,8 +58,9 @@ public class GsonManager implements Initializers {
         // Create Gson with no Arena serializer adapter
         this.noArenaSerializerGson = gsonBuilder.create();
 
-        // Add the ArenaSerializer type adapter now
+        // Add the ArenaSerializer type adapter and ArenaItemStackInstanceCreator now
         gsonBuilder.registerTypeHierarchyAdapter(Arena.class, arenaSerializer);
+        gsonBuilder.registerTypeAdapter(ArenaItemStack.class, arenaItemStackInstanceCreator);
         // Create Gson with all type adapters registered Gson
         this.gson = gsonBuilder.create();
 
@@ -65,6 +70,7 @@ public class GsonManager implements Initializers {
 
     @Override
     public void deinit() {
+        this.arenaSerializer.deinit();
     }
 
     /**
@@ -110,6 +116,15 @@ public class GsonManager implements Initializers {
      */
     public ArenaSerializer getArenaSerializer() {
         return arenaSerializer;
+    }
+
+    /**
+     * Gets arena item stack instance creator.
+     *
+     * @return the arena item stack instance creator
+     */
+    public ArenaItemStackInstanceCreator getArenaItemStackInstanceCreator() {
+        return arenaItemStackInstanceCreator;
     }
 
     /**

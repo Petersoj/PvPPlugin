@@ -17,8 +17,9 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
     protected transient ItemStack itemStack; // No need to serialize because methods below can create it new
     protected Material material;
 
+
     /**
-     * Default constructor for Gson.
+     * Default Constructor for Gson.
      */
     public ArenaItemStack() {
     }
@@ -54,12 +55,12 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
      * @param currentPlayingLines the current playing lines
      * @return the standard lore format
      */
-    public ArrayList<String> getStandardLoreFormat(PvPPlayer pvpPlayer,
-                                                   String... currentPlayingLines) {
+    public String[] getStandardLoreFormat(PvPPlayer pvpPlayer,
+                                          String... currentPlayingLines) {
         ArrayList<String> lore = new ArrayList<>();
 
-        if (!pvpPlayer.isPremium()) {
-            lore.add(ChatColor.GOLD + "You need premium to choose this 1v1 arena.");
+        if (arena.isPremium() && !pvpPlayer.isPremium()) {
+            lore.add(ChatColor.GOLD + "You need premium to choose this arena.");
             lore.add(ChatColor.GOLD + "For premium, visit " + ChatColor.AQUA + "shop.mcsiege.com");
         }
 
@@ -73,12 +74,12 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
         lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +
                 ChatColor.GREEN + arena.getBuiltByName());
 
-        // Append arena description lines (line separated by \n)
-        for (String descriptionLine : arena.getDescription().split("\n")) {
+        // Append arena description lines (line separated by /n)
+        for (String descriptionLine : arena.getDescription().split("/n")) {
             lore.add(ChatColor.GOLD + descriptionLine);
         }
 
-        return lore;
+        return lore.toArray(new String[0]);
     }
 
     /**

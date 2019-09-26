@@ -2,6 +2,8 @@ package net.jacobpeterson.pvpplugin.util;
 
 import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
+
 public final class ChatUtil {
 
     public static final String SERVER_CHAT_PREFIX = ChatColor.YELLOW + "Siege " +
@@ -38,4 +40,35 @@ public final class ChatUtil {
         return String.format("%.1f ", health) + ChatColor.RED + CharUtil.HEART;
     }
 
+    /**
+     * Gets a String[] that will return arguments separated by spaces, except words that are surrounded in quotes will
+     * be combined into one index in the returned String[].
+     *
+     * @param args the args
+     * @return the string []
+     */
+    @SuppressWarnings("StringConcatenationInLoop") // Idc
+    public static String[] getArgsQuoted(String[] args) {
+        ArrayList<String> finalArgs = new ArrayList<>();
+        boolean currentlyInsideQuotes = false;
+        String currentArgBuffer = "";
+        for (String arg : args) {
+            if (arg.startsWith("\"")) {
+                currentlyInsideQuotes = true;
+                currentArgBuffer += arg.substring(1) + " ";
+            } else if (arg.endsWith("\"")) {
+                currentlyInsideQuotes = false;
+                currentArgBuffer += arg.substring(0, arg.length() - 1);
+                finalArgs.add(currentArgBuffer);
+                currentArgBuffer = "";
+            } else { // No quotes found on current arg
+                if (currentlyInsideQuotes) {
+                    currentArgBuffer += arg + " ";
+                } else {
+                    finalArgs.add(arg);
+                }
+            }
+        }
+        return finalArgs.toArray(new String[0]);
+    }
 }

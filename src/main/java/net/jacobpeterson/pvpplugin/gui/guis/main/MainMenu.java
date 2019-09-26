@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class MainMenu extends AbstractInventoryGUI {
@@ -85,7 +86,10 @@ public class MainMenu extends AbstractInventoryGUI {
         }
 
         if (currentItem.equals(ranked1v1Item)) {
-            player.openInventory(pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory());
+            Inventory ranked1v1MenuInventory = pvpPlayer.getPlayerGUIManager().getRanked1v1Menu().getInventory();
+            if (ranked1v1MenuInventory != null) {
+                player.openInventory(ranked1v1MenuInventory);
+            }
         } else if (currentItem.equals(unrankedFFAItem)) {
             FFAGame currentFFAGame = gameManager.getFFAGame();
 

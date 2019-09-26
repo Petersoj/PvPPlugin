@@ -1,5 +1,6 @@
 package net.jacobpeterson.pvpplugin.player.data;
 
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
@@ -187,17 +188,25 @@ public class PlayerDataManager implements Initializers {
         // Turn on referencing to already-created Arenas
         gsonManager.getArenaSerializer().setReferenceDeserialization(true);
 
-        // Arenas times played parsing from DB logic
-        HashMap<Arena, Integer> arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
-                new TypeToken<HashMap<Arena, Integer>>() {
-                }.getType());
-        playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
+        // Try-catch block to prevent player data not being created if there is an error
+        try {
+            // Arenas times played parsing from DB logic
+            HashMap<Arena, Integer> arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
+                    new TypeToken<HashMap<Arena, Integer>>() {
+                    }.getType());
+            playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
 
-        // Arena Inventory parsing from DB logic
-        HashMap<Arena, ItemStack[][]> arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
-                new TypeToken<HashMap<Arena, ItemStack[][]>>() {
-                }.getType());
-        playerData.setArenaInventoryMap(arenaInventory);
+            // Arena Inventory parsing from DB logic
+            HashMap<Arena, ItemStack[][]> arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
+                    new TypeToken<HashMap<Arena, ItemStack[][]>>() {
+                    }.getType());
+            playerData.setArenaInventoryMap(arenaInventory);
+        } catch (JsonParseException exception) {
+            // Print exception and set player data types that failed to empty hashmaps
+            exception.printStackTrace();
+            playerData.setArenaTimesPlayedMap(new HashMap<>());
+            playerData.setArenaInventoryMap(new HashMap<>());
+        }
 
         // Set other primitives
         playerData.setELO(resultSet.getInt(1));

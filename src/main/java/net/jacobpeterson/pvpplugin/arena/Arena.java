@@ -1,7 +1,6 @@
 package net.jacobpeterson.pvpplugin.arena;
 
 import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
-import net.jacobpeterson.pvpplugin.util.ExcludeDeserialization;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
@@ -10,7 +9,6 @@ public abstract class Arena implements Serializable {
 
     protected transient ArenaManager arenaManager;
     protected String name;
-    @ExcludeDeserialization // Prevents ArenaItemStack from being deserialized as this is done manually
     protected ArenaItemStack arenaItemStack;
     protected ItemStack[] inventory; // Use PlayerInventory#getContents()
     protected ItemStack[] armorInventory; // Use PlayerInventory#getArmorContents()

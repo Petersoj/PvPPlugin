@@ -10,12 +10,15 @@ import com.google.gson.JsonSerializer;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
+import net.jacobpeterson.pvpplugin.data.GsonManager;
+import net.jacobpeterson.pvpplugin.util.Initializers;
 
 import java.lang.reflect.Type;
 
-public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<Arena> {
+public class ArenaSerializer implements Initializers, JsonSerializer<Arena>, JsonDeserializer<Arena> {
 
     private PvPPlugin pvpPlugin;
+    private GsonManager gsonManager;
     private boolean referenceSerialization;
     private boolean referenceDeserialization;
 
@@ -31,9 +34,18 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
     }
 
     @Override
+    public void init() {
+        this.gsonManager = pvpPlugin.getGsonManager();
+    }
+
+    @Override
+    public void deinit() {
+    }
+
+    @Override
     public JsonElement serialize(Arena arena, Type type, JsonSerializationContext jsonSerializationContext) {
         if (!referenceSerialization) {
-            return pvpPlugin.getGsonManager().getNoArenaSerializerGson().toJsonTree(arena, type);
+            return gsonManager.getNoArenaSerializerGson().toJsonTree(arena, type);
         } else {
             JsonObject arenaNameObject = new JsonObject();
             // Set the name in the Json Object which is used as the reference to the Arena Object
@@ -46,11 +58,17 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
     public Arena deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
         if (!referenceDeserialization) {
-            Arena arena = pvpPlugin.getGsonManager().getNoArenaSerializerGson().fromJson(jsonElement, type);
+            gsonManager.getArenaItemStackInstanceCreator().setArenaContextType(type);
+
+            // Deserialize the Arena and setup
+            Arena arena = gsonManager.getNoArenaSerializerGson().fromJson(jsonElement, type);
             arena.setArenaManager(pvpPlugin.getArenaManager());
+
+            // Setup the ArenaItemStack
             if (arena.getArenaItemStack() != null) {
-                arena.getArenaItemStack().setArena(arena); // Set the reference in ArenaItemStack
+                arena.getArenaItemStack().setArena(arena);
             }
+
             return arena;
         } else {
             if (!(jsonElement instanceof JsonObject)) {

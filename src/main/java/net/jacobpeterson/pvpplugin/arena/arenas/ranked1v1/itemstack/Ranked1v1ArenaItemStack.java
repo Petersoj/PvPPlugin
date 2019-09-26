@@ -13,6 +13,10 @@ import org.bukkit.Material;
 
 public class Ranked1v1ArenaItemStack extends ArenaItemStack {
 
+    public Ranked1v1ArenaItemStack() {
+        super();
+    }
+
     public Ranked1v1ArenaItemStack(Ranked1v1Arena ranked1v1Arena, Material material) {
         super(ranked1v1Arena, material);
     }
@@ -47,7 +51,7 @@ public class Ranked1v1ArenaItemStack extends ArenaItemStack {
         }
 
         ItemStackUtil.formatLore(itemStack, true, ChatUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
-                (String[]) super.getStandardLoreFormat(pvpPlayer, new String[]{currentlyPlayingStringLine}).toArray());
+                super.getStandardLoreFormat(pvpPlayer, currentlyPlayingStringLine));
     }
 
     @Override

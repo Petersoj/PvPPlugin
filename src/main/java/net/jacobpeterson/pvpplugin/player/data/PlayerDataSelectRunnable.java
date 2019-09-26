@@ -2,6 +2,7 @@ package net.jacobpeterson.pvpplugin.player.data;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -14,29 +15,37 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
 
     private final Logger LOGGER;
 
+    private PvPPlugin pvpPlugin;
     private PvPPlayer pvpPlayer;
     private PlayerDataManager playerDataManager;
+    private Runnable syncCompletionRunnable;
 
     /**
      * Instantiates a new FetchPlayerDataRunnable which is meant to be run async to fetch from the SQL Database
      * and populate {@link PlayerData} via {@link PlayerDataManager#selectPlayerDataFromDatabase(UUID)} (may call
      * {@link PlayerDataManager#insertNewPlayerDataInDatabase(PvPPlayer)} if necessary).
      *
-     * @param pvpPlayer         the pvp player
-     * @param playerDataManager the player data manager
+     * @param pvpPlugin              the pvp plugin
+     * @param pvpPlayer              the pvp player
+     * @param playerDataManager      the player data manager
+     * @param syncCompletionRunnable the runnable to run synchronously on completion of data fetch
      */
-    public PlayerDataSelectRunnable(PvPPlayer pvpPlayer, PlayerDataManager playerDataManager) {
+    public PlayerDataSelectRunnable(PvPPlugin pvpPlugin, PvPPlayer pvpPlayer, PlayerDataManager playerDataManager,
+                                    Runnable syncCompletionRunnable) {
         LOGGER = PvPPlugin.getPluginLogger();
+        this.pvpPlugin = pvpPlugin;
         this.pvpPlayer = pvpPlayer;
         this.playerDataManager = playerDataManager;
+        this.syncCompletionRunnable = syncCompletionRunnable;
     }
 
     @Override
     public void run() {
         boolean insertNewPlayer = false;
+        PlayerData playerData;
 
         try {
-            PlayerData playerData = playerDataManager.selectPlayerDataFromDatabase(pvpPlayer.getPlayer().getUniqueId());
+            playerData = playerDataManager.selectPlayerDataFromDatabase(pvpPlayer.getPlayer().getUniqueId());
 
             if (playerData == null) { // If no exception occurs and player data is null
                 insertNewPlayer = true;
@@ -46,9 +55,6 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
 
             // Set the player data
             pvpPlayer.setPlayerData(playerData);
-
-            // Update the Player Data in accordance with current Arenas
-            playerDataManager.updatePlayerDataArenas(playerData);
         } catch (SQLException exception) {
             LOGGER.log(Level.SEVERE, "Could not select player data for: " + pvpPlayer.getPlayer().getName(), exception);
             playerDataManager.getPlayerManager().kickPlayerSync(pvpPlayer,
@@ -67,6 +73,8 @@ public class PlayerDataSelectRunnable extends BukkitRunnable {
                                 ChatColor.WHITE + "Contact the server admins!");
             }
         }
+
+        Bukkit.getScheduler().runTask(pvpPlugin, syncCompletionRunnable);
     }
 
     /**
