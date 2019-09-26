@@ -16,6 +16,7 @@ public class Ranked1v1Menu extends ChooseArenaMenu {
 
     @Override
     public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
+        event.setCancelled(true);
         for (ArenaItemStack arenaItemStack : arenaItemStacks) {
 //            if () {
 //

@@ -6,6 +6,7 @@ import net.jacobpeterson.pvpplugin.player.event.PlayerEventHandlers;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -155,7 +156,8 @@ public class PluginListeners implements Listener, Initializers {
      *
      * @param event the event
      */
-    @EventHandler
+    // Lowest Event Priority will happen last that way Essentials will set the format and we can prepend ELO
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         this.playerEventHandlers.handleAsyncPlayerChatEvent(event);
     }

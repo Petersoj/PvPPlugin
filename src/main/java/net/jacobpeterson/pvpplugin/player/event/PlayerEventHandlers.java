@@ -169,8 +169,8 @@ public class PlayerEventHandlers implements Initializers {
         if (pvpPlayer == null) {
             return;
         }
-
         PlayerInventoryManager playerInventoryManager = pvpPlayer.getPlayerInventoryManager();
+
 
         if (playerInventoryManager.getPlayNowCompassItem().equals(event.getCurrentItem()) &&
                 !playerInventoryManager.canManipulateInventory()) {
@@ -180,6 +180,8 @@ public class PlayerEventHandlers implements Initializers {
 
     /**
      * Handle async player chat event.
+     * NOTE: This event handler must from triggered from an @EventHandler with priority = EventPriority.LOWEST
+     * that way EssentialsChat will set the format and we can prepend ELO
      *
      * @param event the event
      */
@@ -194,8 +196,8 @@ public class PlayerEventHandlers implements Initializers {
         // Format for normal Bukkit Minecraft message: <%1$s> %2$s
         // Format for PvPPlugin: &8:&3<elo>&8:<displayname>&8: %2$s
 
+        // event.getFormat() here will get the format from EssentialsChat and then prepend the ELO
         event.setFormat(ChatColor.DARK_GRAY + ":" + ChatColor.DARK_AQUA + pvpPlayer.getPlayerData().getELO() +
-                ChatColor.DARK_GRAY + ":" + pvpPlayer.getPrefixedName() + ChatColor.DARK_GRAY + ":" +
-                ChatColor.WHITE + " %2$s");
+                ChatColor.DARK_GRAY + ":" + event.getFormat());
     }
 }

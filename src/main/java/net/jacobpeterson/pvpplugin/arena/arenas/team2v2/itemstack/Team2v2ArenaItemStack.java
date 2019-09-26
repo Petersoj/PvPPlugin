@@ -52,6 +52,11 @@ public class Team2v2ArenaItemStack extends ArenaItemStack {
     }
 
     @Override
+    public ArenaItemStack clone() {
+        return new Team2v2ArenaItemStack((Team2v2Arena) arena, material);
+    }
+
+    @Override
     public Team2v2Arena getArena() {
         return (Team2v2Arena) arena;
     }

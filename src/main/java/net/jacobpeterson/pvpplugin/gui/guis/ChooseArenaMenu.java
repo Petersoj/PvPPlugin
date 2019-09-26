@@ -105,20 +105,39 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
     @SuppressWarnings("SuspiciousMethodCalls") // Suppress this warning because we know that value exists in Map
     public <A extends Arena, G extends Game> void updateArenaItemStacks(HashMap<A, LinkedList<G>> gameQueueMap,
                                                                         PvPPlayer pvpPlayer) {
+        // Clear all previous ArenaItemStacks from reference as we are going to create new ones
         arenaItemStacks.clear();
 
         // Loop through all games add update the itemstacks of the games' arenas
         for (Arena arena : gameQueueMap.keySet()) {
-            ArenaItemStack arenaItemStack = arena.getArenaItemStack();
-            Game currentGame = gameQueueMap.get(arena).peek();
+            if (!arena.isDisabled()) { // Check if arena is not disabled
+                // Clone the ArenaItemStack and get first game in queue
+                ArenaItemStack arenaItemStack = arena.getArenaItemStack(); // Gets the overall ArenaItemStack
+                if (arenaItemStack == null) {
+                    LOGGER.warning("No ArenaItemStack exists for " + arena.getName() + "!");
+                    continue; // Skip below and continue looping through arenas
+                } else {
+                    arenaItemStack = arenaItemStack.clone();
+                }
+                Game currentGame = gameQueueMap.get(arena).peek();
 
-            // Update the ArenaItemStack and add it to the local list
-            arenaItemStack.updateItemStack(currentGame, pvpPlayer);
-            arenaItemStacks.add(arenaItemStack);
+                // Update the ArenaItemStack and add it to the local list
+                arenaItemStack.updateItemStack(currentGame, pvpPlayer);
+                arenaItemStacks.add(arenaItemStack);
+            }
         }
 
         // Create Inventory with updated ArenaItemStacks
         this.createInventory();
+    }
+
+    public ArenaItemStack getArenaItemStack(ItemStack clickedItemStack) {
+        for (ArenaItemStack arenaItemStack : arenaItemStacks) {
+            if (arenaItemStack.getItemStack().equals(clickedItemStack)) {
+                return arenaItemStack;
+            }
+        }
+        return null;
     }
 
     /**

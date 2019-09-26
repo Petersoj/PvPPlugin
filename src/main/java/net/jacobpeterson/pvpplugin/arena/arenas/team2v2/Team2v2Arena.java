@@ -3,6 +3,7 @@ package net.jacobpeterson.pvpplugin.arena.arenas.team2v2;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.itemstack.Team2v2ArenaItemStack;
+import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import org.bukkit.Location;
 
 import java.io.Serializable;
@@ -27,6 +28,14 @@ public class Team2v2Arena extends Arena implements Serializable {
     @Override
     public Team2v2ArenaItemStack getArenaItemStack() {
         return (Team2v2ArenaItemStack) arenaItemStack;
+    }
+
+    @Override
+    public void setArenaItemStack(ArenaItemStack arenaItemStack) {
+        if (arenaItemStack != null && !(arenaItemStack instanceof Team2v2ArenaItemStack)) {
+            throw new IllegalArgumentException("Arena must be a Team2v2ArenaItemStack!");
+        }
+        this.arenaItemStack = arenaItemStack;
     }
 
     /**

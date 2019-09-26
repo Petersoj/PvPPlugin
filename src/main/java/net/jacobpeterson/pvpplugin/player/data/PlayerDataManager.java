@@ -1,5 +1,6 @@
 package net.jacobpeterson.pvpplugin.player.data;
 
+import com.google.gson.reflect.TypeToken;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
@@ -187,13 +188,15 @@ public class PlayerDataManager implements Initializers {
         gsonManager.getArenaSerializer().setReferenceDeserialization(true);
 
         // Arenas times played parsing from DB logic
-        HashMap arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
-                playerData.getArenaTimesPlayedMap().getClass());
+        HashMap<Arena, Integer> arenaTimesPlayedMap = gsonManager.getGson().fromJson(resultSet.getString(2),
+                new TypeToken<HashMap<Arena, Integer>>() {
+                }.getType());
         playerData.setArenaTimesPlayedMap(arenaTimesPlayedMap);
 
         // Arena Inventory parsing from DB logic
-        HashMap arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
-                playerData.getArenaInventoryMap().getClass());
+        HashMap<Arena, ItemStack[][]> arenaInventory = gsonManager.getGson().fromJson(resultSet.getString(3),
+                new TypeToken<HashMap<Arena, ItemStack[][]>>() {
+                }.getType());
         playerData.setArenaInventoryMap(arenaInventory);
 
         // Set other primitives
@@ -219,7 +222,7 @@ public class PlayerDataManager implements Initializers {
     public void updatePlayerDataArenas(PlayerData playerData) {
         ArenaManager arenaManager = playerManager.getPvPPlugin().getArenaManager();
         ArrayList<Arena> allArenas = arenaManager.getAllArenas();
-        HashMap<Arena, ItemStack[]> playerArenaInventoryMap = playerData.getArenaInventoryMap();
+        HashMap<Arena, ItemStack[][]> playerArenaInventoryMap = playerData.getArenaInventoryMap();
         HashMap<Arena, Integer> playerArenaTimesPlayedMap = playerData.getArenaTimesPlayedMap();
 
         if (playerArenaInventoryMap == null) {

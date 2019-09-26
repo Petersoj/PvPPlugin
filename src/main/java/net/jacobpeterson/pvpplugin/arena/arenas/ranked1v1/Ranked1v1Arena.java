@@ -3,6 +3,7 @@ package net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.itemstack.Ranked1v1ArenaItemStack;
+import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import org.bukkit.Location;
 
 import java.io.Serializable;
@@ -26,6 +27,14 @@ public class Ranked1v1Arena extends Arena implements Serializable {
     @Override
     public Ranked1v1ArenaItemStack getArenaItemStack() {
         return (Ranked1v1ArenaItemStack) arenaItemStack;
+    }
+
+    @Override
+    public void setArenaItemStack(ArenaItemStack arenaItemStack) {
+        if (arenaItemStack != null && !(arenaItemStack instanceof Ranked1v1ArenaItemStack)) {
+            throw new IllegalArgumentException("Arena must be a Ranked1v1ArenaItemStack!");
+        }
+        this.arenaItemStack = arenaItemStack;
     }
 
     /**

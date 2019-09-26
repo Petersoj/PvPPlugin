@@ -1,5 +1,6 @@
 package net.jacobpeterson.pvpplugin;
 
+import com.earth2me.essentials.Essentials;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.command.CommandHandler;
 import net.jacobpeterson.pvpplugin.data.DatabaseConfig;
@@ -24,6 +25,7 @@ public class PvPPlugin extends JavaPlugin {
 
     private final Logger LOGGER;
     private PermissionsEx permissionsEx;
+    private Essentials essentials;
     private GsonManager gsonManager;
     private DatabaseConfig databaseConfig;
     private PluginListeners pluginListeners;
@@ -41,6 +43,7 @@ public class PvPPlugin extends JavaPlugin {
         LOGGER.info("Building " + this.getName());
 
         this.permissionsEx = (PermissionsEx) Bukkit.getPluginManager().getPlugin("PermissionsEx");
+        this.essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         this.gsonManager = new GsonManager(this);
         this.databaseConfig = new DatabaseConfig(this);
         this.pluginListeners = new PluginListeners(this);
@@ -119,12 +122,21 @@ public class PvPPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets permissions ex.
+     * Gets PermissionsEx.
      *
-     * @return the permissions ex
+     * @return the PermissionsEx
      */
     public PermissionsEx getPermissionsEx() {
         return permissionsEx;
+    }
+
+    /**
+     * Gets essentials.
+     *
+     * @return the essentials
+     */
+    public Essentials getEssentials() {
+        return essentials;
     }
 
     /**

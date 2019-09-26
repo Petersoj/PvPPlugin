@@ -11,14 +11,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * The type Arena item stack.
- */
-public abstract class ArenaItemStack implements Serializable {
+public abstract class ArenaItemStack implements Serializable, Cloneable {
 
     protected transient Arena arena; // Used strictly for reference
     protected transient ItemStack itemStack; // No need to serialize because methods below can create it new
     protected Material material;
+
+    /**
+     * Default constructor for Gson.
+     */
+    public ArenaItemStack() {
+    }
 
     /**
      * Instantiates a new ArenaItemStack which is used as a wrapper for the {@link ItemStack} representing the Arena.
@@ -70,13 +73,20 @@ public abstract class ArenaItemStack implements Serializable {
         lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +
                 ChatColor.GREEN + arena.getBuiltByName());
 
-        // Append arena description lines
+        // Append arena description lines (line separated by \n)
         for (String descriptionLine : arena.getDescription().split("\n")) {
             lore.add(ChatColor.GOLD + descriptionLine);
         }
 
         return lore;
     }
+
+    /**
+     * Clones this ArenaItemStack, preserving instance type.
+     *
+     * @return the cloned ArenaItemStack
+     */
+    public abstract ArenaItemStack clone();
 
     /**
      * Gets arena.

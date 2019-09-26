@@ -45,6 +45,8 @@ public class GsonManager implements Initializers {
         // Create GsonBuilder and register mandatory type adapters
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.enableComplexMapKeySerialization(); // Will allow keys in Maps to be serialized as Objects
+        // Fields with @ExcludeDeserialization annotations will not be deserialized
+        gsonBuilder.addDeserializationExclusionStrategy(new GsonAnnotationExclusionStrategy());
         gsonBuilder.registerTypeAdapter(Location.class, locationSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack.class, itemStackSerializer);
         gsonBuilder.registerTypeAdapter(ItemStack[].class, itemStackArraySerializer);
@@ -52,8 +54,8 @@ public class GsonManager implements Initializers {
         // Create Gson with no Arena serializer adapter
         this.noArenaSerializerGson = gsonBuilder.create();
 
+        // Add the ArenaSerializer type adapter now
         gsonBuilder.registerTypeHierarchyAdapter(Arena.class, arenaSerializer);
-
         // Create Gson with all type adapters registered Gson
         this.gson = gsonBuilder.create();
 

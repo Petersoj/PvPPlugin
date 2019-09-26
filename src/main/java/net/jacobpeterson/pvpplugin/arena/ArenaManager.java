@@ -42,17 +42,18 @@ public class ArenaManager implements Initializers {
     }
 
     /**
-     * Checks if arena name already exists.
+     * Gets arena by name.
      *
-     * @return whether or not the arena exists boolean
+     * @param name the name
+     * @return the arena by name (null if it doesn't exist)
      */
-    public boolean doesArenaExist(String name) {
+    public Arena getArenaByName(String name) {
         for (Arena arena : getAllArenas()) {
-            if (arena.getName().equals(name)) {
-                return true;
+            if (arena.getName().equalsIgnoreCase(name)) {
+                return arena;
             }
         }
-        return false;
+        return null;
     }
 
     /**

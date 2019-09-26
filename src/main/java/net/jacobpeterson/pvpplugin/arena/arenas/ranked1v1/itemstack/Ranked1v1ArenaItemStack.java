@@ -51,6 +51,11 @@ public class Ranked1v1ArenaItemStack extends ArenaItemStack {
     }
 
     @Override
+    public ArenaItemStack clone() {
+        return new Ranked1v1ArenaItemStack((Ranked1v1Arena) arena, material);
+    }
+
+    @Override
     public Ranked1v1Arena getArena() {
         return (Ranked1v1Arena) arena;
     }

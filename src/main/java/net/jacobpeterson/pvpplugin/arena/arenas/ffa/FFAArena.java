@@ -27,6 +27,11 @@ public class FFAArena extends Arena implements Serializable {
         return arenaItemStack;
     }
 
+    @Override
+    public void setArenaItemStack(ArenaItemStack arenaItemStack) {
+        this.arenaItemStack = arenaItemStack;
+    }
+
     /**
      * Gets spawn location.
      *

@@ -10,7 +10,6 @@ import com.google.gson.JsonSerializer;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
-import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 
 import java.lang.reflect.Type;
 
@@ -69,14 +68,7 @@ public class ArenaSerializer implements JsonSerializer<Arena>, JsonDeserializer<
                 }
             }
 
-            // Create a new arena that doesn't exist just so there is record of a player playing that arena for
-            // player "arena times played"
-            return new Arena(arenaManager, arenaName) {
-                @Override
-                public ArenaItemStack getArenaItemStack() {
-                    return null;
-                }
-            };
+            return null;
         }
     }
 

@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.arenas.ffa.FFAArena;
+import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
+import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.data.GsonManager;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 
@@ -16,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -26,6 +30,10 @@ public class ArenaDataManager implements Initializers {
     private static final String FFA_ARENA_KEY = "ffa";
     private static final String RANKED_1V1_ARENAS_KEY = "ranked_1v1";
     private static final String TEAM_2V2_ARENAS = "team_2v2";
+    private static final Type RANKED_1V1_ARENAS_TYPE = new TypeToken<ArrayList<Ranked1v1Arena>>() {
+    }.getType();
+    private static final Type TEAM_2V2_ARENAS_TYPE = new TypeToken<ArrayList<Team2v2Arena>>() {
+    }.getType();
 
     private final Logger LOGGER;
     private ArenaManager arenaManager;
@@ -112,10 +120,10 @@ public class ArenaDataManager implements Initializers {
         JsonObject arenasObject = (JsonObject) arenasElement;
 
         FFAArena ffaArena = gson.fromJson(arenasObject.getAsJsonObject(FFA_ARENA_KEY), FFAArena.class);
-        ArrayList ranked1v1Arenas = gson.fromJson(arenasObject.getAsJsonArray(RANKED_1V1_ARENAS_KEY),
-                arenaManager.getRanked1v1Arenas().getClass());
-        ArrayList team2v2Arenas = gson.fromJson(arenasObject.getAsJsonArray(TEAM_2V2_ARENAS),
-                arenaManager.getTeam2v2Arenas().getClass());
+        ArrayList<Ranked1v1Arena> ranked1v1Arenas = gson.fromJson(arenasObject.getAsJsonArray(RANKED_1V1_ARENAS_KEY),
+                RANKED_1V1_ARENAS_TYPE);
+        ArrayList<Team2v2Arena> team2v2Arenas = gson.fromJson(arenasObject.getAsJsonArray(TEAM_2V2_ARENAS),
+                TEAM_2V2_ARENAS_TYPE);
 
         arenaManager.setFFAArena(ffaArena);
         arenaManager.setRanked1v1Arenas(ranked1v1Arenas);

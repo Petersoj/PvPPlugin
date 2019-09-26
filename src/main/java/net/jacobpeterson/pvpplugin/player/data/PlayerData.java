@@ -13,7 +13,7 @@ public class PlayerData implements Serializable {
 
     private int elo;
     private HashMap<Arena, Integer> arenaTimesPlayedMap;
-    private HashMap<Arena, ItemStack[]> arenaInventoryMap;
+    private HashMap<Arena, ItemStack[][]> arenaInventoryMap; // [0] = inventory, [1] = armor inventory
     private int unrankedFFAKills;
     private int unrankedFFADeaths;
     private int ranked1v1Kills;
@@ -73,7 +73,7 @@ public class PlayerData implements Serializable {
      *
      * @return the arena inventory map
      */
-    public HashMap<Arena, ItemStack[]> getArenaInventoryMap() {
+    public HashMap<Arena, ItemStack[][]> getArenaInventoryMap() {
         return arenaInventoryMap;
     }
 
@@ -82,7 +82,7 @@ public class PlayerData implements Serializable {
      *
      * @param arenaInventoryMap the arena inventory map
      */
-    public void setArenaInventoryMap(HashMap<Arena, ItemStack[]> arenaInventoryMap) {
+    public void setArenaInventoryMap(HashMap<Arena, ItemStack[][]> arenaInventoryMap) {
         this.arenaInventoryMap = arenaInventoryMap;
     }
 
