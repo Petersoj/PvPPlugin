@@ -16,13 +16,14 @@ public class Team2v2Arena extends Arena implements Serializable {
     private Location spectateLocation;
 
     /**
-     * Instantiates a new Team 2v2 arena.
+     * Instantiates a new Team2v2Arena.
      *
-     * @param arenaManager the arena manager
-     * @param name         the name
+     * @param arenaManager   the arena manager
+     * @param nameIdentifier the name identifier (no color codes)
+     * @param formattedName  the formatted name (can have color codes)
      */
-    public Team2v2Arena(ArenaManager arenaManager, String name) {
-        super(arenaManager, name);
+    public Team2v2Arena(ArenaManager arenaManager, String nameIdentifier, String formattedName) {
+        super(arenaManager, nameIdentifier, formattedName);
     }
 
     @Override

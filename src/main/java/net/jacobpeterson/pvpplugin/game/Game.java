@@ -57,7 +57,7 @@ public abstract class Game implements Initializers {
         player.getInventory().setArmorContents(arena.getArmorInventory());
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD +
-                "You successfully joined " + arena.getName());
+                "You successfully joined " + arena.getFormattedName());
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Type " + ChatColor.AQUA +
                 "/leave " + ChatColor.GOLD + "to get back to the lobby.");
     }

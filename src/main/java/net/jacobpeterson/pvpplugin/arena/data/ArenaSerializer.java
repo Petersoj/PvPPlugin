@@ -49,7 +49,7 @@ public class ArenaSerializer implements Initializers, JsonSerializer<Arena>, Jso
         } else {
             JsonObject arenaNameObject = new JsonObject();
             // Set the name in the Json Object which is used as the reference to the Arena Object
-            arenaNameObject.addProperty("name", arena.getName());
+            arenaNameObject.addProperty("name", arena.getNameIdentifier());
             return arenaNameObject;
         }
     }
@@ -81,7 +81,7 @@ public class ArenaSerializer implements Initializers, JsonSerializer<Arena>, Jso
             String arenaName = ((JsonObject) jsonElement).get("name").getAsString();
 
             for (Arena arena : arenaManager.getAllArenas()) {
-                if (arena.getName().equals(arenaName)) {
+                if (arena.getNameIdentifier().equals(arenaName)) {
                     return arena;
                 }
             }

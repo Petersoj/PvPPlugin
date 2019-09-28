@@ -8,7 +8,8 @@ import java.io.Serializable;
 public abstract class Arena implements Serializable {
 
     protected transient ArenaManager arenaManager;
-    protected String name;
+    protected String nameIdentifier;
+    protected String formattedName;
     protected ArenaItemStack arenaItemStack;
     protected ItemStack[] inventory; // Use PlayerInventory#getContents()
     protected ItemStack[] armorInventory; // Use PlayerInventory#getArmorContents()
@@ -20,11 +21,14 @@ public abstract class Arena implements Serializable {
     /**
      * Instantiates a new Arena.
      *
-     * @param name the name of the Arena
+     * @param arenaManager   the arena manager
+     * @param nameIdentifier the name identifier (no color codes)
+     * @param formattedName  the formatted name (can have color codes)
      */
-    public Arena(ArenaManager arenaManager, String name) {
+    public Arena(ArenaManager arenaManager, String nameIdentifier, String formattedName) {
         this.arenaManager = arenaManager;
-        this.name = name;
+        this.nameIdentifier = nameIdentifier;
+        this.formattedName = formattedName;
         this.disabled = false;
         this.premium = false;
         this.builtByName = "";
@@ -50,21 +54,39 @@ public abstract class Arena implements Serializable {
     }
 
     /**
-     * Gets name.
+     * Gets name identifier.
      *
-     * @return the name
+     * @return the name identifier
      */
-    public String getName() {
-        return name;
+    public String getNameIdentifier() {
+        return nameIdentifier;
     }
 
     /**
-     * Sets name.
+     * Sets name identifier.
      *
-     * @param name the name
+     * @param nameIdentifier the name identifier
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setNameIdentifier(String nameIdentifier) {
+        this.nameIdentifier = nameIdentifier;
+    }
+
+    /**
+     * Gets formatted name.
+     *
+     * @return the formatted name
+     */
+    public String getFormattedName() {
+        return formattedName;
+    }
+
+    /**
+     * Sets formatted name.
+     *
+     * @param formattedName the formatted name
+     */
+    public void setFormattedName(String formattedName) {
+        this.formattedName = formattedName;
     }
 
     /**

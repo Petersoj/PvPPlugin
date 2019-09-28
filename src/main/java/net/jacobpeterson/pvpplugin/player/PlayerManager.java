@@ -3,8 +3,8 @@ package net.jacobpeterson.pvpplugin.player;
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.player.data.PlayerDataManager;
 import net.jacobpeterson.pvpplugin.player.event.PlayerEventHandlers;
+import net.jacobpeterson.pvpplugin.util.ChatUtil;
 import net.jacobpeterson.pvpplugin.util.Initializers;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -83,7 +83,7 @@ public class PlayerManager implements Initializers {
      * @return the player's PermissionsEx group prefix (will be empty string if prefix doesn't exist)
      */
     public String getPlayerGroupPrefix(String playerName) {
-        return ChatColor.translateAlternateColorCodes('&', PermissionsEx.getUser(playerName).getPrefix());
+        return ChatUtil.translateAnyColorCodes(PermissionsEx.getUser(playerName).getPrefix());
     }
 
     /**

@@ -50,7 +50,7 @@ public class Ranked1v1ArenaItemStack extends ArenaItemStack {
             currentlyPlayingStringLine += ChatColor.AQUA + "None";
         }
 
-        ItemStackUtil.formatLore(itemStack, true, ChatUtil.boldColor(ChatColor.YELLOW) + arena.getName(),
+        ItemStackUtil.formatLore(itemStack, true, ChatUtil.translateAnyColorCodes(arena.getFormattedName()),
                 super.getStandardLoreFormat(pvpPlayer, currentlyPlayingStringLine));
     }
 

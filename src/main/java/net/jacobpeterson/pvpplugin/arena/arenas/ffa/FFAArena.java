@@ -13,13 +13,14 @@ public class FFAArena extends Arena implements Serializable {
     private Location leaveLocation;
 
     /**
-     * Instantiates a new FFA arena.
+     * Instantiates a new FFA Arena.
      *
-     * @param arenaManager the arena manager
-     * @param name         the name
+     * @param arenaManager   the arena manager
+     * @param nameIdentifier the name identifier (no color codes)
+     * @param formattedName  the formatted name (can have color codes)
      */
-    public FFAArena(ArenaManager arenaManager, String name) {
-        super(arenaManager, name);
+    public FFAArena(ArenaManager arenaManager, String nameIdentifier, String formattedName) {
+        super(arenaManager, nameIdentifier, formattedName);
     }
 
     @Override

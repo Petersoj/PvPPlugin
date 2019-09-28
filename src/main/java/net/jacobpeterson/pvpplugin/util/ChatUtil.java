@@ -41,8 +41,29 @@ public final class ChatUtil {
     }
 
     /**
+     * Strips any color codes from the input (including § and &).
+     *
+     * @param input the input
+     * @return the string
+     */
+    public static String stripAnyColorCodes(String input) {
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', input));
+    }
+
+    /**
+     * Translate any color codes from the input (usually '&').
+     *
+     * @param input the input
+     * @return the string
+     */
+    public static String translateAnyColorCodes(String input) {
+        return ChatColor.translateAlternateColorCodes('&', input);
+    }
+
+    /**
      * Gets a String[] that will return arguments separated by spaces, except words that are surrounded in quotes will
-     * be combined into one index in the returned String[].
+     * be combined into one index in the returned String[]. Using a /" will not be parsed as a being/end quote for
+     * and argument.
      *
      * @param args the args
      * @return the string []
@@ -51,19 +72,37 @@ public final class ChatUtil {
     public static String[] getArgsQuoted(String[] args) {
         ArrayList<String> finalArgs = new ArrayList<>();
         boolean currentlyInsideQuotes = false;
-        String currentArgBuffer = "";
+        String currentArgString = "";
         for (String arg : args) {
-            if (arg.startsWith("\"")) {
-                currentlyInsideQuotes = true;
-                currentArgBuffer += arg.substring(1) + " ";
-            } else if (arg.endsWith("\"")) {
-                currentlyInsideQuotes = false;
-                currentArgBuffer += arg.substring(0, arg.length() - 1);
-                finalArgs.add(currentArgBuffer);
-                currentArgBuffer = "";
+            if (arg.startsWith("\"") && !arg.startsWith("/\"")) {
+                if (!currentlyInsideQuotes) {
+                    currentlyInsideQuotes = true;
+                    currentArgString += arg.substring(1) + " ";
+                } else {
+                    finalArgs.add(arg);
+                }
+            } else if (arg.endsWith("\"") && !arg.endsWith("/\"")) {
+                if (currentlyInsideQuotes) {
+                    currentlyInsideQuotes = false;
+                    currentArgString += arg.substring(0, arg.length() - 1);
+                    finalArgs.add(currentArgString);
+                    currentArgString = "";
+                } else {
+                    finalArgs.add(arg);
+                }
+            } else if (arg.equals("\"")) {
+                if (currentlyInsideQuotes) {
+                    currentlyInsideQuotes = false;
+                    currentArgString += " ";
+                    finalArgs.add(currentArgString);
+                    currentArgString = "";
+                } else {
+                    currentlyInsideQuotes = true;
+                    currentArgString += " ";
+                }
             } else { // No quotes found on current arg
                 if (currentlyInsideQuotes) {
-                    currentArgBuffer += arg + " ";
+                    currentArgString += arg + " ";
                 } else {
                     finalArgs.add(arg);
                 }

@@ -44,12 +44,12 @@ public class ArenaManager implements Initializers {
     /**
      * Gets arena by name.
      *
-     * @param name the name
+     * @param nameIdentifier the name identifier
      * @return the arena by name (null if it doesn't exist)
      */
-    public Arena getArenaByName(String name) {
+    public Arena getArenaByNameIdentifier(String nameIdentifier) {
         for (Arena arena : getAllArenas()) {
-            if (arena.getName().equalsIgnoreCase(name)) {
+            if (arena.getNameIdentifier().equalsIgnoreCase(nameIdentifier)) {
                 return arena;
             }
         }
@@ -63,9 +63,15 @@ public class ArenaManager implements Initializers {
      */
     public ArrayList<Arena> getAllArenas() {
         ArrayList<Arena> arenas = new ArrayList<>();
-        arenas.add(ffaArena);
-        arenas.addAll(ranked1v1Arenas);
-        arenas.addAll(team2v2Arenas);
+        if (ffaArena != null) {
+            arenas.add(ffaArena);
+        }
+        if (ranked1v1Arenas != null) {
+            arenas.addAll(ranked1v1Arenas);
+        }
+        if (team2v2Arenas != null) {
+            arenas.addAll(team2v2Arenas);
+        }
         return arenas;
     }
 

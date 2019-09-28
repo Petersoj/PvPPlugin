@@ -14,6 +14,7 @@ import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
 import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.data.GsonManager;
 import net.jacobpeterson.pvpplugin.util.Initializers;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,6 +69,25 @@ public class ArenaDataManager implements Initializers {
     @Override
     public void deinit() throws IOException {
         this.saveArenas();
+    }
+
+    /**
+     * Saves the arenas async.
+     *
+     * @see ArenaDataManager#saveArenas()
+     */
+    public void saveArenasAsync() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    ArenaDataManager.this.saveArenas();
+                    LOGGER.info("Saved arenas.");
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(arenaManager.getPvPPlugin());
     }
 
     /**

@@ -3,6 +3,7 @@ package net.jacobpeterson.pvpplugin.arena.itemstack;
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
+import net.jacobpeterson.pvpplugin.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -72,11 +73,11 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
                 ChatColor.AQUA + pvpPlayer.getPlayerData().getArenaTimesPlayedMap().get(arena));
 
         lore.add(ChatColor.GOLD + "Built by" + ChatColor.GRAY + ": " +
-                ChatColor.GREEN + arena.getBuiltByName());
+                ChatUtil.translateAnyColorCodes(arena.getBuiltByName()));
 
         // Append arena description lines (line separated by /n)
         for (String descriptionLine : arena.getDescription().split("/n")) {
-            lore.add(ChatColor.GOLD + descriptionLine);
+            lore.add(ChatUtil.translateAnyColorCodes(descriptionLine));
         }
 
         return lore.toArray(new String[0]);

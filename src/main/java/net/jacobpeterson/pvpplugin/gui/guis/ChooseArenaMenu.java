@@ -82,7 +82,8 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                 }
 
                 if (arenaItemStack.getItemStack() == null) {
-                    LOGGER.warning("No Arena ItemStack representation for arena: " + arenaItemStack.getArena().getName());
+                    LOGGER.warning("No Arena ItemStack representation for arena: " +
+                            arenaItemStack.getArena().getNameIdentifier());
                 } else {
                     inventory.setItem((currentLine * 9) + currentIndex, arenaItemStack.getItemStack());
                 }
@@ -114,7 +115,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                 // Clone the ArenaItemStack and get first game in queue
                 ArenaItemStack arenaItemStack = arena.getArenaItemStack(); // Gets the overall ArenaItemStack
                 if (arenaItemStack == null) {
-                    LOGGER.warning("No ArenaItemStack exists for " + arena.getName() + "!");
+                    LOGGER.warning("No ArenaItemStack exists for " + arena.getNameIdentifier() + "!");
                     continue; // Skip below and continue looping through arenas
                 } else {
                     arenaItemStack = arenaItemStack.clone();

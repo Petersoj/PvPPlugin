@@ -26,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
@@ -56,8 +55,10 @@ public class CommandHandler implements CommandExecutor {
                 return false;
             }
 
-            String commandName = command.getName();
+            // Allows for quoted sequences of args to be one arg
+            args = ChatUtil.getArgsQuoted(args);
 
+            String commandName = command.getName();
             switch (commandName) {
                 case "setlobby":
                     return handleSetLobbyCommand(pvpPlayer);
@@ -231,7 +232,7 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Player record could not be found.");
         } else {
             String prefix = playerManager.getPlayerGroupPrefix(recordPlayerName);
-            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.translateAlternateColorCodes('&', prefix) +
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatUtil.translateAnyColorCodes(prefix) +
                     recordPlayerName + ChatColor.GOLD + "'s Stats" + ChatColor.DARK_GRAY + ":");
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Rank" + ChatColor.DARK_GRAY + ": " +
                     ChatColor.AQUA + playerManager.getPlayerGroupName(recordPlayerName));
@@ -384,14 +385,14 @@ public class CommandHandler implements CommandExecutor {
                     currentFFAArena.setInventory(player.getInventory().getContents());
                     currentFFAArena.setArmorInventory(player.getInventory().getArmorContents());
                     player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully " +
-                            "set the Inventory for the " + ChatColor.WHITE + currentFFAArena.getName() +
+                            "set the Inventory for the " + currentFFAArena.getFormattedName() +
                             ChatColor.GREEN + " arena.");
                 }
 
             } else if (ffaCommand.equalsIgnoreCase("setSpawn")) {
 
                 if (currentFFAArena == null) { // Create the Arena
-                    currentFFAArena = new FFAArena(arenaManager, "FFA Arena");
+                    currentFFAArena = new FFAArena(arenaManager, "FFA Arena", ChatColor.GOLD + "FFA Arena");
                     arenaManager.setFFAArena(currentFFAArena);
 
                     gameManager.updateArenaReferences(); // Creates the FFAGame instance
@@ -416,7 +417,7 @@ public class CommandHandler implements CommandExecutor {
             }
 
             // Now save arenas async
-            this.saveArenasAsync();
+            pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
         }
         return true; // We use our own custom usage messages so don't make Bukkit output them
     }
@@ -483,10 +484,7 @@ public class CommandHandler implements CommandExecutor {
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
         PlayerDataManager playerDataManager = pvpPlugin.getPlayerManager().getPlayerDataManager();
 
-        // Allows for quoted sequences of args to be one arg
-        args = ChatUtil.getArgsQuoted(args);
-
-        if (args.length < 5) { // Check if <5 and not =5 because description is more than 1 word
+        if (args.length < 5) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Incorrect number of " +
                     "arguments! Usage: " + ChatColor.WHITE + "/1v1 arena add <name> <premium?> " +
                     "<built by> <description>");
@@ -505,22 +503,23 @@ public class CommandHandler implements CommandExecutor {
 
 
         // Parse arena information from args
-        String arena1v1Name = args[2];
+        String arena1v1FormattedName = args[2];
+        String arena1v1NameIdentifier = ChatUtil.stripAnyColorCodes(arena1v1FormattedName);
         boolean isPremium = Boolean.parseBoolean(args[3]);
-        String builtByName = args[4];
+        String builtByName = ChatUtil.translateAnyColorCodes(args[4]);
         StringBuilder descriptionStringBuilder = new StringBuilder();
         for (int descriptionIndex = 5; descriptionIndex < args.length; descriptionIndex++) {
             descriptionStringBuilder.append(args[descriptionIndex]).append(" ");
         }
 
         // Check if arena already exists
-        if (arenaManager.getArenaByName(arena1v1Name) != null) {
+        if (arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier) != null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Arena already exists!");
             return true;
         }
 
         // Create the arena
-        Ranked1v1Arena ranked1v1Arena = new Ranked1v1Arena(arenaManager, arena1v1Name);
+        Ranked1v1Arena ranked1v1Arena = new Ranked1v1Arena(arenaManager, arena1v1NameIdentifier, arena1v1FormattedName);
         ranked1v1Arena.setPremium(isPremium);
         ranked1v1Arena.setBuiltByName(builtByName);
         ranked1v1Arena.setDescription(descriptionStringBuilder.toString());
@@ -533,7 +532,7 @@ public class CommandHandler implements CommandExecutor {
         pvpPlugin.getGameManager().updateArenaReferences();
 
         // Save the arenas async
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         // Loop through all online Players, update their inventories that display arenas and their player data
         for (PvPPlayer aPvPPlayer : pvpPlugin.getPlayerManager().getPvPPlayers()) {
@@ -563,10 +562,10 @@ public class CommandHandler implements CommandExecutor {
             return true;
         }
 
-        String arena1v1Name = args[2];
+        String arena1v1NameIdentifier = args[2];
 
         // Get the arena
-        Arena arena = arenaManager.getArenaByName(arena1v1Name);
+        Arena arena = arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier);
         if (arena == null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "That arena does not exist!");
             return true;
@@ -581,7 +580,7 @@ public class CommandHandler implements CommandExecutor {
         // Update the GameManager arena references
         pvpPlugin.getGameManager().updateArenaReferences();
 
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         // Loop through all online Players, update their inventories that display arenas and their player data
         for (PvPPlayer aPvPPlayer : pvpPlugin.getPlayerManager().getPvPPlayers()) {
@@ -603,11 +602,12 @@ public class CommandHandler implements CommandExecutor {
      */
     public boolean handle1v1ArenaSetSpawnCommand(PvPPlayer pvpPlayer, String[] args, int spawnNumber) {
         Player player = pvpPlayer.getPlayer();
-        String arena1v1Name = args[2];
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
+        String arena1v1NameIdentifier = args[2];
+
         // Get the arena
-        Arena arena = arenaManager.getArenaByName(arena1v1Name);
+        Arena arena = arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier);
         if (arena == null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "That arena does not exist!");
             return true;
@@ -627,7 +627,7 @@ public class CommandHandler implements CommandExecutor {
             throw new IllegalArgumentException("Spawn number must be 1 or 2!");
         }
 
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully set the 1v1 Arena spawn " +
                 spawnNumber + ".");
@@ -643,11 +643,12 @@ public class CommandHandler implements CommandExecutor {
      */
     public boolean handle1v1ArenaSetFinishCommand(PvPPlayer pvpPlayer, String[] args) {
         Player player = pvpPlayer.getPlayer();
-        String arena1v1Name = args[2];
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
+        String arena1v1NameIdentifier = args[2];
+
         // Get the arena
-        Arena arena = arenaManager.getArenaByName(arena1v1Name);
+        Arena arena = arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier);
         if (arena == null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "That arena does not exist!");
             return true;
@@ -660,7 +661,7 @@ public class CommandHandler implements CommandExecutor {
         Ranked1v1Arena ranked1v1Arena = (Ranked1v1Arena) arena;
         ranked1v1Arena.setFinishLocation(LocationUtil.centerBlockLocation(player.getLocation()));
 
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully set the 1v1 Arena finish " +
                 "location.");
@@ -676,11 +677,12 @@ public class CommandHandler implements CommandExecutor {
      */
     public boolean handle1v1ArenaSetInvCommand(PvPPlayer pvpPlayer, String[] args) {
         Player player = pvpPlayer.getPlayer();
-        String arena1v1Name = args[1];
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
+        String arena1v1NameIdentifier = args[1];
+
         // Get the arena
-        Arena arena = arenaManager.getArenaByName(arena1v1Name);
+        Arena arena = arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier);
         if (arena == null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "That arena does not exist!");
             return true;
@@ -694,7 +696,7 @@ public class CommandHandler implements CommandExecutor {
         ranked1v1Arena.setInventory(player.getInventory().getContents());
         ranked1v1Arena.setArmorInventory(player.getInventory().getArmorContents());
 
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "Successfully set the 1v1 Arena Inventory.");
         return true;
@@ -712,10 +714,10 @@ public class CommandHandler implements CommandExecutor {
         PlayerDataManager playerDataManager = pvpPlugin.getPlayerManager().getPlayerDataManager();
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
-        String arena1v1Name = args[1];
+        String arena1v1NameIdentifier = args[1];
 
         // Get the arena
-        Arena arena = arenaManager.getArenaByName(arena1v1Name);
+        Arena arena = arenaManager.getArenaByNameIdentifier(arena1v1NameIdentifier);
         if (arena == null) {
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "That arena does not exist!");
             return true;
@@ -728,7 +730,7 @@ public class CommandHandler implements CommandExecutor {
         Ranked1v1Arena ranked1v1Arena = (Ranked1v1Arena) arena;
         ranked1v1Arena.setDisabled(arenaDisabled);
 
-        this.saveArenasAsync();
+        pvpPlugin.getArenaManager().getArenaDataManager().saveArenasAsync();
 
         // Loop through all online Players, update their inventories that display arenas and their player data
         for (PvPPlayer aPvPPlayer : pvpPlugin.getPlayerManager().getPvPPlayers()) {
@@ -750,22 +752,5 @@ public class CommandHandler implements CommandExecutor {
      */
     public boolean handle2v2Command(PvPPlayer pvpPlayer, String[] args) {
         return false;
-    }
-
-    /**
-     * Save the arenas async.
-     */
-    private void saveArenasAsync() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    pvpPlugin.getArenaManager().getArenaDataManager().saveArenas();
-                    LOGGER.info("Saved arenas.");
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
-            }
-        }.runTaskAsynchronously(pvpPlugin);
     }
 }
