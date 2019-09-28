@@ -265,7 +265,32 @@ public class CommandHandler implements CommandExecutor {
      * @return if the command was successful
      */
     public boolean handleSaveCommand(PvPPlayer pvpPlayer) {
-        return false;
+        Player player = pvpPlayer.getPlayer();
+        Game currentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
+
+        if (currentGame == null) {
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You're not currently in a game! " +
+                    "Join a game to save your inventory.");
+            return true;
+        }
+
+        // Save the player inventory for the respective arena
+        pvpPlayer.getPlayerInventoryManager().saveArenaPersistedInventory(currentGame.getArena());
+
+        if (pvpPlayer.isPremium()) {
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Saved your " +
+                    ChatColor.AQUA + "hotbar" + ChatColor.GOLD + " setup forever!");
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Thanks for supporting " +
+                    "our server by donating.");
+        } else {
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Saved your " +
+                    ChatColor.AQUA + "hotbar" + ChatColor.GOLD + " setup until you logout.");
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "However, premium members get to " +
+                    "keep it.");
+            player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Navigate through our premium" +
+                    " packages using " + ChatColor.AQUA + "/buy" + ChatColor.GOLD + "!");
+        }
+        return true;
     }
 
     /**

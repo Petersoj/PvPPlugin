@@ -86,7 +86,9 @@ public class GameManager implements Initializers {
 
         if (ffaArena != null && ffaGame == null) { // Check if FFAGame needs to be created
             this.ffaGame = new FFAGame(this, ffaArena);
-        } else if (ffaGame != null) { // Destroy FFAGame instance because the arena no longer exists
+            this.ffaGame.init();
+            this.ffaGame.start();
+        } else if (ffaArena == null && ffaGame != null) { // Destroy FFAGame instance as the arena no longer exists
             this.ffaGame.stop();
             this.ffaGame.deinit();
             this.ffaGame = null;

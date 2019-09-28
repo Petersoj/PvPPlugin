@@ -1,5 +1,6 @@
 package net.jacobpeterson.pvpplugin.player.inventory;
 
+import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.itemstack.ItemStackUtil;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.util.ChatUtil;
@@ -58,6 +59,37 @@ public class PlayerInventoryManager implements Initializers {
         playerInventory.setArmorContents(null);
 
         playerInventory.setItem(0, PLAY_NOW_COMPASS_ITEM);
+    }
+
+    /**
+     * Load arena persisted inventory.
+     *
+     * @param arena the arena
+     */
+    public void loadArenaPersistedInventory(Arena arena) {
+        PlayerInventory playerInventory = pvpPlayer.getPlayer().getInventory();
+        ItemStack[][] persistedInventory = pvpPlayer.getPlayerData().getArenaInventoryMap().get(arena);
+        if (persistedInventory == null) {
+            pvpPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not load " +
+                    "your saved inventory!");
+            return;
+        } else if (persistedInventory.length != 2) {
+            throw new ArrayIndexOutOfBoundsException("Saved inventory is in wrong format!");
+        }
+        playerInventory.setContents(persistedInventory[0]);
+    }
+
+    /**
+     * Save arena persisted inventory.
+     *
+     * @param arena the arena
+     */
+    public void saveArenaPersistedInventory(Arena arena) {
+        PlayerInventory playerInventory = pvpPlayer.getPlayer().getInventory();
+        ItemStack[] inventoryContents = playerInventory.getContents();
+        ItemStack[] inventoryArmorContents = playerInventory.getArmorContents();
+        pvpPlayer.getPlayerData().getArenaInventoryMap().put(arena,
+                new ItemStack[][]{inventoryContents, inventoryArmorContents});
     }
 
     /**

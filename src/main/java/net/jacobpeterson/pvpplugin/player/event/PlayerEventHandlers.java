@@ -4,6 +4,7 @@ import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.player.PlayerManager;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.player.data.PlayerBukkitDataRemoveRunnable;
+import net.jacobpeterson.pvpplugin.player.data.PlayerData;
 import net.jacobpeterson.pvpplugin.player.data.PlayerDataManager;
 import net.jacobpeterson.pvpplugin.player.data.PlayerDataSelectRunnable;
 import net.jacobpeterson.pvpplugin.player.data.PlayerDataUpdateRunnable;
@@ -87,6 +88,14 @@ public class PlayerEventHandlers implements Initializers {
 
         if (pvpPlayer == null) {
             return;
+        }
+
+        PlayerData playerData = pvpPlayer.getPlayerData();
+
+        // Handle removing data
+        if (!pvpPlayer.isPremium()) {
+            // Clear the arena inventories because non-premium can't persist their inventory.
+            playerData.getArenaInventoryMap().clear();
         }
 
         pvpPlayer.deinit();

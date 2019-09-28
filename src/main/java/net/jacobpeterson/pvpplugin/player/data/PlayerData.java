@@ -13,7 +13,7 @@ public class PlayerData implements Serializable {
 
     private int elo;
     private HashMap<Arena, Integer> arenaTimesPlayedMap;
-    private HashMap<Arena, ItemStack[][]> arenaInventoryMap; // [0] = inventory, [1] = armor inventory
+    private HashMap<Arena, ItemStack[][]> arenaInventoryMap; // [0] = inventory contents, [1] = armor contents
     private int unrankedFFAKills;
     private int unrankedFFADeaths;
     private int ranked1v1Kills;

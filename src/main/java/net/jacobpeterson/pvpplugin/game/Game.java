@@ -8,6 +8,7 @@ import net.jacobpeterson.pvpplugin.util.ChatUtil;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 
@@ -53,8 +54,13 @@ public abstract class Game implements Initializers {
 
         pvpPlayers.add(pvpPlayer);
 
-        player.getInventory().setContents(arena.getInventory());
-        player.getInventory().setArmorContents(arena.getArmorInventory());
+        PlayerInventory playerInventory = player.getInventory();
+        if (pvpPlayer.isPremium()) {
+            pvpPlayer.getPlayerInventoryManager().loadArenaPersistedInventory(arena);
+        } else {
+            playerInventory.setContents(arena.getInventory());
+            playerInventory.setArmorContents(arena.getArmorInventory());
+        }
 
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD +
                 "You successfully joined " + arena.getFormattedName());
@@ -75,6 +81,10 @@ public abstract class Game implements Initializers {
             pvpPlayers.remove(pvpPlayer);
         } else {
             return;
+        }
+
+        if (pvpPlayer.isPremium()) {
+            pvpPlayer.getPlayerInventoryManager().saveArenaPersistedInventory(arena);
         }
 
         pvpPlayer.getPlayerInventoryManager().loadSpawnInventory();
