@@ -16,7 +16,7 @@ public class FFAGame extends Game {
      * @param ffaArena    the ffa arena
      */
     public FFAGame(GameManager gameManager, FFAArena ffaArena) {
-        super(gameManager, ffaArena);
+        super(gameManager, ffaArena, "FFA");
 
         this.gameEventHandler = new FFAGameEventHandlers(this);
     }

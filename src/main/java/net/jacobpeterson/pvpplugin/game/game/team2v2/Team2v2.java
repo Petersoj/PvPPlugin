@@ -22,6 +22,21 @@ public class Team2v2 {
     }
 
     /**
+     * Gets other team member.
+     *
+     * @param pvpPlayer the pvp player
+     * @return the other team member
+     */
+    public PvPPlayer getOtherTeamMember(PvPPlayer pvpPlayer) {
+        if (teamLeader.equals(pvpPlayer)) {
+            return teamMember;
+        } else if (teamMember.equals(pvpPlayer)) {
+            return teamLeader;
+        }
+        return null;
+    }
+
+    /**
      * Gets team 2v2 game.
      *
      * @return the team 2v2 game

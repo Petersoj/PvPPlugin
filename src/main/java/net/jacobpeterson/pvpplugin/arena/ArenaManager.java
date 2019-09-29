@@ -9,7 +9,11 @@ import net.jacobpeterson.pvpplugin.util.Initializers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The type Arena manager.
+ */
 public class ArenaManager implements Initializers {
 
     private PvPPlugin pvpPlugin;
@@ -73,6 +77,26 @@ public class ArenaManager implements Initializers {
             arenas.addAll(team2v2Arenas);
         }
         return arenas;
+    }
+
+    /**
+     * Gets random ranked 1v1 arena.
+     *
+     * @return the random ranked 1v1 arena
+     */
+    public Arena getRandomRanked1v1Arena() {
+        ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+        return ranked1v1Arenas.get(threadLocalRandom.nextInt(ranked1v1Arenas.size()));
+    }
+
+    /**
+     * Gets random team 2v2 arena.
+     *
+     * @return the random team 2v2 arena
+     */
+    public Arena getRandomTeam2v2Arena() {
+        ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+        return team2v2Arenas.get(threadLocalRandom.nextInt(team2v2Arenas.size()));
     }
 
     /**

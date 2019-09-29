@@ -16,7 +16,10 @@ public abstract class Game implements Initializers {
 
     protected GameManager gameManager;
     protected Arena arena;
+    protected String name;
     protected boolean inProgress;
+    protected boolean duel;
+    protected ArrayList<PvPPlayer> invitedPlayers;
     protected AbstractGameEventHandlers gameEventHandler;
     protected ArrayList<PvPPlayer> pvpPlayers;
 
@@ -25,10 +28,15 @@ public abstract class Game implements Initializers {
      *
      * @param gameManager the game manager
      * @param arena       the arena
+     * @param name        the name
      */
-    public Game(GameManager gameManager, Arena arena) {
+    public Game(GameManager gameManager, Arena arena, String name) {
         this.gameManager = gameManager;
         this.arena = arena;
+        this.name = name;
+        this.inProgress = false;
+        this.duel = false;
+        this.invitedPlayers = new ArrayList<>();
         this.pvpPlayers = new ArrayList<>();
     }
 
@@ -117,12 +125,66 @@ public abstract class Game implements Initializers {
     public abstract void setArena(Arena arena);
 
     /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Is in progress boolean.
      *
      * @return the boolean
      */
     public boolean isInProgress() {
         return inProgress;
+    }
+
+    /**
+     * Is duel boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isDuel() {
+        return duel;
+    }
+
+    /**
+     * Sets duel.
+     *
+     * @param duel the duel
+     */
+    public void setDuel(boolean duel) {
+        this.duel = duel;
+    }
+
+    /**
+     * Gets invited players.
+     *
+     * @return the invited players
+     */
+    public ArrayList<PvPPlayer> getInvitedPlayers() {
+        return invitedPlayers;
+    }
+
+    /**
+     * Sets invited players.
+     *
+     * @param invitedPlayers the invited players
+     */
+    public void setInvitedPlayers(ArrayList<PvPPlayer> invitedPlayers) {
+        this.invitedPlayers = invitedPlayers;
     }
 
     /**

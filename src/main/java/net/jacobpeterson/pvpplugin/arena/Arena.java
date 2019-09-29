@@ -14,7 +14,6 @@ public abstract class Arena implements Serializable {
     protected ItemStack[] inventory; // Use PlayerInventory#getContents()
     protected ItemStack[] armorInventory; // Use PlayerInventory#getArmorContents()
     protected boolean disabled;
-    protected boolean premium;
     protected String builtByName;
     protected String description;
 
@@ -30,7 +29,6 @@ public abstract class Arena implements Serializable {
         this.nameIdentifier = nameIdentifier;
         this.formattedName = formattedName;
         this.disabled = false;
-        this.premium = false;
         this.builtByName = "";
         this.description = "";
     }
@@ -155,24 +153,6 @@ public abstract class Arena implements Serializable {
      */
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-
-    /**
-     * Is premium boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isPremium() {
-        return premium;
-    }
-
-    /**
-     * Sets premium.
-     *
-     * @param premium the premium
-     */
-    public void setPremium(boolean premium) {
-        this.premium = premium;
     }
 
     /**

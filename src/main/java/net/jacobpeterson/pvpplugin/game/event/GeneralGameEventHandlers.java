@@ -52,7 +52,11 @@ public class GeneralGameEventHandlers implements Initializers {
 
         Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handlePlayerQuitEvent(event, pvpPlayer);
+            if (playerCurrentGame.isInProgress()) {
+                playerCurrentGame.getGameEventHandler().handlePlayerQuitEvent(event, pvpPlayer);
+            } else {
+                this.gameManager.handlePlayerLeaveQueue(pvpPlayer);
+            }
         }
     }
 
@@ -75,7 +79,9 @@ public class GeneralGameEventHandlers implements Initializers {
 
         Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handleEntityDamageByBlockEvent(event, pvpPlayer);
+            if (playerCurrentGame.isInProgress()) {
+                playerCurrentGame.getGameEventHandler().handleEntityDamageByBlockEvent(event, pvpPlayer);
+            }
         }
     }
 
@@ -87,6 +93,9 @@ public class GeneralGameEventHandlers implements Initializers {
      * @param event the event
      */
     public void handleEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -104,8 +113,10 @@ public class GeneralGameEventHandlers implements Initializers {
         }
 
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handleEntityDamageByEntityEvent(
-                    event, damageePvPPlayer, damagerPvPPlayer);
+            if (playerCurrentGame.isInProgress()) {
+                playerCurrentGame.getGameEventHandler().handleEntityDamageByEntityEvent(
+                        event, damageePvPPlayer, damagerPvPPlayer);
+            }
         }
     }
 
@@ -124,7 +135,9 @@ public class GeneralGameEventHandlers implements Initializers {
 
         Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handlePlayerDeathEvent(event, pvpPlayer);
+            if (playerCurrentGame.isInProgress()) {
+                playerCurrentGame.getGameEventHandler().handlePlayerDeathEvent(event, pvpPlayer);
+            }
         }
     }
 
@@ -143,7 +156,9 @@ public class GeneralGameEventHandlers implements Initializers {
 
         Game playerCurrentGame = pvpPlayer.getPlayerGameManager().getCurrentGame();
         if (playerCurrentGame != null) {
-            playerCurrentGame.getGameEventHandler().handlePlayerRespawnEvent(event, pvpPlayer);
+            if (playerCurrentGame.isInProgress()) {
+                playerCurrentGame.getGameEventHandler().handlePlayerRespawnEvent(event, pvpPlayer);
+            }
         }
     }
 }

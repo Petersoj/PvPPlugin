@@ -60,9 +60,11 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
                                           String... currentPlayingLines) {
         ArrayList<String> lore = new ArrayList<>();
 
-        if (arena.isPremium() && !pvpPlayer.isPremium()) {
+        if (!pvpPlayer.isPremium()) {
             lore.add(ChatColor.GOLD + "You need premium to choose this arena.");
+            lore.add(ChatColor.GOLD + "Click the emerald to join a random arena.");
             lore.add(ChatColor.GOLD + "For premium, visit " + ChatColor.AQUA + "shop.mcsiege.com");
+            lore.add(ChatColor.WHITE.toString()); // Empty line
         }
 
         if (currentPlayingLines != null) {

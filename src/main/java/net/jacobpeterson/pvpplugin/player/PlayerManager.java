@@ -68,6 +68,9 @@ public class PlayerManager implements Initializers {
      * @return the PvPPlayer
      */
     public PvPPlayer getPvPPlayer(Player player) {
+        if (player == null) {
+            return null;
+        }
         for (PvPPlayer pvpPlayer : pvpPlayers) {
             if (pvpPlayer.getPlayer() == player) {
                 return pvpPlayer;

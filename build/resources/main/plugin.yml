@@ -17,13 +17,13 @@ commands:
     description: Saves the in-game hotbar while playing 1v1/2v2
   scoreboard:
     description: Top 10 players (most elo)
+  duel:
+    aliases: [challenge]
+    description: Sends a 1v1 duel to a player
   accept:
     description: Accepts a duel challenge/team invite
   leave:
     description: Leaves the arena
-  challenge:
-    aliases: [duel]
-    description: Sends a 1v1 duel to a player
 
   ffa:
     description: Joins the ffa arena

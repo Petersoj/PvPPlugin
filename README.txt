@@ -31,6 +31,7 @@ Global commands to these plugins:
 /save -> Saves the in-game hotbar while playing 1v1/2v2
 /scoreboard -> Top 10 players (most elo)
 /accept <player> -> Accepts a duel challenge/team invite
+/leave queue -> Removes player from current duel or normal game queue
 
 Messages:
 Scoreboard (top 10):
@@ -121,7 +122,7 @@ Game Rank (the leaderboard position/rank)
 
 Commands:
 /1v1 -> Opens the 1v1 menu (Screenshot: )
-/challenge <player> or /duel <player> -> Sends a 1v1 duel to a player
+/challenge <player> or /duel <player> -> Sends a 1v1 duel to a player to 1v1 on any arena
 /1v1 arena add <name> <premium?> <built by> <description> -> Creates a 1v1 arena (use /n for multi-line description)
 /1v1 arena remove <arena> -> Removes a 1v1 arena
 /1v1 arena setSpawn1 <arena> -> Sets the first spawn when joining the arena

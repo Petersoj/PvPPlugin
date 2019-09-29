@@ -15,6 +15,12 @@ public abstract class AbstractGameEventHandlers {
 
     protected Game game;
 
+    /**
+     * Instantiates a new AbstractGameEventHandlers.
+     * NOTE: All these events assume that the game is in progress!
+     *
+     * @param game the game
+     */
     public AbstractGameEventHandlers(Game game) {
         this.game = game;
     }

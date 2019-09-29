@@ -17,6 +17,10 @@ public class Ranked1v1Menu extends ChooseArenaMenu {
     @Override
     public void onInventoryClickEvent(PvPPlayer pvpPlayer, InventoryClickEvent event) {
         event.setCancelled(true);
+        /*
+        Random Queue (this text shows up if you are in the random queue in 1v1): &6You are in position &b<position> &6of the queue.
+        In Queue against player (this will show up if you have been challenged by a player and accepted): &6You and <displayname> &6are in position &b<position> &6of the queue.
+         */
         for (ArenaItemStack arenaItemStack : arenaItemStacks) {
 //            if () {
 //
