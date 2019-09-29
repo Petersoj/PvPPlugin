@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -47,6 +48,16 @@ public class PluginListeners implements Listener, Initializers {
 
     @Override
     public void deinit() {
+    }
+
+    /**
+     * On player command pre process event.
+     *
+     * @param event the event
+     */
+    @EventHandler
+    public void onPlayerCommandPreProcessEvent(PlayerCommandPreprocessEvent event) {
+        this.pvpPlugin.getCommandHandler().handlePlayerCommandPreProcessEvent(event);
     }
 
     /**

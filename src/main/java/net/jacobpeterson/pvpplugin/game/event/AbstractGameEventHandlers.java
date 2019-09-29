@@ -111,15 +111,21 @@ public abstract class AbstractGameEventHandlers {
      */
     protected void sendDeathMessage(PvPPlayer deadPvPPlayer) {
         DamageTracker damageTracker = deadPvPPlayer.getPlayerGameManager().getDamageTracker();
-        PvPPlayer lastDamagingPvPPlayer = damageTracker.getLastDamagerPvPPlayer();
+        PvPPlayer lastDamagerPvPPlayer = damageTracker.getLastDamagerPvPPlayer();
 
         // Format: <displayname> &6had &b<health> &6health left when they killed you.
-        String deathMessage = ChatUtil.SERVER_CHAT_PREFIX + lastDamagingPvPPlayer.getPrefixedName() +
-                ChatColor.GOLD + " had " + ChatColor.AQUA +
-                ChatUtil.formatPlayerHealth((float) lastDamagingPvPPlayer.getPlayer().getHealth()) +
-                ChatColor.AQUA + " when they killed you.";
-
-        deadPvPPlayer.getPlayer().sendMessage(deathMessage);
+        if (lastDamagerPvPPlayer != null) {
+            String deathMessage = ChatUtil.SERVER_CHAT_PREFIX + lastDamagerPvPPlayer.getPrefixedName() +
+                    ChatColor.GOLD + " had " + ChatColor.AQUA +
+                    ChatUtil.formatPlayerHealth((float) lastDamagerPvPPlayer.getPlayer().getHealth()) +
+                    ChatColor.GOLD + " when they killed you.";
+            deadPvPPlayer.getPlayer().sendMessage(deathMessage);
+        } else if (damageTracker.getLastDamagerObject() != null) {
+            deadPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You died from " +
+                    damageTracker.getLastDamagerObject().toString().toLowerCase() + ChatColor.GOLD + ".");
+        } else {
+            deadPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You died!");
+        }
     }
 
     /**

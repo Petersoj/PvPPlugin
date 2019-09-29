@@ -91,13 +91,16 @@ public class MainMenu extends AbstractInventoryGUI {
                 player.openInventory(ranked1v1MenuInventory);
             }
         } else if (currentItem.equals(unrankedFFAItem)) {
-            FFAGame currentFFAGame = gameManager.getFFAGame();
+            FFAGame ffaGame = gameManager.getFFAGame();
 
-            if (currentFFAGame == null) {
+            if (ffaGame == null) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "FFA Game does not exist!");
                 player.closeInventory();
+            } else if (ffaGame.equals(pvpPlayer.getPlayerGameManager().getCurrentGame())) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You're already in FFA!");
+                player.closeInventory();
             } else {
-                currentFFAGame.join(pvpPlayer);
+                ffaGame.join(pvpPlayer);
             }
         } else if (currentItem.equals(teamPvPItem)) {
             // TODO Check if player has already created team, if so, open the craft team menu.

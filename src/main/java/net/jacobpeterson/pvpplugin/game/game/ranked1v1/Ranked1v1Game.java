@@ -2,9 +2,9 @@ package net.jacobpeterson.pvpplugin.game.game.ranked1v1;
 
 import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.arenas.ranked1v1.Ranked1v1Arena;
-import net.jacobpeterson.pvpplugin.arena.arenas.team2v2.Team2v2Arena;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.game.GameManager;
+import net.jacobpeterson.pvpplugin.game.game.ranked1v1.listener.Ranked1v1EventHandlers;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.util.Initializers;
 
@@ -16,26 +16,27 @@ public class Ranked1v1Game extends Game implements Initializers {
     /**
      * Instantiates a new Ranked 1v1 Game which serves as a game instance for the Arena.
      *
-     * @param gameManager  the game manager
-     * @param team2v2Arena the team 2v2 arena
+     * @param gameManager    the game manager
+     * @param ranked1v1Arena the ranked 1 v 1 arena
      */
-    public Ranked1v1Game(GameManager gameManager, Team2v2Arena team2v2Arena) {
-        super(gameManager, team2v2Arena, "Ranked 1v1");
+    public Ranked1v1Game(GameManager gameManager, Ranked1v1Arena ranked1v1Arena) {
+        super(gameManager, ranked1v1Arena, "Ranked 1v1");
+
+        this.gameEventHandlers = new Ranked1v1EventHandlers(this);
     }
 
     @Override
     public void init() {
-
     }
 
     @Override
     public void deinit() {
-
     }
 
     @Override
     public void start() {
-
+        // Start countdown and .join()
+        // Start another countdown
     }
 
     @Override

@@ -7,6 +7,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
+import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +35,45 @@ public final class PlayerUtil {
      */
     // Thanks to https://stackoverflow.com/a/47238049
     private static final Pattern UUID_DASH_PATTERN = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
+
+    /**
+     * Sends title to player via NMS.
+     *
+     * @param player      the player
+     * @param title       the title (true for title, false for subtitle)
+     * @param text        the text
+     * @param fadeInTime  the fade in time in ticks
+     * @param showTime    the show time in ticks
+     * @param fadeOutTime the fade out time in ticks
+     * @param color       the color
+     */
+    public static void sendTitle(Player player, boolean title, String text,
+                                 int fadeInTime, int showTime, int fadeOutTime, ChatColor color) {
+        PacketPlayOutTitle packetPlayOutTitleTimes = new PacketPlayOutTitle(fadeInTime, showTime, fadeOutTime);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleTimes);
+
+        IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.
+                a("{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
+        PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(
+                title ? PacketPlayOutTitle.EnumTitleAction.TITLE : PacketPlayOutTitle.EnumTitleAction.SUBTITLE,
+                chatBaseComponent);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitle);
+    }
+
+    /**
+     * Clears title on player screen via NMS.
+     *
+     * @param player the player
+     */
+    public static void clearTitle(Player player) {
+        IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a(""); // No text needed
+        PacketPlayOutTitle packetPlayOutTitleClear = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.CLEAR,
+                chatBaseComponent);
+        PacketPlayOutTitle packetPlayOutTitleReset = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.RESET,
+                chatBaseComponent);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleClear);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleReset);
+    }
 
     /**
      * Gets a player UUID from a player name via Mojang's RestAPI.

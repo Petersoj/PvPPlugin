@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class Game implements Initializers {
 
@@ -20,7 +21,7 @@ public abstract class Game implements Initializers {
     protected boolean inProgress;
     protected boolean duel;
     protected ArrayList<PvPPlayer> invitedPlayers;
-    protected AbstractGameEventHandlers gameEventHandler;
+    protected AbstractGameEventHandlers gameEventHandlers;
     protected ArrayList<PvPPlayer> pvpPlayers;
 
     /**
@@ -62,10 +63,13 @@ public abstract class Game implements Initializers {
 
         pvpPlayers.add(pvpPlayer);
 
+        // Load/set the player inventory
         PlayerInventory playerInventory = player.getInventory();
+        boolean loadDefaultInventory = true;
         if (pvpPlayer.isPremium()) {
-            pvpPlayer.getPlayerInventoryManager().loadArenaPersistedInventory(arena);
-        } else {
+            loadDefaultInventory = !pvpPlayer.getPlayerInventoryManager().loadArenaPersistedInventory(arena);
+        }
+        if (loadDefaultInventory) {
             playerInventory.setContents(arena.getInventory());
             playerInventory.setArmorContents(arena.getArmorInventory());
         }
@@ -73,7 +77,7 @@ public abstract class Game implements Initializers {
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD +
                 "You successfully joined " + arena.getFormattedName());
         player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Type " + ChatColor.AQUA +
-                "/leave " + ChatColor.GOLD + "to get back to the lobby.");
+                "/leave" + ChatColor.GOLD + " to get back to the lobby.");
     }
 
     /**
@@ -91,14 +95,19 @@ public abstract class Game implements Initializers {
             return;
         }
 
+        // Update the player stats
+        HashMap<Arena, Integer> arenaTimesPlayedMap = pvpPlayer.getPlayerData().getArenaTimesPlayedMap();
+        int previousTimesPlayed = arenaTimesPlayedMap.get(arena);
+        arenaTimesPlayedMap.put(arena, previousTimesPlayed + 1);
+
+        // Save the player inventory if premium
         if (pvpPlayer.isPremium()) {
             pvpPlayer.getPlayerInventoryManager().saveArenaPersistedInventory(arena);
         }
 
         pvpPlayer.getPlayerInventoryManager().loadSpawnInventory();
 
-        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully left the " +
-                "FFA Arena");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "You successfully left " + name);
     }
 
     /**
@@ -188,12 +197,12 @@ public abstract class Game implements Initializers {
     }
 
     /**
-     * Gets game event handler.
+     * Gets game event handlers.
      *
-     * @return the game event handler
+     * @return the game event handlers
      */
-    public AbstractGameEventHandlers getGameEventHandler() {
-        return gameEventHandler;
+    public AbstractGameEventHandlers getGameEventHandlers() {
+        return gameEventHandlers;
     }
 
     /**

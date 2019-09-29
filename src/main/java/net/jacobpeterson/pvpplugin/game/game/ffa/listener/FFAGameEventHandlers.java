@@ -19,9 +19,7 @@ public class FFAGameEventHandlers extends AbstractGameEventHandlers {
 
     @Override
     public void handlePlayerQuitEvent(PlayerQuitEvent event, PvPPlayer pvpPlayer) {
-        if (game.isInProgress()) {
-            this.getGame().leave(pvpPlayer);
-        }
+        this.getGame().leave(pvpPlayer);
     }
 
     @Override

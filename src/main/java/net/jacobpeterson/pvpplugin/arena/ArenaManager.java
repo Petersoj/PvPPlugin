@@ -85,6 +85,9 @@ public class ArenaManager implements Initializers {
      * @return the random ranked 1v1 arena
      */
     public Arena getRandomRanked1v1Arena() {
+        if (ranked1v1Arenas.size() == 0) {
+            return null;
+        }
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
         return ranked1v1Arenas.get(threadLocalRandom.nextInt(ranked1v1Arenas.size()));
     }
@@ -95,6 +98,9 @@ public class ArenaManager implements Initializers {
      * @return the random team 2v2 arena
      */
     public Arena getRandomTeam2v2Arena() {
+        if (team2v2Arenas.size() == 0) {
+            return null;
+        }
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
         return team2v2Arenas.get(threadLocalRandom.nextInt(team2v2Arenas.size()));
     }

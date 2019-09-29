@@ -49,17 +49,41 @@ public class ItemStackArraySerializer implements JsonSerializer<ItemStack[]>, Js
         }
 
         JsonArray jsonItemStackArray = (JsonArray) jsonElement;
+        int size = -1;
 
-        if (jsonItemStackArray.size() > 0) {
-            int size = jsonItemStackArray.get(0).getAsJsonObject().getAsJsonPrimitive("size").getAsInt();
+        // Loop through to find 'size' to create ItemStack[]
+        for (JsonElement arrayElement : jsonItemStackArray) {
+            if (!(arrayElement instanceof JsonObject)) {
+                throw new JsonParseException("JSON Array must be all Objects!");
+            }
+
+            JsonObject slotJsonObject = arrayElement.getAsJsonObject();
+            if (slotJsonObject.has("size")) {
+                size = slotJsonObject.getAsJsonPrimitive("size").getAsInt();
+            }
+        }
+
+        if (size == -1) {
+            return null;
+        } else {
             contents = new ItemStack[size];
         }
 
-        for (int index = 1; index < jsonItemStackArray.size(); index++) {
-            JsonObject slotJsonObject = jsonItemStackArray.get(index).getAsJsonObject();
-            ItemStack itemStack = jsonDeserializationContext.deserialize(slotJsonObject.getAsJsonObject("item"),
-                    ItemStack.class);
-            contents[slotJsonObject.getAsJsonPrimitive("slot").getAsInt()] = itemStack;
+        // Loop through to create all ItemStacks
+        for (JsonElement arrayElement : jsonItemStackArray) {
+            if (!(arrayElement instanceof JsonObject)) {
+                throw new JsonParseException("JSON Array must be all Objects!");
+            }
+
+            JsonObject slotJsonObject = arrayElement.getAsJsonObject();
+
+            // Check if array element object has 'slot' as this is the ItemStack object
+            if (slotJsonObject.has("slot")) {
+                ItemStack itemStack = jsonDeserializationContext.deserialize(slotJsonObject.getAsJsonObject("item"),
+                        ItemStack.class);
+                int slot = slotJsonObject.getAsJsonPrimitive("slot").getAsInt();
+                contents[slot] = itemStack;
+            }
         }
 
         return contents;

@@ -18,7 +18,7 @@ public class FFAGame extends Game {
     public FFAGame(GameManager gameManager, FFAArena ffaArena) {
         super(gameManager, ffaArena, "FFA");
 
-        this.gameEventHandler = new FFAGameEventHandlers(this);
+        this.gameEventHandlers = new FFAGameEventHandlers(this);
     }
 
     @Override

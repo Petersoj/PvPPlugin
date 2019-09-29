@@ -65,18 +65,22 @@ public class PlayerInventoryManager implements Initializers {
      * Load arena persisted inventory.
      *
      * @param arena the arena
+     * @return the if the inventory was loaded
      */
-    public void loadArenaPersistedInventory(Arena arena) {
+    public boolean loadArenaPersistedInventory(Arena arena) {
         PlayerInventory playerInventory = pvpPlayer.getPlayer().getInventory();
         ItemStack[][] persistedInventory = pvpPlayer.getPlayerData().getArenaInventoryMap().get(arena);
         if (persistedInventory == null) {
             pvpPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not load " +
                     "your saved inventory!");
-            return;
+            return false;
         } else if (persistedInventory.length != 2) {
-            throw new ArrayIndexOutOfBoundsException("Saved inventory is in wrong format!");
+            new ArrayIndexOutOfBoundsException("Saved inventory is in wrong format!").printStackTrace();
+            return false;
         }
         playerInventory.setContents(persistedInventory[0]);
+        playerInventory.setArmorContents(persistedInventory[1]);
+        return true;
     }
 
     /**

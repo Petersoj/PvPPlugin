@@ -231,19 +231,30 @@ public class GameManager implements Initializers {
         if (playerCurrentGame instanceof Ranked1v1Game) { // Check if the game was Ranked1v1Game
             Ranked1v1Game ranked1v1Game = (Ranked1v1Game) playerCurrentGame;
             if (pvpPlayer.equals(ranked1v1Game.getDueler())) { // Check if queue leaver is dueler
+                ranked1v1Game.setDueler(null);
+
+                // Notify acceptor that the dueler has left
                 PvPPlayer acceptorPvPPlayer = ranked1v1Game.getAcceptor();
-                acceptorPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
-                        ChatColor.RED + "Your opponent has left your game queue!");
-                acceptorPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
-                        ChatColor.GOLD + "Join another game!");
-                // Cancel game
-                acceptorPvPPlayer.getPlayerGameManager().setCurrentGame(null);
+                if (acceptorPvPPlayer != null) {
+                    acceptorPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
+                            ChatColor.RED + "Your opponent has left your game queue!");
+                    acceptorPvPPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
+                            ChatColor.GOLD + "Join another game!");
+                    // Set acceptor current game to null as you need a dueler to keep playing
+                    acceptorPvPPlayer.getPlayerGameManager().setCurrentGame(null);
+                }
             } else if (pvpPlayer.equals(ranked1v1Game.getAcceptor())) { // Check if queue leaver is acceptor
-                ranked1v1Game.getDueler().getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
-                        ChatColor.RED + "Your opponent has left your game queue!");
-                ranked1v1Game.getDueler().getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
-                        ChatColor.GOLD + "Invite/join another or type " + ChatColor.WHITE + "/leave queue" +
-                        ChatColor.GOLD + " to leave your Ranked 1v1 game.");
+                ranked1v1Game.setAcceptor(null);
+
+                // Notify dueler that the acceptor has left
+                PvPPlayer duelerPvPPlayer = ranked1v1Game.getDueler();
+                if (duelerPvPPlayer != null) {
+                    ranked1v1Game.getDueler().getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
+                            ChatColor.RED + "Your opponent has left your game queue!");
+                    ranked1v1Game.getDueler().getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX +
+                            ChatColor.GOLD + "Invite/join another or type " + ChatColor.WHITE + "/leave queue" +
+                            ChatColor.GOLD + " to leave your Ranked 1v1 game.");
+                }
                 // Allow dueler game instance to persist because another player could accept another invite, etc.
             }
 

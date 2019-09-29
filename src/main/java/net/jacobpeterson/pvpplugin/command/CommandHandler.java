@@ -27,6 +27,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -47,6 +48,34 @@ public class CommandHandler implements CommandExecutor {
     public CommandHandler(PvPPlugin pvpPlugin) {
         this.LOGGER = PvPPlugin.getPluginLogger();
         this.pvpPlugin = pvpPlugin;
+    }
+
+    /**
+     * Handle player command pre process event.
+     * Used to catch commands before they go to other plugins.
+     *
+     * @param event the event
+     */
+    public void handlePlayerCommandPreProcessEvent(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        PvPPlayer pvpPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(player);
+
+        if (pvpPlayer == null) {
+            return;
+        }
+
+        // event.getMessage() includes the '/' in the command e.g. '/help'
+        String command = event.getMessage();
+
+        boolean cancel = false;
+        switch (command.toLowerCase()) {
+            case "/help":
+                cancel = preprocessHelpCommand(pvpPlayer);
+                break;
+            default:
+                break;
+        }
+        event.setCancelled(cancel);
     }
 
     @Override
@@ -98,6 +127,54 @@ public class CommandHandler implements CommandExecutor {
             commandSender.sendMessage("You must be a player to execute PvPPlugin commands.");
             return false;
         }
+    }
+
+    /**
+     * Preprocess help command.
+     *
+     * @param pvpPlayer the pvp player
+     * @return whether or not to cancel the command preprocess event
+     */
+    public boolean preprocessHelpCommand(PvPPlayer pvpPlayer) {
+        Player player = pvpPlayer.getPlayer();
+
+        // TODO send detailed command info for admins
+        // Check if player has elevated privileges
+        // if (pvpPlayer.hasElevatedPrivileges()) {
+        //
+        // } else { // Send regular command info
+        //
+        // }
+
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/lobby" +
+                ChatColor.WHITE + " - go to the lobby");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/record" +
+                ChatColor.WHITE + " - show your record");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/record <player>" +
+                ChatColor.WHITE + " - show another player's record");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/save" +
+                ChatColor.WHITE + " - saves your inventory for later (Premium players is automatic)");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/scoreboard" +
+                ChatColor.WHITE + " - shows the top 10 players (most ELO)");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/duel <player>" +
+                ChatColor.WHITE + " - duel a player in ranked 1v1");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/duel team <team leader>" +
+                ChatColor.WHITE + " - duel a team");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/accept <player>" +
+                ChatColor.WHITE + " - accept a ranked 1v1 duel");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/accept team <team leader>" +
+                ChatColor.WHITE + " - accept a team duel");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/leave" +
+                ChatColor.WHITE + " - leave your current game");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/leave queue" +
+                ChatColor.WHITE + " - leave your game queue (or duel queue)");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/ffa" +
+                ChatColor.WHITE + " - join FFA");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/1v1" +
+                ChatColor.WHITE + " - open the Ranked 1v1 Menu");
+        player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "/2v2" +
+                ChatColor.WHITE + " - open the 2v2 Menu");
+        return true; // Cancel the event
     }
 
     /**
@@ -391,9 +468,16 @@ public class CommandHandler implements CommandExecutor {
             PvPPlayer duelPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(
                     Bukkit.getPlayer(duelPlayerName));
 
-            if (duelPlayer == null) { // Check if player is online
+            // Check if player is online
+            if (duelPlayer == null) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not find player " +
                         ChatColor.WHITE + duelPlayerName + ChatColor.RED + "!");
+                return true;
+            }
+
+            // Check if duel player is themselves
+            if (duelPlayer.equals(pvpPlayer)) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You can't duel yourself!");
                 return true;
             }
 
@@ -455,6 +539,11 @@ public class CommandHandler implements CommandExecutor {
             if (duelTeam2v2LeaderPlayer == null) { // Check if team leader is online
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not find player " +
                         ChatColor.WHITE + duelTeam2v2LeaderName);
+                return true;
+            }
+            // Check if duel team leader is themselves
+            if (duelTeam2v2LeaderPlayer.equals(pvpPlayer)) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You can't duel yourself!");
                 return true;
             }
 
@@ -589,7 +678,7 @@ public class CommandHandler implements CommandExecutor {
             }
 
             Game acceptPlayerCurrentGame = acceptPlayer.getPlayerGameManager().getCurrentGame();
-            // Check if accept player cannot be accepted
+            // Check if accept player is in a game
             if (acceptPlayerCurrentGame != null && acceptPlayerCurrentGame.isInProgress()) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Player " +
                         acceptPlayer.getPrefixedName() + ChatColor.GOLD + " is currently in a game!");
@@ -608,39 +697,62 @@ public class CommandHandler implements CommandExecutor {
                         acceptPlayer.getPrefixedName() + ChatColor.GOLD + " already accepted another player!");
                 return true;
             }
+            // Check if player is not invited to accept player's game
+            if (!acceptPlayerCurrentRanked1v1Game.getInvitedPlayers().contains(pvpPlayer)) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You were never invited to " +
+                        "this game!");
+                return true;
+            }
+            // Check if current player's game is in progress
+            if (playerCurrentGame != null && playerCurrentGame.isInProgress()) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You're currently in a game!");
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Use " + ChatColor.WHITE +
+                        "/leave" + ChatColor.RED + " to leave your current game.");
+                return true;
+            }
             // Check if accept player is part of another type of game
             if (playerCurrentGame != null && !(playerCurrentGame instanceof Ranked1v1Game)) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must leave the " +
                         "queue of any other game before attempting to accept another player's 1v1 duel!");
                 return true;
             }
-
-            // Check if player cannot invite other players
+            // Check if player's team is full or in queue
             Ranked1v1Game playerCurrentRanked1v1Game = (Ranked1v1Game) playerCurrentGame;
             if (playerCurrentRanked1v1Game != null &&
-                    playerCurrentRanked1v1Game.getDueler() != null &&
-                    playerCurrentRanked1v1Game.getAcceptor() != null) {
+                    (playerCurrentRanked1v1Game.getDueler() != null ||
+                            playerCurrentRanked1v1Game.getAcceptor() != null) &&
+                    !gameManager.isInQueue(playerCurrentRanked1v1Game)) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You cannot accept any more invites!");
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Use " + ChatColor.WHITE +
-                        "/leave queue" + ChatColor.RED + " to leave your current game.");
+                        "/leave queue" + ChatColor.RED + " to leave your current game queue.");
                 return true;
             }
 
             // Accept the invite
+            acceptPlayerCurrentRanked1v1Game.getInvitedPlayers().clear();
             acceptPlayerCurrentRanked1v1Game.setAcceptor(pvpPlayer);
             playerGameManager.setCurrentGame(acceptPlayerCurrentRanked1v1Game);
 
             // Send info messages
             acceptPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + pvpPlayer.getPrefixedName() +
                     ChatColor.GREEN + " has accepted your duel invite!");
-            acceptPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Now select an arena" +
-                    "to join in Ranked 1v1 Menu.");
+            acceptPlayer.getPlayer().sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GOLD + "Now select an " +
+                    "arena to join in Ranked 1v1 Menu.");
             player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.GREEN + "You have successfully" +
                     " accepted the invite!");
             return true;
         } else if (args.length == 2) {
 
             // /accept command for 2v2
+
+            String acceptTeamLeaderName = args[1];
+            PvPPlayer acceptTeamLeaderPlayer = pvpPlugin.getPlayerManager().getPvPPlayer(
+                    Bukkit.getPlayer(acceptTeamLeaderName));
+
+            if (acceptTeamLeaderPlayer == null) {
+                player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not find player " +
+                        ChatColor.WHITE + acceptTeamLeaderName + ChatColor.RED + "!");
+            }
 
             // TODO
 

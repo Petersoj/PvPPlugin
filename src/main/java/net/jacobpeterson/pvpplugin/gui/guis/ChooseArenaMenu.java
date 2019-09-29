@@ -2,6 +2,7 @@ package net.jacobpeterson.pvpplugin.gui.guis;
 
 import net.jacobpeterson.pvpplugin.PvPPlugin;
 import net.jacobpeterson.pvpplugin.arena.Arena;
+import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.pvpplugin.game.Game;
 import net.jacobpeterson.pvpplugin.gui.AbstractInventoryGUI;
@@ -26,6 +27,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     protected final Logger LOGGER;
 
+    protected final ArenaManager arenaManager;
     protected final PlayerGUIManager playerGUIManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
@@ -34,11 +36,13 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      * Instantiates a new 'Choose Arena' menu. This is meant to be extended by other GUI/menus
      * as this is a general viewer.
      *
+     * @param arenaManager     the arena manager
      * @param playerGUIManager the player gui manager
      * @param title            the title
      */
-    public ChooseArenaMenu(PlayerGUIManager playerGUIManager, String title) {
+    public ChooseArenaMenu(ArenaManager arenaManager, PlayerGUIManager playerGUIManager, String title) {
         this.LOGGER = PvPPlugin.getPluginLogger();
+        this.arenaManager = arenaManager;
         this.playerGUIManager = playerGUIManager;
         this.title = title;
         this.arenaItemStacks = new ArrayList<>();

@@ -1,5 +1,7 @@
 package net.jacobpeterson.pvpplugin.player;
 
+import net.jacobpeterson.pvpplugin.PvPPlugin;
+import net.jacobpeterson.pvpplugin.gui.GUIManager;
 import net.jacobpeterson.pvpplugin.player.data.PlayerData;
 import net.jacobpeterson.pvpplugin.player.game.PlayerGameManager;
 import net.jacobpeterson.pvpplugin.player.gui.PlayerGUIManager;
@@ -24,10 +26,13 @@ public class PvPPlayer implements Initializers {
      */
     // Package-private so that no instance of this are created without the PlayerManager knowing
     PvPPlayer(PlayerManager playerManager, Player player) {
+        PvPPlugin pvpPlugin = playerManager.getPvPPlugin();
+        GUIManager guiManager = pvpPlugin.getGUIManager();
+
         this.playerManager = playerManager;
         this.player = player;
         this.playerGameManager = new PlayerGameManager(this);
-        this.playerGUIManager = new PlayerGUIManager(this);
+        this.playerGUIManager = new PlayerGUIManager(guiManager, this);
         this.playerInventoryManager = new PlayerInventoryManager(this);
     }
 
@@ -61,6 +66,17 @@ public class PvPPlayer implements Initializers {
      */
     public boolean isPremium() {
         return playerManager.isPlayerPremium(this.getPlayer());
+    }
+
+    /**
+     * Has elevated privileges boolean.
+     * Basically just check is the player has the "game.inventory" permission.
+     *
+     * @return the boolean
+     * @see PlayerInventoryManager#canManipulateInventory()
+     */
+    public boolean hasElevatedPrivileges() {
+        return playerInventoryManager.canManipulateInventory();
     }
 
     /**
