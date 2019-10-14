@@ -64,6 +64,7 @@ public class CommandHandler implements CommandExecutor {
             return;
         }
 
+
         // event.getMessage() includes the '/' in the command e.g. '/help'
         String command = event.getMessage();
 
@@ -457,7 +458,8 @@ public class CommandHandler implements CommandExecutor {
         }
 
         if (args.length == 1) { // args[1] might be 'team' or '<playername>'
-            if (args[0].equalsIgnoreCase("team")) { // Check if second arg is 'team'
+            // Check if second arg is 'team'
+            if (args[0].equalsIgnoreCase("team")) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must specify the team leader " +
                         "of the team you want to duel!");
                 return true;
@@ -536,7 +538,8 @@ public class CommandHandler implements CommandExecutor {
             Team2v2Game duelTeam2v2Game;
             Team2v2 duelTeam2v2;
 
-            if (duelTeam2v2LeaderPlayer == null) { // Check if team leader is online
+            // Check if team leader is online
+            if (duelTeam2v2LeaderPlayer == null) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "Could not find player " +
                         ChatColor.WHITE + duelTeam2v2LeaderName);
                 return true;
@@ -660,7 +663,8 @@ public class CommandHandler implements CommandExecutor {
                     "/accept team <team leader>");
             return true;
         } else if (args.length == 1) { // args[1] might be 'team' or '<playername>'
-            if (args[0].equalsIgnoreCase("team")) { // Check if second arg is 'team'
+            // Check if second arg is 'team'
+            if (args[0].equalsIgnoreCase("team")) {
                 player.sendMessage(ChatUtil.SERVER_CHAT_PREFIX + ChatColor.RED + "You must specify the name of the " +
                         "team leader you want to accept the invite from!");
                 return true;

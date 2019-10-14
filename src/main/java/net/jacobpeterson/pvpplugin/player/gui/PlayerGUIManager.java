@@ -30,12 +30,13 @@ public class PlayerGUIManager implements Initializers, InventoryReferenceMatcher
      */
     public PlayerGUIManager(GUIManager guiManager, PvPPlayer pvpPlayer) {
         ArenaManager arenaManager = guiManager.getPvPPlugin().getArenaManager();
+        GameManager gameManager = guiManager.getPvPPlugin().getGameManager();
 
         this.pvpPlayer = pvpPlayer;
         this.guiManager = guiManager;
-        this.ranked1v1Menu = new Ranked1v1Menu(arenaManager, this);
+        this.ranked1v1Menu = new Ranked1v1Menu(arenaManager, gameManager, this);
         this.team2v2Menu = new Team2v2Menu(this);
-        this.team2v2ArenaMenu = new Team2v2ArenaMenu(arenaManager, this);
+        this.team2v2ArenaMenu = new Team2v2ArenaMenu(arenaManager, gameManager, this);
         this.team2v2CraftTeamMenu = new Team2v2CraftTeamMenu(this);
     }
 

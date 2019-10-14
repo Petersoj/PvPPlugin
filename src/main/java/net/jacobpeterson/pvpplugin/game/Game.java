@@ -9,6 +9,7 @@ import net.jacobpeterson.pvpplugin.util.Initializers;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,8 @@ public abstract class Game implements Initializers {
     protected ArrayList<PvPPlayer> invitedPlayers;
     protected AbstractGameEventHandlers gameEventHandlers;
     protected ArrayList<PvPPlayer> pvpPlayers;
+    protected BukkitRunnable teleportCountDownRunnable;
+    protected BukkitRunnable startCountDownRunnable;
 
     /**
      * Instantiates a new Game which represents an instance of a game in an Arena.
@@ -43,6 +46,7 @@ public abstract class Game implements Initializers {
 
     /**
      * Start the game.
+     * Note: This method assumes that every player is ready to start the game.
      */
     public abstract void start();
 
@@ -212,5 +216,23 @@ public abstract class Game implements Initializers {
      */
     public ArrayList<PvPPlayer> getPvPPlayers() {
         return pvpPlayers;
+    }
+
+    /**
+     * Gets teleport count down runnable.
+     *
+     * @return the teleport count down runnable
+     */
+    public BukkitRunnable getTeleportCountDownRunnable() {
+        return teleportCountDownRunnable;
+    }
+
+    /**
+     * Gets start count down runnable.
+     *
+     * @return the start count down runnable
+     */
+    public BukkitRunnable getStartCountDownRunnable() {
+        return startCountDownRunnable;
     }
 }

@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class ArenaItemStack implements Serializable, Cloneable {
+public abstract class ArenaItemStack implements Serializable {
 
     protected transient Arena arena; // Used strictly for reference
     protected transient ItemStack itemStack; // No need to serialize because methods below can create it new
@@ -86,11 +86,12 @@ public abstract class ArenaItemStack implements Serializable, Cloneable {
     }
 
     /**
-     * Clones this ArenaItemStack, preserving instance type.
+     * Soft copy this ArenaItemStack, preserving instance type.
+     * Will basically call a copy constructor.
      *
      * @return the cloned ArenaItemStack
      */
-    public abstract ArenaItemStack clone();
+    public abstract ArenaItemStack softCopy();
 
     /**
      * Gets arena.

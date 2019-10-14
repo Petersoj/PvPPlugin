@@ -7,6 +7,9 @@ import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.game.game.ranked1v1.listener.Ranked1v1EventHandlers;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
 import net.jacobpeterson.pvpplugin.util.Initializers;
+import net.jacobpeterson.pvpplugin.util.PlayerUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Ranked1v1Game extends Game implements Initializers {
 
@@ -27,6 +30,33 @@ public class Ranked1v1Game extends Game implements Initializers {
 
     @Override
     public void init() {
+        teleportCountDownRunnable = new BukkitRunnable() {
+            int teleportCountDown = 4;
+
+            @Override
+            public void run() {
+                if (teleportCountDown == 0) {
+                    this.cancel();
+                    // The rest is handled in the Game#startCountDownRunnable
+                } else {
+                    teleportCountDown--;
+                }
+
+                String teleportCountDownString = String.valueOf(teleportCountDown);
+                String subtitleString = ChatColor.WHITE + "second" + (teleportCountDown != 1 ? "s" : "") +
+                        " to arena teleport!";
+
+                PlayerUtil.sendTitle(dueler.getPlayer(), teleportCountDownString, subtitleString, 0, 20, 0);
+                PlayerUtil.sendTitle(acceptor.getPlayer(), teleportCountDownString, subtitleString, 0, 20, 0);
+            }
+        };
+
+        this.startCountDownRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+
+            }
+        };
     }
 
     @Override
@@ -35,13 +65,18 @@ public class Ranked1v1Game extends Game implements Initializers {
 
     @Override
     public void start() {
-        // Start countdown and .join()
-        // Start another countdown
+        inProgress = true;
+
+        teleportCountDownRunnable.runTaskTimer(gameManager.getPvPPlugin(), 0, 20);
+        startCountDownRunnable.runTaskTimer(gameManager.getPvPPlugin(), 20 * 4, 20);
     }
 
     @Override
     public void stop() {
+        inProgress = false;
 
+        teleportCountDownRunnable.cancel();
+        startCountDownRunnable.cancel();
     }
 
     @Override

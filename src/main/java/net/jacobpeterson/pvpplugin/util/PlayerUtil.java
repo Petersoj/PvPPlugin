@@ -9,7 +9,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
-import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -40,24 +39,36 @@ public final class PlayerUtil {
      * Sends title to player via NMS.
      *
      * @param player      the player
-     * @param title       the title (true for title, false for subtitle)
-     * @param text        the text
+     * @param title       the title (can be null)
+     * @param subtitle    the subtitle (can be null)
      * @param fadeInTime  the fade in time in ticks
      * @param showTime    the show time in ticks
      * @param fadeOutTime the fade out time in ticks
-     * @param color       the color
      */
-    public static void sendTitle(Player player, boolean title, String text,
-                                 int fadeInTime, int showTime, int fadeOutTime, ChatColor color) {
+    public static void sendTitle(Player player, String title, String subtitle,
+                                 int fadeInTime, int showTime, int fadeOutTime) {
+        // Send the times first
         PacketPlayOutTitle packetPlayOutTitleTimes = new PacketPlayOutTitle(fadeInTime, showTime, fadeOutTime);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleTimes);
 
-        IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.
-                a("{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
-        PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(
-                title ? PacketPlayOutTitle.EnumTitleAction.TITLE : PacketPlayOutTitle.EnumTitleAction.SUBTITLE,
-                chatBaseComponent);
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitle);
+        if (title != null) {
+            IChatBaseComponent titleChatBaseComponent = IChatBaseComponent.ChatSerializer.
+                    a("{\"text\": \"" + title + "\"}");
+
+            PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(
+                    PacketPlayOutTitle.EnumTitleAction.TITLE, titleChatBaseComponent);
+
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitle);
+        }
+        if (subtitle != null) {
+            IChatBaseComponent subTitleChatBaseComponent = IChatBaseComponent.ChatSerializer.
+                    a("{\"text\": \"" + subtitle + "\"}");
+
+            PacketPlayOutTitle packetPlayOutSubtitle = new PacketPlayOutTitle(
+                    PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitleChatBaseComponent);
+
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutSubtitle);
+        }
     }
 
     /**
@@ -66,11 +77,10 @@ public final class PlayerUtil {
      * @param player the player
      */
     public static void clearTitle(Player player) {
-        IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a(""); // No text needed
-        PacketPlayOutTitle packetPlayOutTitleClear = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.CLEAR,
-                chatBaseComponent);
-        PacketPlayOutTitle packetPlayOutTitleReset = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.RESET,
-                chatBaseComponent);
+        PacketPlayOutTitle packetPlayOutTitleClear = new PacketPlayOutTitle(
+                PacketPlayOutTitle.EnumTitleAction.CLEAR, null);
+        PacketPlayOutTitle packetPlayOutTitleReset = new PacketPlayOutTitle(
+                PacketPlayOutTitle.EnumTitleAction.RESET, null);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleClear);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutTitleReset);
     }

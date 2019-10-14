@@ -84,7 +84,6 @@ public class GameManager implements Initializers {
      * Should be called whenever there is an addition/removal of arenas.
      * Will also stop/deinit games as necessary.
      */
-    @SuppressWarnings("SuspiciousMethodCalls") // Suppress this warning because we know that value exists in Map
     public void updateArenaReferences() {
         ArenaManager arenaManager = pvpPlugin.getArenaManager();
 
@@ -164,12 +163,29 @@ public class GameManager implements Initializers {
     }
 
     /**
+     * Updates ranked 1v1 games (manages queue)
+     */
+    public void updateRanked1v1Games() {
+        for (Ranked1v1Arena ranked1v1Arena : ranked1v1GameQueueMap.keySet()) {
+            LinkedList<Ranked1v1Game> ranked1v1GameQueue = ranked1v1GameQueueMap.get(ranked1v1Arena);
+
+            // Check if games are in queue and game in queue front is in progress
+            if (ranked1v1GameQueue.size() > 0 && !ranked1v1GameQueue.peek().isInProgress()) {
+                // TODO
+            }
+        }
+    }
+
+    /**
      * Checks if a game is in a queue.
      *
      * @param game the game
      * @return the boolean
      */
     public boolean isInQueue(Game game) {
+        if (game == null) {
+            return false;
+        }
         if (game.getArena() == null) {
             return false;
         }
@@ -196,10 +212,14 @@ public class GameManager implements Initializers {
 
     /**
      * Removes a game from its queue.
+     * Note: This method assumes that all the PlayerGameManager managing has been done.
      *
      * @param game the game
      */
     public void removeFromQueue(Game game) {
+        if (game == null) {
+            return;
+        }
         if (game.getArena() == null) {
             return;
         }
@@ -214,12 +234,17 @@ public class GameManager implements Initializers {
 
     /**
      * Handles a player leaving the queue (sends messages to affected players, dissolves games, etc.).
+     * Note: This method assumes that the game is NOT in progress, if it is, then it will throw an exception.
      *
      * @param pvpPlayer the pvp player
      */
     public void handlePlayerLeaveQueue(PvPPlayer pvpPlayer) {
         PlayerGameManager playerGameManager = pvpPlayer.getPlayerGameManager();
         Game playerCurrentGame = playerGameManager.getCurrentGame();
+
+        if (playerCurrentGame != null && playerCurrentGame.isInProgress()) {
+            throw new RuntimeException();
+        }
 
         if (this.isInQueue(playerCurrentGame)) { // Check if game is in arena queue
             // Remove this game from queue because all players have to be present in order for the game to be valid

@@ -5,6 +5,7 @@ import net.jacobpeterson.pvpplugin.arena.Arena;
 import net.jacobpeterson.pvpplugin.arena.ArenaManager;
 import net.jacobpeterson.pvpplugin.arena.itemstack.ArenaItemStack;
 import net.jacobpeterson.pvpplugin.game.Game;
+import net.jacobpeterson.pvpplugin.game.GameManager;
 import net.jacobpeterson.pvpplugin.gui.AbstractInventoryGUI;
 import net.jacobpeterson.pvpplugin.itemstack.ItemStackUtil;
 import net.jacobpeterson.pvpplugin.player.PvPPlayer;
@@ -29,6 +30,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
 
     protected final ArenaManager arenaManager;
     protected final PlayerGUIManager playerGUIManager;
+    protected final GameManager gameManager;
     protected String title;
     protected ArrayList<ArenaItemStack> arenaItemStacks;
 
@@ -38,12 +40,15 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
      *
      * @param arenaManager     the arena manager
      * @param playerGUIManager the player gui manager
+     * @param gameManager      the game manager
      * @param title            the title
      */
-    public ChooseArenaMenu(ArenaManager arenaManager, PlayerGUIManager playerGUIManager, String title) {
+    public ChooseArenaMenu(ArenaManager arenaManager, PlayerGUIManager playerGUIManager, GameManager gameManager,
+                           String title) {
         this.LOGGER = PvPPlugin.getPluginLogger();
         this.arenaManager = arenaManager;
         this.playerGUIManager = playerGUIManager;
+        this.gameManager = gameManager;
         this.title = title;
         this.arenaItemStacks = new ArrayList<>();
     }
@@ -122,7 +127,7 @@ public abstract class ChooseArenaMenu extends AbstractInventoryGUI {
                     LOGGER.warning("No ArenaItemStack exists for " + arena.getNameIdentifier() + "!");
                     continue; // Skip below and continue looping through arenas
                 } else {
-                    arenaItemStack = arenaItemStack.clone();
+                    arenaItemStack = arenaItemStack.softCopy(); // Preserves instance type
                 }
                 Game currentGame = gameQueueMap.get(arena).peek();
 
